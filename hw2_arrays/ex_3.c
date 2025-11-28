@@ -9,7 +9,7 @@
 
 int input(unsigned int *number);
 void triangle_matrix(int matrix[N][N], int matrix_size);
-void print_matrix(int matrix[N][N], int matrix_size);
+void print_matrix(const int matrix[N][N], int matrix_size);
 
 // =================================================================
 int main() {
@@ -56,7 +56,7 @@ void triangle_matrix(int matrix[N][N], int matrix_size) {
   }
 }
 
-void print_matrix(int matrix[N][N], int matrix_size) {
+void print_matrix(const int matrix[N][N], int matrix_size) {
   for (int i = 0; i < matrix_size; i++) {
     for (int j = 0; j < matrix_size; j++) {
       printf("%-*d", WIDTH, matrix[i][j]);

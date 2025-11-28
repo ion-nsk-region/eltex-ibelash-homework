@@ -9,7 +9,7 @@
 void flip_array(int array[N], int array_size);
 void generate_array(int array[N], int array_size);
 int input(int *number);
-void print_array(int array[N], int array_size);
+void print_array(const int array[N], int array_size);
 
 // ==================================================================
 int main() {
@@ -39,10 +39,9 @@ int main() {
 // ==================================================================
 
 void flip_array(int array[N], int array_size) {
-  int tmp, ind_opp;
   int middle = array_size / 2;
 
-  for (int i = 0; i < middle; i++) {
+  for (int tmp, ind_opp, i = 0; i < middle; i++) {
     ind_opp = array_size - i - 1;  // индекс противоположного элемента
 
     tmp = array[i];
@@ -64,7 +63,7 @@ int input(int *number) {
   return 0;
 }
 
-void print_array(int array[N], int array_size) {
+void print_array(const int array[N], int array_size) {
   printf("%d", array[0]);
   for (int i = 1; i < array_size; i++) {
     printf(" %d", array[i]);
