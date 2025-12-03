@@ -32,17 +32,18 @@ int main() {
 
   while (5 != menu_item) {
     menu_item = menu();
-    if (-1 == menu_item) {
-      printf(
-          "Ошибка: такого пункта меню не существует.\n"
-          "        Пожалуйста введите только одну цифру.\n");
-    }
+
     switch (menu_item) {
+      case -1:
+        printf(
+            "Ошибка: Такого пункта меню не существует.\n"
+            "        Пожалуйста введите только одну цифру.\n");
+        break;
       case 1:
         if (100 <= directory_size) {
           printf(
               "Ошибка: Превышен допустимый размер справочника.\n"
-              "Пожалуйста, удалите лишние записи.\n");
+              "        Пожалуйста, удалите лишние записи.\n");
           break;
         }
         if (0 == abonent_add(directory)) {
@@ -55,20 +56,28 @@ int main() {
         }
         break;
       case 3:
+        if (0 >= directory_size) {
+            printf("Справочник пуст.\n");
+            break;
+        }
         if (0 != directory_search(directory, directory_size)) {
           printf("Ошибка: Неверный ввод. Пожалуйста, введите снова.");
         }
         break;
       case 4:
-        list_all_abonents(directory);
-        printf("Всего абонентов: %d\n", directory_size);
+        if(0 < directory_size) {
+                list_all_abonents(directory);
+            printf("Всего абонентов: %d\n", directory_size);
+        } else {
+            printf("Справочник пуст.\n");
+        }
         break;
       case 5:
         printf("Выходим.\n");
         break;
       default:
-        printf("Ошибка: пункт меню %d) всё ещё в разработке.\n", menu_item);
-        printf("Пожалуйста, выберите другой пункт меню.\n");
+        printf("Ошибка: Пункт меню %d) всё ещё в разработке.\n", menu_item);
+        printf("        Пожалуйста, выберите другой пункт меню.\n");
         break;
     }
   }
@@ -118,7 +127,9 @@ int abonent_add(struct abonent directory[DIR_SIZE]) {
     return 3;
   }
 
-  index = abonent_search(directory, "000000000\0", 0);
+  index = abonent_search(directory, "000000000\0", 0); 
+  // Мы предполагаем что никто не станет вводить имя из одних только нулей
+
   for (int i = 0; i < FIELD_SIZE - 1; i++) {
     directory[index].name[i] = new_abonent.name[i];
     directory[index].second_name[i] = new_abonent.second_name[i];
@@ -147,7 +158,8 @@ int field_input(char field[FIELD_SIZE]) {
     i++;
   }
   buf[i] = '\0';  // заменяем перенос строки на конец строки
-                  // Возможно надо поколдовать с вводом на Windows и Mac.
+                  // Возможно надо поколдовать с вводом на Windows и Mac,
+                  // но я не проверял за неимением оных под рукой.
   if (i > n) {
     printf(
         "Ошибка: Введённые данные больше %d байт.\n"
@@ -175,6 +187,14 @@ int abonent_del_interactive(struct abonent directory[DIR_SIZE]) {
     printf("Ошибка: id за пределами возможных значений от 0 до %d\n", DIR_SIZE);
     return 2;
   }
+  // Мы предполагаем, что FIELD_SIZE равно 10, отсюда такие "нулевые" строки
+  if (0 == string_compare(directory[id].name, "000000000\0") &&
+      0 == string_compare(directory[id].second_name, "000000000\0") &&
+      0 == string_compare(directory[id].tel, "000000000\0")) {
+    printf("Пустая запись. Уже удалено?\n");
+    return 3;
+  }
+
   abonent_del(&directory[id]);
   return 0;
 }
@@ -248,7 +268,10 @@ int string_compare(char string1[], char string2[]) {
 }
 
 void abonent_print(struct abonent abonent) {
-  printf("%-10s %-10s %-10s\n", abonent.name, abonent.second_name, abonent.tel);
+  // Позиции колонок захардкодил.
+  // Иначе мультибайтные символы отображаются со смещением.
+  printf("\033[5G%s\033[16G%s\033[27G%s\n", abonent.name, abonent.second_name,
+         abonent.tel);
 }
 
 void list_all_abonents(struct abonent directory[DIR_SIZE]) {
