@@ -7,54 +7,139 @@
 
 #include <stdio.h>
 
-#define DIR_SIZE 100 ///< Размер справочника
-#define FIELD_SIZE 10 ///< Размер поля для ввода данных
+#define DIR_SIZE 100   ///< Размер справочника
+#define FIELD_SIZE 10  ///< Размер поля для ввода данных
 
 /*!
  * \brief Структура, хранящая имена и телефоны абонентов.
  *
  * По каждому абоненту в справочнике хранится следующая информация:
- * - имя 
+ * - имя
  * - второе имя (фамилия)
  * - телефон.
  *
  * Размер данных не более #FIELD_SIZE символов для латиницы и в два раза меньше
  * для кириллицы.
  */
-struct abonent {
-  char name[FIELD_SIZE]; ///< Имя абонента 
-  char second_name[FIELD_SIZE]; ///< Второе имя (Фамилия) абонента
-  char tel[FIELD_SIZE]; ///< Номер телефона абонента
+struct Abonent {
+  char name[FIELD_SIZE];  ///< Имя абонента
+  char second_name[FIELD_SIZE];  ///< Второе имя (Фамилия) абонента
+  char tel[FIELD_SIZE];  ///< Номер телефона абонента
 };
 
 /*!
- * \brief Создаёт новую запись об абоненте. 
+ * \brief Создаёт новую запись об абоненте.
  *
  * Новая запись помещается в первую свободную (заполненную нулями) ячейку.
- * \param[in,out] directory Ссылка на справочник (массив) с абонентами.
+ * \param[in,out] directory Ссылка на справочник (массив) с абонентами. 
+ * Размер справочника задаётся в макросе #DIR_SIZE.
  * \return Код ошибки, где:
- * - 0 - всё в порядке
- * - 1 - произошла ошибка во время ввода имени
- * - 2 - произошла ошибка во время ввода второго имени
- * - 3 - произошла ошибка во время ввода телефона    
- * \todo Передавать в сообщение об ошибке код ошибки из функции #field_input.
+ * - 0 - всё в порядке.
+ * - 1 - произошла ошибка во время ввода имени.
+ * - 2 - произошла ошибка во время ввода второго имени.
+ * - 3 - произошла ошибка во время ввода телефона.
+ * \todo Передавать в сообщение об ошибке код ошибки из функции #field_input
+ * или человекопонятное объяснение, о том что именно вызвало ошибку и что
+ * делать, чтобы ошибки больше не возникало.
  */
-int abonent_add(struct abonent directory[DIR_SIZE]);
-int abonent_del_interactive(struct abonent directory[DIR_SIZE]);
-void abonent_del(struct abonent *abonent);
-void abonent_print(struct abonent abonent);
-int abonent_search(struct abonent directory[DIR_SIZE], char name[FIELD_SIZE],
+int abonent_add(struct Abonent directory[DIR_SIZE]);
+
+/*!
+ * \brief Интерактивное удаление абонента.
+ *
+ * Удаляет запись по id абонента. Обёртка для #abonent_del.
+ * \param[in] id Номер записи в справочнике, которую необходимо удалить. 
+ * Не параметр функции: Интерактивный ввод с клавиатуры.
+ * \param[in,out] directory Ссылка на справочник (массив) с абонентами.
+ * Размер справочника задаётся в макросе #DIR_SIZE.
+ * \return Код ошибки, где:
+ * - 0 - всё в порядке.
+ * - 1 - введено не число.
+ * - 2 - введённое id за пределами возможных значений.
+ * - 3 - пустая запись. Уже удалено?
+ */
+int abonent_del_interactive(struct Abonent directory[DIR_SIZE]);
+
+/*!
+ * \brief Удаление абонента.
+ *
+ * Удаляет запись по указателю на конкретного абонента.
+ * Удаление заключается в заполнении всех полей нулями.
+ * \param[in] *abonent указатель на абонента.
+ */
+void abonent_del(struct Abonent *abonent);
+
+/*!
+ * \brief Вывод информации об абоненте.
+ *
+ * Выводит информацию об абоненте в строку. Поля начинаются со следующих
+ * колонок: 
+ * - имя - с 5й колонки; 
+ * - второе имя - с 16й колонки;
+ * - телефон - с 27й колонки.
+ *
+ * Предназначена для использования в составе других функций. 
+ *
+ * \param[in] abonent абонент, информацию о котором надо вывести.
+ */
+void abonent_print(struct Abonent abonent);
+
+/*!
+ * \brief Поиск id абонента в справочнике по имени.
+ *
+ * Предназначена для использования в составе других функций. 
+ *
+ * \param[in] directory Ссылка на справочник (массив) с абонентами.
+ * Размер справочника задаётся в макросе #DIR_SIZE.
+ * \param[in] name Имя, по которому надо найти абонента.
+ * \param[in] start Индекс в справочнике, с которого надо начать поиск.
+ * \return 
+ * - id абонента с совпадающим именем.
+ * - -1 если ничего не найдено.
+ */
+int abonent_search(struct Abonent directory[DIR_SIZE], char name[FIELD_SIZE],
                    int start);
-void clear_dir(struct abonent directory[DIR_SIZE]);
-int directory_search(struct abonent directory[DIR_SIZE], int dir_size);
+
+/*!
+ * \brief Заполнить все записи справочника нулями.
+ *
+ * Вызывает #abonent_del для всего справочника.
+ *
+ * \param[in] directory Ссылка на справочник (массив) с абонентами.
+ * Размер справочника задаётся в макросе #DIR_SIZE.
+ */
+void clear_dir(struct Abonent directory[DIR_SIZE]);
+
+/*!
+ * \brief Интерактивный поиск абонентов.
+ *
+ * \param[in] directory Ссылка на справочник (массив) с абонентами.
+ * Размер справочника задаётся в макросе #DIR_SIZE.
+ * \param[in] dir_size Текущий размер справочника.
+ * \return 
+ * - 0 - всё в порядке.
+ * - код ошибки функции #field_input. 
+ */
+int directory_search(struct Abonent directory[DIR_SIZE], int dir_size);
+
+/*!
+ * \brief Обработка консольного ввода.
+ *
+ * \param[in,out] field поле, в которое надо записать введённые данные.
+ * \return Код ошибки, где:
+ * - 0 - всё в порядке.
+ * - 1 - ошибка при чтении данных.
+ * - 2 - пустой ввод, то есть ничего не было введено.
+ * - 3 - введено больше, чем размер поля #FIELD_SIZE.
+ */
 int field_input(char field[FIELD_SIZE]);
-void list_all_abonents(struct abonent directory[DIR_SIZE]);
+void list_all_abonents(struct Abonent directory[DIR_SIZE]);
 int menu();
 int string_compare(char string1[], char string2[]);
 
 // ====================================================================
 int main() {
-  struct abonent directory[DIR_SIZE];
+  struct Abonent directory[DIR_SIZE];
   int directory_size = 0;
   int menu_item = 0;
 
@@ -87,19 +172,19 @@ int main() {
         break;
       case 3:
         if (0 >= directory_size) {
-            printf("Справочник пуст.\n");
-            break;
+          printf("Справочник пуст.\n");
+          break;
         }
         if (0 != directory_search(directory, directory_size)) {
           printf("Ошибка: Неверный ввод. Пожалуйста, введите снова.");
         }
         break;
       case 4:
-        if(0 < directory_size) {
-                list_all_abonents(directory);
-            printf("Всего абонентов: %d\n", directory_size);
+        if (0 < directory_size) {
+          list_all_abonents(directory);
+          printf("Всего абонентов: %d\n", directory_size);
         } else {
-            printf("Справочник пуст.\n");
+          printf("Справочник пуст.\n");
         }
         break;
       case 5:
@@ -135,8 +220,8 @@ int menu() {
   return item;
 }
 
-int abonent_add(struct abonent directory[DIR_SIZE]) {
-  struct abonent new_abonent;
+int abonent_add(struct Abonent directory[DIR_SIZE]) {
+  struct Abonent new_abonent;
   int index;
 
   printf("Введите имя: ");
@@ -157,7 +242,7 @@ int abonent_add(struct abonent directory[DIR_SIZE]) {
     return 3;
   }
 
-  index = abonent_search(directory, "000000000\0", 0); 
+  index = abonent_search(directory, "000000000\0", 0);
   // Мы предполагаем что никто не станет вводить имя из одних только нулей
 
   for (int i = 0; i < FIELD_SIZE - 1; i++) {
@@ -206,7 +291,7 @@ int field_input(char field[FIELD_SIZE]) {
   return 0;
 }
 
-int abonent_del_interactive(struct abonent directory[DIR_SIZE]) {
+int abonent_del_interactive(struct Abonent directory[DIR_SIZE]) {
   int id;
   printf("Пожалуйста, укажите id абонента для удаления: ");
   if (1 != scanf("%d", &id)) {
@@ -229,7 +314,7 @@ int abonent_del_interactive(struct abonent directory[DIR_SIZE]) {
   return 0;
 }
 
-void abonent_del(struct abonent *the_abonent) {
+void abonent_del(struct Abonent *the_abonent) {
   int n = FIELD_SIZE - 1;
   for (int i = 0; i < n; i++) {
     the_abonent->name[i] = '0';
@@ -241,13 +326,13 @@ void abonent_del(struct abonent *the_abonent) {
   the_abonent->tel[n] = '\0';
 }
 
-void clear_dir(struct abonent directory[DIR_SIZE]) {
+void clear_dir(struct Abonent directory[DIR_SIZE]) {
   for (int i = 0; i < DIR_SIZE; i++) {
     abonent_del(&directory[i]);
   }
 }
 
-int directory_search(struct abonent directory[DIR_SIZE], int dir_size) {
+int directory_search(struct Abonent directory[DIR_SIZE], int dir_size) {
   int index = 0, res;
   char name[FIELD_SIZE];
   printf("Введите имя для поиска: ");
@@ -271,7 +356,7 @@ int directory_search(struct abonent directory[DIR_SIZE], int dir_size) {
   return 0;
 }
 
-int abonent_search(struct abonent directory[DIR_SIZE], char name[FIELD_SIZE],
+int abonent_search(struct Abonent directory[DIR_SIZE], char name[FIELD_SIZE],
                    int start) {
   for (int i = start; i < DIR_SIZE; i++) {
     if (0 == string_compare(name, directory[i].name)) {
@@ -297,14 +382,14 @@ int string_compare(char string1[], char string2[]) {
   return 1;
 }
 
-void abonent_print(struct abonent abonent) {
+void abonent_print(struct Abonent abonent) {
   // Позиции колонок захардкодил.
   // Иначе мультибайтные символы отображаются со смещением.
   printf("\033[5G%s\033[16G%s\033[27G%s\n", abonent.name, abonent.second_name,
          abonent.tel);
 }
 
-void list_all_abonents(struct abonent directory[DIR_SIZE]) {
+void list_all_abonents(struct Abonent directory[DIR_SIZE]) {
   printf("id: Имя:       Фамилия:   Телефон:\n");
   for (int i = 0; i < DIR_SIZE; i++) {
     if (1 == string_compare(directory[i].name, "000000000\0")) {
