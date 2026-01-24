@@ -21,8 +21,16 @@ int main() {
   directory->size = 0;
 
   abonent_add(directory);
+  abonent_add(directory);
+  list_all_abonents(directory);
+  abonent_del(directory, directory->head);
+  list_all_abonents(directory);
+  abonent_del(directory, directory->head);
+  list_all_abonents(directory);
 
-  printf("Name: %s LName: %s Tel: %s\n", directory->head->name, directory->head->second_name, directory->head->tel);
+  free(directory->head);
+  free(directory);
+  directory = NULL;
 
   return 0;
 }

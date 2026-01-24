@@ -81,10 +81,9 @@ int abonent_del_interactive(struct Abonent directory[DIR_SIZE]);
  * \brief Удаление абонента.
  *
  * Удаляет запись по указателю на конкретного абонента.
- * Удаление заключается в заполнении всех полей нулями.
  * \param[in] *abonent указатель на абонента.
  */
-void abonent_del(struct Abonent *abonent);
+int abonent_del(struct Directory *dir, struct Abonent *the_abonent); 
 
 /*!
  * \brief Вывод информации об абоненте.
@@ -159,7 +158,7 @@ int field_input(char field[FIELD_SIZE]);
  * \param[in] directory Ссылка на справочник (массив) с абонентами.
  * Размер справочника задаётся в макросе #DIR_SIZE.
  */
-void list_all_abonents(struct Abonent directory[DIR_SIZE]);
+void list_all_abonents(struct Directory *dir);
 
 /*!
  * \brief Вывод консольного меню.
