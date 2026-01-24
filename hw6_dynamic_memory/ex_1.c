@@ -22,11 +22,14 @@
  * и программа продолжает выполняться до победного выхода.
  */
 int main() {
-  struct Abonent directory[DIR_SIZE];
-  int directory_size = 0;
+  struct Directory *directory =
+      (struct Directory *)malloc(sizeof(struct Directory));
+  directory->head = NULL;
+  directory->tail = NULL;
+  directory->size = 0;
   int menu_item = 0;
 
-  clear_dir(directory);
+  //  clear_dir(directory);
 
   while (5 != menu_item) {
     menu_item = menu();
@@ -38,39 +41,40 @@ int main() {
             "        Пожалуйста введите только одну цифру.\n");
         break;
       case 1:
-        if (100 <= directory_size) {
+        if (MAX_DIR_SIZE <= directory->size) {
           printf(
               "Ошибка: Превышен допустимый размер справочника.\n"
               "        Пожалуйста, удалите лишние записи.\n");
           break;
         }
         if (0 == abonent_add(directory)) {
-          directory_size++;
+          directory->size++;
         }
         break;
       case 2:
         if (0 == abonent_del_interactive(directory)) {
-          directory_size--;
+          directory->size--;
         }
         break;
       case 3:
-        if (0 >= directory_size) {
+        if (0 >= directory->size) {
           printf("Справочник пуст.\n");
           break;
         }
-        if (0 != directory_search(directory, directory_size)) {
+        if (0 != directory_search(directory)) {
           printf("Ошибка: Неверный ввод. Пожалуйста, введите снова.");
         }
         break;
       case 4:
-        if (0 < directory_size) {
+        if (0 < directory->size) {
           list_all_abonents(directory);
-          printf("Всего абонентов: %d\n", directory_size);
+          printf("Всего абонентов: %d\n", directory->size);
         } else {
           printf("Справочник пуст.\n");
         }
         break;
       case 5:
+  //  clear_dir(directory);
         printf("Выходим.\n");
         break;
       default:
@@ -83,4 +87,3 @@ int main() {
   return 0;
 }
 // ====================================================================
-

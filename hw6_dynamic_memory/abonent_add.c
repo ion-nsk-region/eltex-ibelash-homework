@@ -1,36 +1,52 @@
 #include "abonent_dir.h"
 
-int abonent_add(struct Abonent directory[DIR_SIZE]) {
-  struct Abonent new_abonent;
-  int index;
+int abonent_add(struct Directory *directory) {
+  if (NULL == directory) {
+    return -1;
+  }
+  struct Abonent *new_abonent =
+      (struct Abonent *)malloc(sizeof(struct Abonent));
+  if (NULL == new_abonent) {
+    printf("Новая запись не создана: Не удалось выделить память.\n"
+           "Попробуйте снова.\n");
+    return -2;
+  }
 
   printf("Введите имя: ");
-  if (0 != field_input(new_abonent.name)) {
-    printf("Новая запись не создана. Попробуйте снова.\n");
+  if (0 != field_input(new_abonent->name)) {
+    printf("Новая запись не создана: Ошибка при вводе имени.\n"
+           "Попробуйте снова.\n");
+    free(new_abonent);
     return 1;
   }
 
   printf("Введите фамилию: ");
-  if (0 != field_input(new_abonent.second_name)) {
-    printf("Новая запись не создана. Попробуйте снова.\n");
+  if (0 != field_input(new_abonent->second_name)) {
+    printf("Новая запись не создана: Ошибка при вводе фамилии.\n"
+           "Попробуйте снова.\n");
+    free(new_abonent);
     return 2;
   }
 
   printf("Введите телефон: ");
-  if (0 != field_input(new_abonent.tel)) {
-    printf("Новая запись не создана. Попробуйте снова.\n");
+  if (0 != field_input(new_abonent->tel)) {
+    printf("Новая запись не создана: Ошибка при вводе телефона.\n"
+           "Попробуйте снова.\n");
+    free(new_abonent);
     return 3;
   }
 
-  index = abonent_search(directory, "000000000\0", 0);
-  // Мы предполагаем что никто не станет вводить имя из одних только нулей
+  new_abonent->prev = directory->tail;
+  new_abonent->next = NULL;
 
-  for (int i = 0; i < FIELD_SIZE - 1; i++) {
-    directory[index].name[i] = new_abonent.name[i];
-    directory[index].second_name[i] = new_abonent.second_name[i];
-    directory[index].tel[i] = new_abonent.tel[i];
+  if (NULL == directory->head) {
+    directory->head = new_abonent;
   }
+  if (NULL != directory->tail) {
+    directory->tail->next = new_abonent;
+  }
+  directory->tail = new_abonent;
+  directory->size++;
 
   return 0;
 }
-
