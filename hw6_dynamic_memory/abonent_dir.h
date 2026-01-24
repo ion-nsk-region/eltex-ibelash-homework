@@ -105,16 +105,13 @@ void abonent_print(struct Abonent abonent);
  *
  * \note Предназначена для использования в составе других функций.
  *
- * \param[in] directory Ссылка на справочник (массив) с абонентами.
- * Размер справочника задаётся в макросе #DIR_SIZE.
+ * \param[in] start Указатель на абонента, с которого надо начать поиск.
  * \param[in] name Имя, по которому надо найти абонента.
- * \param[in] start Индекс в справочнике, с которого надо начать поиск.
- * \return
- * - id абонента с совпадающим именем.
- * - -1 если ничего не найдено.
+ * \return типа Struct Abonent
+ * - Указатель на абонента с совпадающим именем.
+ * - NULL если ничего не найдено.
  */
-int abonent_search(struct Abonent directory[DIR_SIZE], char name[FIELD_SIZE],
-                   int start);
+struct Abonent *abonent_search(struct Abonent *start, char name[FIELD_SIZE]);
 
 /*!
  * \brief Заполнить все записи справочника нулями.
