@@ -1,24 +1,24 @@
 #include "abonent_dir.h"
 
-int directory_search(struct Abonent directory[DIR_SIZE], int dir_size) {
-  int index = 0, res;
+int directory_search(struct Directory *dir) {
+  int res;
   char name[FIELD_SIZE];
+  struct Abonent *abonent = dir->head;
+
   printf("Введите имя для поиска: ");
   res = field_input(name);
   if (0 != res) {
     return res;
   }
 
-  printf("id: Имя:       Фамилия:   Телефон:\n");
-
-  for (int i = 0; i < dir_size; i++) {
-    index = abonent_search(directory, name, index);
-    if (-1 == index) {
-      break;
-    }
-    printf("%3d ", index);
-    abonent_print(directory[index]);
-    index++;
+  printf("id:  Имя:       Фамилия:   Телефон:\n");
+  int i = 0;
+  while(NULL != abonent) {
+    i++;
+    printf("%3d ", i);
+    abonent = abonent_search(abonent, name);
+    abonent_print(*abonent);
+    abonent = abonent->next;
   }
   printf("\n");
   return 0;

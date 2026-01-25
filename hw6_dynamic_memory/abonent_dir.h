@@ -107,7 +107,7 @@ void abonent_print(struct Abonent abonent);
  *
  * \param[in] start Указатель на абонента, с которого надо начать поиск.
  * \param[in] name Имя, по которому надо найти абонента.
- * \return типа Struct Abonent
+ * \return
  * - Указатель на абонента с совпадающим именем.
  * - NULL если ничего не найдено.
  */
@@ -127,14 +127,11 @@ void clear_dir(struct Abonent directory[DIR_SIZE]);
  * \brief Интерактивный поиск абонентов.
  *
  * \param[in] directory Ссылка на справочник (массив) с абонентами.
- * Размер справочника задаётся в макросе #DIR_SIZE.
- * \param[in] dir_size Текущий размер справочника =
- * число действительных записей.
  * \return
  * - 0 - всё в порядке.
  * - код ошибки функции #field_input.
  */
-int directory_search(struct Abonent directory[DIR_SIZE], int dir_size);
+int directory_search(struct Directory *dir);
 
 /*!
  * \brief Обработка консольного ввода.
