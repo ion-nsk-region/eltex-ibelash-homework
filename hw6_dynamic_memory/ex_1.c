@@ -35,12 +35,12 @@ int main() {
     menu_item = menu();
 
     switch (menu_item) {
-      case -1:
+      case MENU_ERROR:
         printf(
             "Ошибка: Такого пункта меню не существует.\n"
             "        Пожалуйста введите только одну цифру.\n");
         break;
-      case 1:
+      case MENU_ADD:
         if (MAX_DIR_SIZE <= directory->size) {
           printf(
               "Ошибка: Превышен допустимый размер справочника.\n"
@@ -51,12 +51,12 @@ int main() {
           directory->size++;
         }
         break;
-      case 2:
+      case MENU_DEL:
         if (0 == abonent_del_interactive(directory)) {
           directory->size--;
         }
         break;
-      case 3:
+      case MENU_SEARCH:
         if (0 >= directory->size) {
           printf("Справочник пуст.\n");
           break;
@@ -65,7 +65,7 @@ int main() {
           printf("Ошибка: Неверный ввод. Пожалуйста, введите снова.");
         }
         break;
-      case 4:
+      case MENU_LIST_ALL:
         if (0 < directory->size) {
           list_all_abonents(directory);
           printf("Всего абонентов: %d\n", directory->size);
@@ -73,7 +73,7 @@ int main() {
           printf("Справочник пуст.\n");
         }
         break;
-      case 5:
+      case MENU_EXIT:
   //  clear_dir(directory);
         printf("Выходим.\n");
         break;

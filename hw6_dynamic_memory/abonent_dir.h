@@ -154,6 +154,15 @@ int field_input(char field[FIELD_SIZE]);
  */
 void list_all_abonents(struct Directory *dir);
 
+enum menu_item {
+    MENU_ERROR = -1,
+    MENU_ADD = 1,
+    MENU_DEL = 2,
+    MENU_SEARCH = 3,
+    MENU_LIST_ALL = 4,
+    MENU_EXIT = 5
+};
+
 /*!
  * \brief Вывод консольного меню.
  *
