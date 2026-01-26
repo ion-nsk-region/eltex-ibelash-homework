@@ -75,7 +75,7 @@ int abonent_add(struct Directory *directory);
  * - 2 - введённое id за пределами возможных значений.
  * - 3 - пустая запись. Уже удалено?
  */
-int abonent_del_interactive(struct Abonent directory[DIR_SIZE]);
+int abonent_del_interactive(struct Directory *dir);
 
 /*!
  * \brief Удаление абонента.
@@ -187,5 +187,16 @@ int menu();
  * - 1 - строки не равны.
  */
 int string_compare(char string1[], char string2[]);
+
+/*
+ * \brief Запрос вида Да/Нет. Где "Нет" это ответ по умолчанию.
+ *
+ * \return
+ * - -2 - Неизвестный вариант ответа
+ * - -1 - Возникла ошибка при чтении данных
+ * - 0 - Нет
+ * - 1 - Да
+ */
+int yesno(void); 
 
 #endif // IBELASH_ABONENT_DIR_H
