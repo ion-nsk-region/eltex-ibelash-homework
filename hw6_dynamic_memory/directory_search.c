@@ -22,7 +22,7 @@ int directory_search(struct Directory *dir) {
     printf("Абоненты с именем \"%s\" не найдены.\n", name);
     return 0;
   }
-  printf("№:   Имя:       Фамилия:   Телефон:\n");
+  printf("№:  Имя:       Фамилия:   Телефон:\n");
   int i = 1;
   printf("%3d ", i);
   abonent_print(*abonent);
@@ -38,6 +38,6 @@ int directory_search(struct Directory *dir) {
       abonent = abonent->next;
     }
   }
-  printf("\n");
+
   return 0;
 }

@@ -29,8 +29,6 @@ int main() {
   directory->size = 0;
   int menu_item = 0;
 
-  //  clear_dir(directory);
-
   while (5 != menu_item) {
     menu_item = menu();
 
@@ -48,12 +46,10 @@ int main() {
           break;
         }
         if (0 == abonent_add(directory)) {
-          directory->size++;
         }
         break;
       case MENU_DEL:
         if (0 == abonent_del_interactive(directory)) {
-          directory->size--;
         }
         break;
       case MENU_SEARCH:
@@ -68,13 +64,14 @@ int main() {
       case MENU_LIST_ALL:
         if (0 < directory->size) {
           list_all_abonents(directory);
-          printf("Всего абонентов: %d\n", directory->size);
         } else {
           printf("Справочник пуст.\n");
         }
         break;
       case MENU_EXIT:
-  //  clear_dir(directory);
+        clear_dir(directory);
+        free(directory);
+        directory = NULL;
         printf("Выходим.\n");
         break;
       default:

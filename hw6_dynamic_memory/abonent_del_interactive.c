@@ -4,7 +4,7 @@
 int abonent_del_interactive(struct Directory *dir) {
   int res;
   char name[FIELD_SIZE];
-  struct Abonent *abonent = dir->head;
+  struct Abonent *abonent = dir->head, *next;
 
   printf("Введите имя абонента для удаления: ");
   res = field_input(name);
@@ -23,6 +23,8 @@ int abonent_del_interactive(struct Directory *dir) {
       break;
     }
     abonent_print(*abonent);
+    next = abonent->next;
+
     printf("Удалить абонента?");
     if (yesno()) {
       res = abonent_del(dir, abonent);
@@ -37,9 +39,8 @@ int abonent_del_interactive(struct Directory *dir) {
     }
     printf("Продолжить поиск следующего совпадения?");
     if (yesno()) {
-      abonent = abonent->next;
-    } else
-      break;
+        abonent = next;
+    } else break;
   }
 
   return 0;
