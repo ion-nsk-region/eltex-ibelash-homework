@@ -119,14 +119,13 @@ void abonent_print(struct Abonent abonent);
 struct Abonent *abonent_search(struct Abonent *start, char name[FIELD_SIZE]);
 
 /*!
- * \brief Заполнить все записи справочника нулями.
+ * \brief Удалить все записи справочника.
  *
  * Вызывает #abonent_del для всего справочника.
  *
- * \param[in] directory Ссылка на справочник (массив) с абонентами.
- * Размер справочника задаётся в макросе #DIR_SIZE.
+ * \param[in] dir Ссылка на справочник (массив) с абонентами.
  */
-void clear_dir(struct Abonent directory[DIR_SIZE]);
+void clear_dir(struct Directory *dir);
 
 /*!
  * \brief Интерактивный поиск абонентов.
