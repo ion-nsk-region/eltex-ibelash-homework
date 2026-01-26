@@ -1,24 +1,46 @@
 #include "abonent_dir.h"
+// #include "yesno.h"
 
-int abonent_del_interactive(struct Abonent directory[DIR_SIZE]) {
-  int id;
-  printf("Пожалуйста, укажите id абонента для удаления: ");
-  if (1 != scanf("%d", &id)) {
-    printf("Ошибка: введено не число.");
-    return 1;
+int abonent_del_interactive(struct Directory *dir) {
+  int res;
+  char name[FIELD_SIZE];
+  struct Abonent *abonent = dir->head;
+
+  printf("Введите имя абонента для удаления: ");
+  res = field_input(name);
+  if (0 != res) {
+    return res;
   }
-  if (-1 >= id || DIR_SIZE <= id) {
-    printf("Ошибка: id за пределами возможных значений от 0 до %d\n", DIR_SIZE);
-    return 2;
-  }
-  // Мы предполагаем, что FIELD_SIZE равно 10, отсюда такие "нулевые" строки
-  if (0 == string_compare(directory[id].name, "000000000\0") &&
-      0 == string_compare(directory[id].second_name, "000000000\0") &&
-      0 == string_compare(directory[id].tel, "000000000\0")) {
-    printf("Пустая запись. Уже удалено?\n");
-    return 3;
+  if (!string_compare("", name)) {
+    printf("Ничего не введено. Ничего не удаляем.\n");
+    return 0;
   }
 
-  abonent_del(&directory[id]);
+  while (NULL != abonent) {
+    abonent = abonent_search(abonent, name);
+    if (NULL == abonent) {
+      printf("Совпадений не найдено.\n");
+      break;
+    }
+    abonent_print(*abonent);
+    printf("Удалить абонента?");
+    if (yesno()) {
+      res = abonent_del(dir, abonent);
+      if (0 != res) {
+        printf(
+            "Произошла ошибка во время удаления."
+            "Код ошибки: %d\n",
+            res);
+        return -1;
+      } else
+        printf("Удалён успешно.\n");
+    }
+    printf("Продолжить поиск следующего совпадения?");
+    if (yesno()) {
+      abonent = abonent->next;
+    } else
+      break;
+  }
+
   return 0;
 }

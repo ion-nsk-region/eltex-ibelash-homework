@@ -82,6 +82,11 @@ int abonent_del_interactive(struct Directory *dir);
  *
  * Удаляет запись по указателю на конкретного абонента.
  * \param[in] *abonent указатель на абонента.
+ * \return
+ * - 0 - всё в порядке
+ * - -1 - Пустой указатель на справочник, или справочник пуст
+ *        или пустые указатели на голову/хвост справочника.
+ * - -2 - Пустой указатель на абонента.
  */
 int abonent_del(struct Directory *dir, struct Abonent *the_abonent); 
 
