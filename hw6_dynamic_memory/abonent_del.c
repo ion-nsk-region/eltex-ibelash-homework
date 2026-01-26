@@ -7,6 +7,10 @@ int abonent_del(struct Directory *dir, struct Abonent *the_abonent) {
     return -1;
   }
   
+  if(NULL == the_abonent) {
+    return -2;
+  }
+  
   if(NULL != the_abonent->prev) {
     /*   v----<-------<-----<-prev
      * prev <-- the_abonent --> next
