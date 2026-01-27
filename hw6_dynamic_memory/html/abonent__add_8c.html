@@ -27,7 +27,7 @@
   <td id="projectalign">
    <div id="projectname">Справочник абонентов
    </div>
-   <div id="projectbrief">CLI интерфейс для работы со справочником на 100 абонентов</div>
+   <div id="projectbrief">CLI интерфейс для работы со справочником абонентов</div>
   </td>
  </tr>
  </tbody>
@@ -99,13 +99,13 @@ $(document).ready(function(){initNavTree('abonent__add_8c.html',''); initResizab
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Функции</h2></td></tr>
-<tr class="memitem:ab7876aa25ceb20529572a99f8aca989c" id="r_ab7876aa25ceb20529572a99f8aca989c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="abonent__add_8c.html#ab7876aa25ceb20529572a99f8aca989c">abonent_add</a> (struct <a class="el" href="structAbonent.html">Abonent</a> directory[<a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb">DIR_SIZE</a>])</td></tr>
-<tr class="memdesc:ab7876aa25ceb20529572a99f8aca989c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Создаёт новую запись об абоненте.  <br /></td></tr>
-<tr class="separator:ab7876aa25ceb20529572a99f8aca989c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa01eddb87f06730224e09982a9424432" id="r_aa01eddb87f06730224e09982a9424432"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="abonent__add_8c.html#aa01eddb87f06730224e09982a9424432">abonent_add</a> (struct <a class="el" href="structDirectory.html">Directory</a> *directory)</td></tr>
+<tr class="memdesc:aa01eddb87f06730224e09982a9424432"><td class="mdescLeft">&#160;</td><td class="mdescRight">Создаёт новую запись об абоненте.  <br /></td></tr>
+<tr class="separator:aa01eddb87f06730224e09982a9424432"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Функции</h2>
-<a id="ab7876aa25ceb20529572a99f8aca989c" name="ab7876aa25ceb20529572a99f8aca989c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab7876aa25ceb20529572a99f8aca989c">&#9670;&#160;</a></span>abonent_add()</h2>
+<a id="aa01eddb87f06730224e09982a9424432" name="aa01eddb87f06730224e09982a9424432"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa01eddb87f06730224e09982a9424432">&#9670;&#160;</a></span>abonent_add()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -113,17 +113,17 @@ $(document).ready(function(){initNavTree('abonent__add_8c.html',''); initResizab
         <tr>
           <td class="memname">int abonent_add </td>
           <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structAbonent.html">Abonent</a>&#160;</td>
-          <td class="paramname"><em>directory</em>[DIR_SIZE]</td><td>)</td>
+          <td class="paramtype">struct <a class="el" href="structDirectory.html">Directory</a> *&#160;</td>
+          <td class="paramname"><em>directory</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Создаёт новую запись об абоненте. </p>
-<p>Новая запись помещается в первую свободную (заполненную нулями) ячейку. </p><dl class="params"><dt>Аргументы</dt><dd>
+<dl class="params"><dt>Аргументы</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">directory</td><td>Ссылка на справочник (массив) с абонентами. Размер справочника задаётся в макросе <a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb" title="Размер справочника">DIR_SIZE</a>. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">directory</td><td>Ссылка на справочник (массив) с абонентами. </td></tr>
   </table>
   </dd>
 </dl>

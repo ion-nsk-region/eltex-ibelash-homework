@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['tel_0',['tel',['../structAbonent.html#aec9be15443a0f45b02df936cb03018e9',1,'Abonent']]]
+  ['prev_0',['prev',['../structAbonent.html#ae237d404b018426b60a97d47686d4f37',1,'Abonent']]]
 ];

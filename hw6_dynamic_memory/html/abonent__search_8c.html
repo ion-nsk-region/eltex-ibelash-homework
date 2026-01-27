@@ -27,7 +27,7 @@
   <td id="projectalign">
    <div id="projectname">Справочник абонентов
    </div>
-   <div id="projectbrief">CLI интерфейс для работы со справочником на 100 абонентов</div>
+   <div id="projectbrief">CLI интерфейс для работы со справочником абонентов</div>
   </td>
  </tr>
  </tbody>
@@ -99,34 +99,28 @@ $(document).ready(function(){initNavTree('abonent__search_8c.html',''); initResi
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Функции</h2></td></tr>
-<tr class="memitem:a0ca3fefdae150ec69cd139347511994f" id="r_a0ca3fefdae150ec69cd139347511994f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="abonent__search_8c.html#a0ca3fefdae150ec69cd139347511994f">abonent_search</a> (struct <a class="el" href="structAbonent.html">Abonent</a> directory[<a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb">DIR_SIZE</a>], char name[<a class="el" href="abonent__dir_8h.html#a49d2668adfdf4f710a6c58fdbc0bcbe6">FIELD_SIZE</a>], int start)</td></tr>
-<tr class="memdesc:a0ca3fefdae150ec69cd139347511994f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Поиск id абонента в справочнике по имени.  <br /></td></tr>
-<tr class="separator:a0ca3fefdae150ec69cd139347511994f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9bc714ddf29455c5939966d253b1270" id="r_ae9bc714ddf29455c5939966d253b1270"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structAbonent.html">Abonent</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="abonent__search_8c.html#ae9bc714ddf29455c5939966d253b1270">abonent_search</a> (struct <a class="el" href="structAbonent.html">Abonent</a> *start, char name[<a class="el" href="abonent__dir_8h.html#a49d2668adfdf4f710a6c58fdbc0bcbe6">FIELD_SIZE</a>])</td></tr>
+<tr class="memdesc:ae9bc714ddf29455c5939966d253b1270"><td class="mdescLeft">&#160;</td><td class="mdescRight">Поиск id абонента в справочнике по имени.  <br /></td></tr>
+<tr class="separator:ae9bc714ddf29455c5939966d253b1270"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Функции</h2>
-<a id="a0ca3fefdae150ec69cd139347511994f" name="a0ca3fefdae150ec69cd139347511994f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ca3fefdae150ec69cd139347511994f">&#9670;&#160;</a></span>abonent_search()</h2>
+<a id="ae9bc714ddf29455c5939966d253b1270" name="ae9bc714ddf29455c5939966d253b1270"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9bc714ddf29455c5939966d253b1270">&#9670;&#160;</a></span>abonent_search()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int abonent_search </td>
+          <td class="memname">struct <a class="el" href="structAbonent.html">Abonent</a> * abonent_search </td>
           <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structAbonent.html">Abonent</a>&#160;</td>
-          <td class="paramname"><em>directory</em>[DIR_SIZE], </td>
+          <td class="paramtype">struct <a class="el" href="structAbonent.html">Abonent</a> *&#160;</td>
+          <td class="paramname"><em>start</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">char&#160;</td>
-          <td class="paramname"><em>name</em>[FIELD_SIZE], </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>start</em>&#160;</td>
+          <td class="paramname"><em>name</em>[FIELD_SIZE]&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -140,15 +134,14 @@ $(document).ready(function(){initNavTree('abonent__search_8c.html',''); initResi
 <dl class="section note"><dt>Заметки</dt><dd>Предназначена для использования в составе других функций.</dd></dl>
 <dl class="params"><dt>Аргументы</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">directory</td><td>Ссылка на справочник (массив) с абонентами. Размер справочника задаётся в макросе <a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb" title="Размер справочника">DIR_SIZE</a>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">start</td><td>Указатель на абонента, с которого надо начать поиск. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>Имя, по которому надо найти абонента. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">start</td><td>Индекс в справочнике, с которого надо начать поиск. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Возвращает</dt><dd><ul>
-<li>id абонента с совпадающим именем.</li>
-<li>-1 если ничего не найдено. </li>
+<li>Указатель на абонента с совпадающим именем.</li>
+<li>NULL если ничего не найдено. </li>
 </ul>
 </dd></dl>
 

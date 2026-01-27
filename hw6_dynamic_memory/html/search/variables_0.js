@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['name_0',['name',['../structAbonent.html#aa5b7be808c28932b7ed3550cead83e4d',1,'Abonent']]]
+  ['head_0',['head',['../structDirectory.html#a66346a4e29826fa00c4a44219948d728',1,'Directory']]]
 ];

@@ -27,7 +27,7 @@
   <td id="projectalign">
    <div id="projectname">Справочник абонентов
    </div>
-   <div id="projectbrief">CLI интерфейс для работы со справочником на 100 абонентов</div>
+   <div id="projectbrief">CLI интерфейс для работы со справочником абонентов</div>
   </td>
  </tr>
  </tbody>
@@ -99,34 +99,51 @@ $(document).ready(function(){initNavTree('abonent__del_8c.html',''); initResizab
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Функции</h2></td></tr>
-<tr class="memitem:ae0d3b91c0887e89e304be537f484caab" id="r_ae0d3b91c0887e89e304be537f484caab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="abonent__del_8c.html#ae0d3b91c0887e89e304be537f484caab">abonent_del</a> (struct <a class="el" href="structAbonent.html">Abonent</a> *the_abonent)</td></tr>
-<tr class="memdesc:ae0d3b91c0887e89e304be537f484caab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Удаление абонента.  <br /></td></tr>
-<tr class="separator:ae0d3b91c0887e89e304be537f484caab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a873bdeea38c21874fea892a4f2a64345" id="r_a873bdeea38c21874fea892a4f2a64345"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="abonent__del_8c.html#a873bdeea38c21874fea892a4f2a64345">abonent_del</a> (struct <a class="el" href="structDirectory.html">Directory</a> *dir, struct <a class="el" href="structAbonent.html">Abonent</a> *the_abonent)</td></tr>
+<tr class="memdesc:a873bdeea38c21874fea892a4f2a64345"><td class="mdescLeft">&#160;</td><td class="mdescRight">Удаление абонента.  <br /></td></tr>
+<tr class="separator:a873bdeea38c21874fea892a4f2a64345"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Функции</h2>
-<a id="ae0d3b91c0887e89e304be537f484caab" name="ae0d3b91c0887e89e304be537f484caab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0d3b91c0887e89e304be537f484caab">&#9670;&#160;</a></span>abonent_del()</h2>
+<a id="a873bdeea38c21874fea892a4f2a64345" name="a873bdeea38c21874fea892a4f2a64345"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a873bdeea38c21874fea892a4f2a64345">&#9670;&#160;</a></span>abonent_del()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void abonent_del </td>
+          <td class="memname">int abonent_del </td>
           <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structAbonent.html">Abonent</a> *&#160;</td>
-          <td class="paramname"><em>abonent</em></td><td>)</td>
+          <td class="paramtype">struct <a class="el" href="structDirectory.html">Directory</a> *&#160;</td>
+          <td class="paramname"><em>dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">struct <a class="el" href="structAbonent.html">Abonent</a> *&#160;</td>
+          <td class="paramname"><em>the_abonent</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Удаление абонента. </p>
-<p>Удаляет запись по указателю на конкретного абонента. Удаление заключается в заполнении всех полей нулями. </p><dl class="params"><dt>Аргументы</dt><dd>
+<p>Удаляет запись по указателю на конкретного абонента. </p><dl class="params"><dt>Аргументы</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">*abonent</td><td>указатель на абонента. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">*dir</td><td>указатель на справочник. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">*the_abonent</td><td>указатель на абонента. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Возвращает</dt><dd><ul>
+<li>0 - всё в порядке</li>
+<li>-1 - Пустой указатель на справочник, или справочник пуст или пустые указатели на голову/хвост справочника.</li>
+<li>-2 - Пустой указатель на абонента. </li>
+</ul>
+</dd></dl>
 
 </div>
 </div>

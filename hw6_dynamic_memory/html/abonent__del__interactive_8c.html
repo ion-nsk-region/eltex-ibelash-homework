@@ -27,7 +27,7 @@
   <td id="projectalign">
    <div id="projectname">Справочник абонентов
    </div>
-   <div id="projectbrief">CLI интерфейс для работы со справочником на 100 абонентов</div>
+   <div id="projectbrief">CLI интерфейс для работы со справочником абонентов</div>
   </td>
  </tr>
  </tbody>
@@ -99,13 +99,13 @@ $(document).ready(function(){initNavTree('abonent__del__interactive_8c.html','')
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Функции</h2></td></tr>
-<tr class="memitem:a1afaadc235446a22d48c34787457dbc7" id="r_a1afaadc235446a22d48c34787457dbc7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="abonent__del__interactive_8c.html#a1afaadc235446a22d48c34787457dbc7">abonent_del_interactive</a> (struct <a class="el" href="structAbonent.html">Abonent</a> directory[<a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb">DIR_SIZE</a>])</td></tr>
-<tr class="memdesc:a1afaadc235446a22d48c34787457dbc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Интерактивное удаление абонента.  <br /></td></tr>
-<tr class="separator:a1afaadc235446a22d48c34787457dbc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab97ede79a57ca1ea329bb19628099207" id="r_ab97ede79a57ca1ea329bb19628099207"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="abonent__del__interactive_8c.html#ab97ede79a57ca1ea329bb19628099207">abonent_del_interactive</a> (struct <a class="el" href="structDirectory.html">Directory</a> *dir)</td></tr>
+<tr class="memdesc:ab97ede79a57ca1ea329bb19628099207"><td class="mdescLeft">&#160;</td><td class="mdescRight">Интерактивное удаление абонента.  <br /></td></tr>
+<tr class="separator:ab97ede79a57ca1ea329bb19628099207"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Функции</h2>
-<a id="a1afaadc235446a22d48c34787457dbc7" name="a1afaadc235446a22d48c34787457dbc7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1afaadc235446a22d48c34787457dbc7">&#9670;&#160;</a></span>abonent_del_interactive()</h2>
+<a id="ab97ede79a57ca1ea329bb19628099207" name="ab97ede79a57ca1ea329bb19628099207"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab97ede79a57ca1ea329bb19628099207">&#9670;&#160;</a></span>abonent_del_interactive()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -113,22 +113,24 @@ $(document).ready(function(){initNavTree('abonent__del__interactive_8c.html','')
         <tr>
           <td class="memname">int abonent_del_interactive </td>
           <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structAbonent.html">Abonent</a>&#160;</td>
-          <td class="paramname"><em>directory</em>[DIR_SIZE]</td><td>)</td>
+          <td class="paramtype">struct <a class="el" href="structDirectory.html">Directory</a> *&#160;</td>
+          <td class="paramname"><em>dir</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Интерактивное удаление абонента. </p>
-<p>Удаляет запись по id абонента. Обёртка для <a class="el" href="abonent__dir_8h.html#a7bc1cb45c2a43785e13d14f93cfc86a2" title="Удаление абонента.">abonent_del</a>. </p><dl class="params"><dt>Аргументы</dt><dd>
+<p>Удаляет запись по имени абонента. Обёртка для <a class="el" href="abonent__dir_8h.html#a873bdeea38c21874fea892a4f2a64345" title="Удаление абонента.">abonent_del</a>. </p><dl class="section note"><dt>Заметки</dt><dd>Имя абонента для удаления вводится через stdin (консоль). </dd></dl>
+<dl class="params"><dt>Аргументы</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>Номер записи в справочнике, которую необходимо удалить. Не параметр функции: Интерактивный ввод с клавиатуры. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">directory</td><td>Ссылка на справочник (массив) с абонентами. Размер справочника задаётся в макросе <a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb" title="Размер справочника">DIR_SIZE</a>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dir</td><td>Ссылка на справочник (массив) с абонентами. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Возвращает</dt><dd>Код ошибки, где:<ul>
+<li>-1 - Пустой указатель на справочник</li>
+<li>-2 - Не удалось выделить память под абонента</li>
 <li>0 - всё в порядке.</li>
 <li>1 - введено не число.</li>
 <li>2 - введённое id за пределами возможных значений.</li>

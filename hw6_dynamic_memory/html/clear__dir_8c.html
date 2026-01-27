@@ -27,7 +27,7 @@
   <td id="projectalign">
    <div id="projectname">Справочник абонентов
    </div>
-   <div id="projectbrief">CLI интерфейс для работы со справочником на 100 абонентов</div>
+   <div id="projectbrief">CLI интерфейс для работы со справочником абонентов</div>
   </td>
  </tr>
  </tbody>
@@ -99,13 +99,13 @@ $(document).ready(function(){initNavTree('clear__dir_8c.html',''); initResizable
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Функции</h2></td></tr>
-<tr class="memitem:ad748453e8ac0c0401c0cfd2eea00b45c" id="r_ad748453e8ac0c0401c0cfd2eea00b45c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clear__dir_8c.html#ad748453e8ac0c0401c0cfd2eea00b45c">clear_dir</a> (struct <a class="el" href="structAbonent.html">Abonent</a> directory[<a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb">DIR_SIZE</a>])</td></tr>
-<tr class="memdesc:ad748453e8ac0c0401c0cfd2eea00b45c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Заполнить все записи справочника нулями.  <br /></td></tr>
-<tr class="separator:ad748453e8ac0c0401c0cfd2eea00b45c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef08613d8342d9ccb33d6c8c41bb498f" id="r_aef08613d8342d9ccb33d6c8c41bb498f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clear__dir_8c.html#aef08613d8342d9ccb33d6c8c41bb498f">clear_dir</a> (struct <a class="el" href="structDirectory.html">Directory</a> *dir)</td></tr>
+<tr class="memdesc:aef08613d8342d9ccb33d6c8c41bb498f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Удалить все записи справочника.  <br /></td></tr>
+<tr class="separator:aef08613d8342d9ccb33d6c8c41bb498f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Функции</h2>
-<a id="ad748453e8ac0c0401c0cfd2eea00b45c" name="ad748453e8ac0c0401c0cfd2eea00b45c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad748453e8ac0c0401c0cfd2eea00b45c">&#9670;&#160;</a></span>clear_dir()</h2>
+<a id="aef08613d8342d9ccb33d6c8c41bb498f" name="aef08613d8342d9ccb33d6c8c41bb498f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef08613d8342d9ccb33d6c8c41bb498f">&#9670;&#160;</a></span>clear_dir()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -113,18 +113,18 @@ $(document).ready(function(){initNavTree('clear__dir_8c.html',''); initResizable
         <tr>
           <td class="memname">void clear_dir </td>
           <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structAbonent.html">Abonent</a>&#160;</td>
-          <td class="paramname"><em>directory</em>[DIR_SIZE]</td><td>)</td>
+          <td class="paramtype">struct <a class="el" href="structDirectory.html">Directory</a> *&#160;</td>
+          <td class="paramname"><em>dir</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Заполнить все записи справочника нулями. </p>
-<p>Вызывает <a class="el" href="abonent__dir_8h.html#a7bc1cb45c2a43785e13d14f93cfc86a2" title="Удаление абонента.">abonent_del</a> для всего справочника.</p>
+<p>Удалить все записи справочника. </p>
+<p>Вызывает <a class="el" href="abonent__dir_8h.html#a873bdeea38c21874fea892a4f2a64345" title="Удаление абонента.">abonent_del</a> для всего справочника.</p>
 <dl class="params"><dt>Аргументы</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">directory</td><td>Ссылка на справочник (массив) с абонентами. Размер справочника задаётся в макросе <a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb" title="Размер справочника">DIR_SIZE</a>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dir</td><td>Ссылка на справочник (массив) с абонентами. </td></tr>
   </table>
   </dd>
 </dl>

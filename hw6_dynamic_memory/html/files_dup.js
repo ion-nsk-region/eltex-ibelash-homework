@@ -12,5 +12,6 @@ var files_dup =
     [ "field_input.c", "field__input_8c.html", "field__input_8c" ],
     [ "list_all_abonents.c", "list__all__abonents_8c.html", "list__all__abonents_8c" ],
     [ "menu.c", "menu_8c.html", "menu_8c" ],
-    [ "string_compare.c", "string__compare_8c.html", "string__compare_8c" ]
+    [ "string_compare.c", "string__compare_8c.html", "string__compare_8c" ],
+    [ "yesno.c", "yesno_8c.html", "yesno_8c" ]
 ];

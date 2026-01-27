@@ -27,7 +27,7 @@
   <td id="projectalign">
    <div id="projectname">Справочник абонентов
    </div>
-   <div id="projectbrief">CLI интерфейс для работы со справочником на 100 абонентов</div>
+   <div id="projectbrief">CLI интерфейс для работы со справочником абонентов</div>
   </td>
  </tr>
  </tbody>
@@ -99,13 +99,13 @@ $(document).ready(function(){initNavTree('list__all__abonents_8c.html',''); init
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Функции</h2></td></tr>
-<tr class="memitem:a0aec7915141d7a05dd71f35be45dbe73" id="r_a0aec7915141d7a05dd71f35be45dbe73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="list__all__abonents_8c.html#a0aec7915141d7a05dd71f35be45dbe73">list_all_abonents</a> (struct <a class="el" href="structAbonent.html">Abonent</a> directory[<a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb">DIR_SIZE</a>])</td></tr>
-<tr class="memdesc:a0aec7915141d7a05dd71f35be45dbe73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Вывод всех записей справочника.  <br /></td></tr>
-<tr class="separator:a0aec7915141d7a05dd71f35be45dbe73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a274caaf453dcc7a0cb8587162db9392c" id="r_a274caaf453dcc7a0cb8587162db9392c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="list__all__abonents_8c.html#a274caaf453dcc7a0cb8587162db9392c">list_all_abonents</a> (struct <a class="el" href="structDirectory.html">Directory</a> *dir)</td></tr>
+<tr class="memdesc:a274caaf453dcc7a0cb8587162db9392c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Вывод всех записей справочника.  <br /></td></tr>
+<tr class="separator:a274caaf453dcc7a0cb8587162db9392c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Функции</h2>
-<a id="a0aec7915141d7a05dd71f35be45dbe73" name="a0aec7915141d7a05dd71f35be45dbe73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0aec7915141d7a05dd71f35be45dbe73">&#9670;&#160;</a></span>list_all_abonents()</h2>
+<a id="a274caaf453dcc7a0cb8587162db9392c" name="a274caaf453dcc7a0cb8587162db9392c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a274caaf453dcc7a0cb8587162db9392c">&#9670;&#160;</a></span>list_all_abonents()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -113,8 +113,8 @@ $(document).ready(function(){initNavTree('list__all__abonents_8c.html',''); init
         <tr>
           <td class="memname">void list_all_abonents </td>
           <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structAbonent.html">Abonent</a>&#160;</td>
-          <td class="paramname"><em>directory</em>[DIR_SIZE]</td><td>)</td>
+          <td class="paramtype">struct <a class="el" href="structDirectory.html">Directory</a> *&#160;</td>
+          <td class="paramname"><em>dir</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -123,7 +123,7 @@ $(document).ready(function(){initNavTree('list__all__abonents_8c.html',''); init
 <p>Вывод всех записей справочника. </p>
 <p>Выводим все ненулевые записи из справочника. </p><dl class="params"><dt>Аргументы</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">directory</td><td>Ссылка на справочник (массив) с абонентами. Размер справочника задаётся в макросе <a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb" title="Размер справочника">DIR_SIZE</a>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dir</td><td>Ссылка на справочник (массив) с абонентами. </td></tr>
   </table>
   </dd>
 </dl>

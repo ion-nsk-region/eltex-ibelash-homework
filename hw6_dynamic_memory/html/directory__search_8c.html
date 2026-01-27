@@ -27,7 +27,7 @@
   <td id="projectalign">
    <div id="projectname">Справочник абонентов
    </div>
-   <div id="projectbrief">CLI интерфейс для работы со справочником на 100 абонентов</div>
+   <div id="projectbrief">CLI интерфейс для работы со справочником абонентов</div>
   </td>
  </tr>
  </tbody>
@@ -99,13 +99,13 @@ $(document).ready(function(){initNavTree('directory__search_8c.html',''); initRe
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Функции</h2></td></tr>
-<tr class="memitem:ae526260ef66be767ce53d363350e392e" id="r_ae526260ef66be767ce53d363350e392e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="directory__search_8c.html#ae526260ef66be767ce53d363350e392e">directory_search</a> (struct <a class="el" href="structAbonent.html">Abonent</a> directory[<a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb">DIR_SIZE</a>], int dir_size)</td></tr>
-<tr class="memdesc:ae526260ef66be767ce53d363350e392e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Интерактивный поиск абонентов.  <br /></td></tr>
-<tr class="separator:ae526260ef66be767ce53d363350e392e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36b29b4938b8882ecb8aa8f83b94e1aa" id="r_a36b29b4938b8882ecb8aa8f83b94e1aa"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="directory__search_8c.html#a36b29b4938b8882ecb8aa8f83b94e1aa">directory_search</a> (struct <a class="el" href="structDirectory.html">Directory</a> *dir)</td></tr>
+<tr class="memdesc:a36b29b4938b8882ecb8aa8f83b94e1aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Интерактивный поиск абонентов.  <br /></td></tr>
+<tr class="separator:a36b29b4938b8882ecb8aa8f83b94e1aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Функции</h2>
-<a id="ae526260ef66be767ce53d363350e392e" name="ae526260ef66be767ce53d363350e392e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae526260ef66be767ce53d363350e392e">&#9670;&#160;</a></span>directory_search()</h2>
+<a id="a36b29b4938b8882ecb8aa8f83b94e1aa" name="a36b29b4938b8882ecb8aa8f83b94e1aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36b29b4938b8882ecb8aa8f83b94e1aa">&#9670;&#160;</a></span>directory_search()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -113,19 +113,9 @@ $(document).ready(function(){initNavTree('directory__search_8c.html',''); initRe
         <tr>
           <td class="memname">int directory_search </td>
           <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structAbonent.html">Abonent</a>&#160;</td>
-          <td class="paramname"><em>directory</em>[DIR_SIZE], </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">struct <a class="el" href="structDirectory.html">Directory</a> *&#160;</td>
+          <td class="paramname"><em>dir</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>dir_size</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -133,8 +123,7 @@ $(document).ready(function(){initNavTree('directory__search_8c.html',''); initRe
 <p>Интерактивный поиск абонентов. </p>
 <dl class="params"><dt>Аргументы</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">directory</td><td>Ссылка на справочник (массив) с абонентами. Размер справочника задаётся в макросе <a class="el" href="abonent__dir_8h.html#aac52a71d47407de47c401baf9c827cdb" title="Размер справочника">DIR_SIZE</a>. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">dir_size</td><td>Текущий размер справочника = число действительных записей. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dir</td><td>Ссылка на справочник (массив) с абонентами. </td></tr>
   </table>
   </dd>
 </dl>
