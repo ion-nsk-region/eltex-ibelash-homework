@@ -4,20 +4,38 @@ ARCHIVER = ar
 ARCHIVER_OPTS = rc
 
 LIB = calc
-HEADERS = calc.h
+HEADERS = libs/calc.h
+LIB_SRCS = $(wildcard libs/*.c)
+LIB_OBJ = $(LIB_SRCS:.c=.o)
+
 SRCS = $(wildcard *.c)
 OBJ = $(SRCS:.c=.o)
 
-main.exe: main.c lib$(LIB).a
-	$(CC) $(FLAGS) -o $@ $< -L. -l$(LIB)
+main.exe: $(SRCS) lib$(LIB).a $(HEADERS)
+	@echo "\nСобираем главный исполняемый файл."
+	$(CC) $(FLAGS) -o $@ $< -L. -l$(LIB) -Wl,-rpath,./plugins
 
-%.o: %.c $(HEADERS)
+msg_main_obj:
+	@echo "\nСоздаём объектные файлы для основной программы"
+
+./%.o: ./%.c $(HEADERS) msg_main_obj
 	$(CC) $(FLAGS) -c $< -o $@
 
-lib$(LIB).a: $(OBJ)
+msg_lib_obj:
+	@echo "\nСоздаём объектные файлы для статической библиотеки"
+
+./libs/%.o: ./libs/%.c $(HEADERS) msg_lib_obj
+	$(CC) $(FLAGS) -c $< -o $@
 	$(ARCHIVER) $(ARCHIVER_OPTS) lib$(LIB).a $(OBJ)
 
-.PHONY: clean
+lib$(LIB).a: $(LIB_OBJ)
+	@echo "\nСобираем статическую библиотеку"
+	$(ARCHIVER) $(ARCHIVER_OPTS) lib$(LIB).a $(OBJ)
+
+#TODO Запустить make в директории с плагинами
+
+.PHONY: clean msg_lib_obj msg_main_obj 
 
 clean:
-	rm -f *.o *.c~ *.h~ main.exe lib$(LIB).a
+	@echo "\nУдаляем все сгенерированные файлы."
+	rm -vf *.o ./libs/*.o *.c~ *.h~ main.exe ./lib$(LIB).a
