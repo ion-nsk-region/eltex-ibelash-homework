@@ -1,5 +1,9 @@
 #include "calc.h"
 
+char func_name[] = "calc_add";
+char menu_name[] = "сложение";
+unsigned int menu_pos = 1;
+
 void calc_add(void) {
   int a, b;
 

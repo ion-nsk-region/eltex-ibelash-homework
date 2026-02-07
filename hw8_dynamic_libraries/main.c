@@ -1,43 +1,32 @@
 #include "calc.h"
 
 int main(void) {
-  int menu_item = 0;
+  int menu_item = 0, n_items = 0, menu_exit;
+  char *func_names[FUNC_MAX], *menu_names[FUNC_MAX], *error;
+  void *func_handles[FUNC_MAX];
 
-  while (MENU_EXIT != menu_item) {
+  load_plugins(func_handles, func_names, menu_names, &n_items);
+
+  menu_exit = n_items + 1;
+
+  while (menu_exit != menu_item) {
     menu_item = menu();
 
-    switch (menu_item) {
-      case MENU_ERROR:
-        printf(
+    if (MENU_ERROR == menu_item) {
+      printf(
             "Ошибка: Такого пункта меню не существует.\n"
             "        Пожалуйста, введите только одну цифру.\n");
-        break;
-      case MENU_ADD:
-        printf("Выполняем сложение\n");
-        calc_add();
-        break;
-      case MENU_SUB:
-        printf("Выполняем вычитание\n");
-        calc_sub();
-        break;
-      case MENU_MUL:
-        printf("Выполняем умножение\n");
-        calc_mul();
-        break;
-      case MENU_DIV:
-        printf("Выполняем деление\n");
-        calc_div();
-        break;
-      case MENU_EXIT:
+        continue;
+    } else if(menu_exit == menu_item) {
         printf("Выходим.\n");
-        break;
-      default:
-        printf(
-            "Ошибка: Пункт меню %d) всё ещё в разработке.\n"
-            "        Пожалуйста, выберите другой пункт меню.\n",
-            menu_item);
-        break;
+        continue;
     }
+    
+    run_operation();
+    
   }
+
+  unload_plugins();
+
   return 0;
 }
