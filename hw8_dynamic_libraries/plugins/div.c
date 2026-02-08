@@ -1,20 +1,19 @@
-#include "calc.h"
+char func_name[] = "calc_div";
+char menu_name[] = "деление";
+unsigned int menu_pos = 4;
 
-void calc_div(void) {
-  int a, b;
+int calc_div(int a, int b) {
 
-  while (0 != calc_input(&a, &b)) {
-    printf("Попробуйте снова.\n\n");
-  }
   // TODO Проверка аргументов на переполнение
   // INT_MIN / -1
 
   if (0 != b) {
-    printf("%d\n", (a / b));
+    return (a / b);
   } else {
-    printf(
+    fprintf(stderr,
         "Результат деления на 0 равен всем значениям одновременно.\n"
         "Но мы предотвратили эту операцию,\n"
         "чтобы сэкономить компьютерную память - она нынче дорогая.\n");
+    return NULL;
   }
 }

@@ -1,12 +1,10 @@
-#include "calc.h"
+char func_name[] = "calc_sub";
+char menu_name[] = "вычитание";
+unsigned int menu_pos = 2;
 
-void calc_sub(void) {
-  int a, b;
+int calc_sub(int a, int b) {
 
-  while (0 != calc_input(&a, &b)) {
-    printf("Попробуйте снова.\n\n");
-  }
-  // TODO Проверка аргументов на переполнение снизу
+  // TODO Проверка аргументов на переполнение
 
-  printf("%d\n", (a - b));
+  return (a - b);
 }

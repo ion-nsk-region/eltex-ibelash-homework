@@ -1,23 +1,25 @@
 CC = gcc
 FLAGS = -Wall -Werror -Wextra
 
-LIB = calc
 HEADERS = ../libs/calc.h $(wildcard *.h)
 
 SRCS = $(wildcard *.c)
 OBJ = $(SRCS:.c=.o)
+PLUGINS = $(addprefix lib,$(SRCS:.c=.so))
 
-msg_plugin_obj:
-	@echo "\nСоздаём объектные файлы для плагинов"
-
-%.o: %.c $(HEADERS) msg_plugin_obj
-	$(CC) $(FLAGS) -fPIC -c $< -o $@
+all: $(PLUGINS) 
 
 msg_plugin_build:
 	@echo "\nСобираем плагины"
 
-lib%.so: %.o %.h msg_plugin_build
+lib%.so: %.o msg_plugin_build
 	$(CC) -shared $(FLAGS) $< -o $@
+
+msg_plugin_obj:
+	@echo "\nСоздаём объектные файлы для плагинов"
+
+%.o: %.c $(HEADERS) 
+	$(CC) $(FLAGS) -fPIC -c $< -o $@
 
 .PHONY: clean msg_plugin_obj msg_plugin_build
 
