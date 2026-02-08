@@ -27,7 +27,6 @@ int main(void) {
     
     printf("Выполняем %s\n", menu_names[menu_item]);
     run_operation(func_handles[menu_item], func_names[menu_item]);
-    
   }
 
   // unload_plugins();

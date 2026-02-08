@@ -1,50 +1,46 @@
-#include <dlfcn.h>
+#include <stdlib.h>
 #include "calc.h"
 
-int load_plugins(
-                void *func_handles[FUNC_MAX], 
-                char *func_names[FUNC_MAX], 
-                char *menu_names[FUNC_MAX], 
-                int *n_items) {
-    char *error;
-    void *handle;
-    unsigned int *menu_pos;
+int load_plugins(void *func_handles[FUNC_MAX], char *func_names[FUNC_MAX],
+                 char *menu_names[FUNC_MAX], int *n_items) {
+  char *func_name, *menu_name, path_buffer[255];
+  void *handle;
+  unsigned int *menu_pos;
+  struct dirent **namelist;
+  int ret, n;
 
-    dlerror(); // Очищаем сообщения об ошибках
-    *n_items = 0;
+  /*
+  for (int i = 0; i < FUNC_MAX; i++) {
+      func_handles[i] = NULL;
+      func_names[i] = NULL;
+      menu_names[i] = NULL;
+  }
+  */
 
-    handle = dlopen("./libs/libadd.so", RTLD_NOW);
-    //handle = dlopen(plugin_path, RTLD_NOW);
-    error = dlerror();
-    if (NULL == handle && NULL != error) {
-        fprintf(stderr, "%s\n", error);
-        return -1;
+  *n_items = 0;
+
+  n = scandir("./plugins", &namelist, filter_plugin_names, alphasort);
+  if (n == -1) {
+    perror("scandir");
+    return -1;
+  }
+
+  while (n--) {
+    printf("./plugins/%s\n", namelist[n]->d_name);
+    sprintf(path_buffer, "./plugins/%s", namelist[n]->d_name);
+    const char *plugin_path = path_buffer;
+    ret = get_plugin_symbols(plugin_path, &handle, &func_name, &menu_name,
+                             &menu_pos);
+    if (0 == ret) {
+      func_handles[*menu_pos] = handle;
+      func_names[*menu_pos] = func_name;
+      menu_names[*menu_pos] = menu_name;
     }
-    
-    menu_pos = (unsigned int *)dlsym(handle, "menu_pos");
-    error = dlerror();
-    if (NULL != error) {
-        fprintf(stderr, "%s\n", error);
-        return -2;
-    }
+    free(namelist[n]);
+  }
+  free(namelist);
 
-    func_handles[*menu_pos] = handle;
+  *n_items = *n_items + 1;
 
-    func_names[*menu_pos] = dlsym(handle, "func_name");
-    error = dlerror();
-    if (NULL != error) {
-        fprintf(stderr, "%s\n", error);
-        return -3;
-    }
-    
-    menu_names[*menu_pos] = dlsym(handle, "menu_name");
-    error = dlerror();
-    if (NULL != error) {
-        fprintf(stderr, "%s\n", error);
-        return -4;
-    }
-
-    *n_items = *n_items + 1;
-
-    return 0;
+  return 0;
 }
