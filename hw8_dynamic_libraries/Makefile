@@ -26,11 +26,10 @@ msg_lib_obj:
 
 ./libs/%.o: ./libs/%.c $(HEADERS) msg_lib_obj
 	$(CC) $(FLAGS) -c $< -o $@
-	$(ARCHIVER) $(ARCHIVER_OPTS) lib$(LIB).a $(OBJ)
 
 lib$(LIB).a: $(LIB_OBJ)
 	@echo "\nСобираем статическую библиотеку"
-	$(ARCHIVER) $(ARCHIVER_OPTS) lib$(LIB).a $(OBJ)
+	$(ARCHIVER) $(ARCHIVER_OPTS) lib$(LIB).a $(LIB_OBJ)
 
 #TODO Запустить make в директории с плагинами
 
