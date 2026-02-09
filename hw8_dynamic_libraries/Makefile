@@ -11,7 +11,7 @@ LIB_OBJ = $(LIB_SRCS:.c=.o)
 SRCS = $(wildcard *.c)
 OBJ = $(SRCS:.c=.o)
 
-main.exe: $(SRCS) lib$(LIB).a $(HEADERS)
+main.exe: $(SRCS) lib$(LIB).a $(HEADERS) plugins
 	@echo "\nСобираем главный исполняемый файл."
 	$(CC) $(FLAGS) -o $@ $< -L. -l$(LIB) -Wl,-rpath,./plugins
 
@@ -31,9 +31,10 @@ lib$(LIB).a: $(LIB_OBJ)
 	@echo "\nСобираем статическую библиотеку"
 	$(ARCHIVER) $(ARCHIVER_OPTS) lib$(LIB).a $(LIB_OBJ)
 
-#TODO Запустить make в директории с плагинами
+plugins:
+	$(MAKE) -C ./plugins
 
-.PHONY: clean msg_lib_obj msg_main_obj 
+.PHONY: clean msg_lib_obj msg_main_obj plugins 
 
 clean:
 	@echo "\nУдаляем все сгенерированные файлы."
