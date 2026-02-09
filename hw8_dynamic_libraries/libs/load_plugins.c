@@ -11,14 +11,6 @@ int load_plugins(void *func_handles[FUNC_MAX], char *func_names[FUNC_MAX],
   struct dirent **namelist;
   int ret, n;
 
-  /*
-  for (int i = 0; i < FUNC_MAX; i++) {
-      func_handles[i] = NULL;
-      func_names[i] = NULL;
-      menu_names[i] = NULL;
-  }
-  */
-
   *n_items = 0;
 
   n = scandir("./plugins", &namelist, filter_plugin_names, alphasort);
@@ -28,7 +20,6 @@ int load_plugins(void *func_handles[FUNC_MAX], char *func_names[FUNC_MAX],
   }
 
   while (n--) {
-    //    printf("./plugins/%s\n", namelist[n]->d_name);
     sprintf(path_buffer, "./plugins/%s", namelist[n]->d_name);
     const char *plugin_path = path_buffer;
     ret = get_plugin_symbols(plugin_path, &handle, &func_name, &menu_name,

@@ -5,6 +5,10 @@ int main(void) {
   char *func_names[FUNC_MAX], *menu_names[FUNC_MAX];
   void *func_handles[FUNC_MAX];
 
+  for (int i = 0; i < FUNC_MAX; i++) {
+    func_handles[i] = NULL;
+  }
+
   ret = load_plugins(func_handles, func_names, menu_names, &n_items);
   if (0 > ret) {
     printf("Ошибка во время загрузки плагинов.\n");
@@ -17,19 +21,19 @@ int main(void) {
 
     if (MENU_ERROR == menu_item) {
       printf(
-            "Ошибка: Такого пункта меню не существует.\n"
-            "        Пожалуйста, введите только одну цифру.\n");
-        continue;
-    } else if(menu_exit == menu_item) {
-        printf("Выходим.\n");
-        continue;
+          "Ошибка: Такого пункта меню не существует.\n"
+          "        Пожалуйста, введите только одну цифру.\n");
+      continue;
+    } else if (menu_exit == menu_item) {
+      printf("Выходим.\n");
+      continue;
     }
-    
+
     printf("Выполняем %s\n", menu_names[menu_item]);
     run_operation(func_handles[menu_item], func_names[menu_item]);
   }
 
-  // unload_plugins();
+  unload_plugins(func_handles);
 
   return 0;
 }
