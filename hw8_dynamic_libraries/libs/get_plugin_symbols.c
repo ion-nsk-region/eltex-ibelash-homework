@@ -1,6 +1,6 @@
 #include "calc.h"
 
-int get_plugin_symbols(char *plugin_path, void **handle, char **func_name, char **menu_name, unsigned int **menu_pos) {
+int get_plugin_symbols(const char *plugin_path, void **handle, char **func_name, char **menu_name, unsigned int **menu_pos) {
     char *error;
     dlerror(); // Очищаем сообщения об ошибках
 
