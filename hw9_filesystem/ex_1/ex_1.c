@@ -1,15 +1,15 @@
 #include "ex_1.h"
 
 int main(void) {
-    char //*string_in, 
+    char string_in[BUFSIZ] = "Мы это не увидим, если всё работает.", 
          *string_out = "String from file";
     const char *filename = "output.txt";
 
     createFile(filename);
     write2File(filename, string_out);
-//    readFromFileEnd(filename, string_in);
+    readBackwardsFromFile(filename, string_in);
 
-//    printf("%s\n", string_in);
+    printf("%s\n", string_in);
 
     return 0;
 }
