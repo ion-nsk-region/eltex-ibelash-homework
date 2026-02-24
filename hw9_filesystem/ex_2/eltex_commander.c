@@ -8,7 +8,8 @@ int main() {
                         "Код ошибки: %d\nВыходим.\n", ret);
     }
     
-    printw("Привет! 🤓");
+    printw("Привет! 🤓\n");
+    printw("Мои размеры %d x %d\n", LINES, COLS);
 
     refresh();
     getch();
