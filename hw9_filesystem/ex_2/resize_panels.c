@@ -1,9 +1,11 @@
 #include "eltex_commander.h"
 
-void resize_panels(WINDOW *left_panel, WINDOW *right_panel) {
+int resize_panels(WINDOW *left_panel, WINDOW *right_panel) {
   int t_y, t_x,  //< Размеры основного окна (терминала)
       lp_y, lp_x,  //< Размеры левой панели
       rp_y, rp_x;  //< Размеры правой панели
+  char path_buffer[PATH_MAX];
+  int ret = 0;
   clear();
 
   // Обрабатываем изменение размера терминала
@@ -14,8 +16,15 @@ void resize_panels(WINDOW *left_panel, WINDOW *right_panel) {
   box(left_panel, ACS_VLINE, ACS_HLINE);
   box(right_panel, ACS_VLINE, ACS_HLINE);
 
+  // Выводим содержимое левой директории
+  sprintf(path_buffer, "./");
+  const char *left_path = path_buffer;
+  ret = list_dir(left_path, left_panel);
+
   // выводим размеры терминала, левой и правой панели.
   getmaxyx(left_panel, lp_y, lp_x);
   getmaxyx(right_panel, rp_y, rp_x);
   mvprintw(0, 0, "%dx%d  L %dx%d  R %dx%d", t_y, t_x, lp_y, lp_x, rp_y, rp_x);
+
+  return ret;
 }
