@@ -16,10 +16,8 @@ int cleanup(WINDOW *left_panel, WINDOW *right_panel, WINDOW *left_content,
             "Не удалось вернуть настройки терминала в исходное состояние.\n"
             "Рекомендуем перезапустить терминал.\n");
   }
-  if (cleanup_namelist(left_list, left_nfiles) &&
-      cleanup_namelist(right_list, right_nfiles)) {
-    // all good
-  } else {
+  if (!cleanup_namelist(left_list, left_nfiles) ||
+      !cleanup_namelist(right_list, right_nfiles)) {
     ret = -1;
   }
 
