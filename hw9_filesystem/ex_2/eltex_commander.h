@@ -16,7 +16,9 @@ int cleanup_namelist(struct dirent **namelist, int n);
 int create_panels(WINDOW *stdscr, WINDOW **left_panel, WINDOW **right_panel,
                   WINDOW **left_content, WINDOW **right_content);
 int initialize_terminal(void);
-int list_dir(const char dir_path[PATH_MAX], struct dirent **namelist, int *n_files);
-int resize_panels(WINDOW *left_panel, WINDOW *right_panel);
+int list_dir(const char dir_path[PATH_MAX], struct dirent ***namelist, int *n_files);
+int print_dir(WINDOW *panel, struct dirent **namelist, int n_files);
+int resize_panels(WINDOW *left_panel, WINDOW *left_content, WINDOW *right_panel, WINDOW *right_content);
+int init_colors(void); 
 
 #endif  // ELTEX_COMMANDER_H

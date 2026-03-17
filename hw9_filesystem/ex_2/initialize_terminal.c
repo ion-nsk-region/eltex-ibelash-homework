@@ -50,5 +50,7 @@ int initialize_terminal(void) {
     return -5;
   }
 
+  init_colors();
+
   return 0;
 }

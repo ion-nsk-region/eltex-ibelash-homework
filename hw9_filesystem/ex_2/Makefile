@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -g -Wall -Wextra -Werror
 LIB = libeltex_commander.a
 SRC = $(filter-out eltex_commander.c, $(wildcard *.c))
 OBJ := $(SRC:.c=.o)

@@ -27,7 +27,7 @@ int create_panels(WINDOW *stdscr, WINDOW **left_panel, WINDOW **right_panel, WIN
     return -1;
   }
   *right_content = derwin(*right_panel, t_y - 4, (t_x / 2) - 2, 1, 1);
-  if (NULL == *right_panel) {
+  if (NULL == *right_content) {
     fprintf(stderr,
             "Не удалось создать окно для содержимого правой панели.\n"
             "Выходим.\n");
