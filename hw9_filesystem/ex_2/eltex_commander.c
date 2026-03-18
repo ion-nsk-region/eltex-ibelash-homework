@@ -6,6 +6,7 @@ int main(void) {
       *active_panel, *active_content;
   struct dirent **left_list = NULL, **right_list = NULL, **active_list = NULL;
   char path_buffer[PATH_MAX];
+  const char *active_path, *left_path, *right_path;
 
   ret = initialize_terminal();
   if (0 > ret) return ret;
@@ -16,12 +17,12 @@ int main(void) {
 
   // Первоначально открываемые директории: текущая и домашняя
   sprintf(path_buffer, "./");
-  const char *left_path = path_buffer;
+  left_path = path_buffer;
   if (0 != list_dir(left_path, &left_list, &left_nfiles)) {
     return -1;
   }
 
-  const char *right_path = getenv("HOME");
+  right_path = getenv("HOME");
   if (0 != list_dir(right_path, &right_list, &right_nfiles)) {
     return -2;
   }
@@ -31,13 +32,14 @@ int main(void) {
   active_select = left_select;
   active_list = left_list;
   active_nfiles = left_nfiles;
+  active_path = left_path;
   // исходная отрисовка
   print_all(left_panel, left_content, left_list, left_nfiles, right_panel,
             right_content, right_list, right_nfiles, active_content, active_select);
 
   do {
     // Собственно вывод на экран
-    debug(left_panel, left_content, right_panel, right_content, active_select);
+    // debug(left_panel, left_content, right_panel, right_content, active_select);
     refresh_all(left_panel, left_content, right_panel, right_content);
 
     button_pressed = getch();
@@ -49,19 +51,23 @@ int main(void) {
       case '\t':
         // переключаемся между панелями
         if (active_panel == left_panel) {
+          left_select = active_select;
+          left_path = active_path;
+          active_path = right_path;
           active_panel = right_panel;
           active_content = right_content;
           active_list = right_list;
           active_nfiles = right_nfiles;
-          left_select = active_select;
           active_select = right_select;
           print_dir(left_content, left_list, left_nfiles, -left_select);
         } else if (active_panel == right_panel) {
+          right_select = active_select;
+          right_path = active_path;
+          active_path = left_path;
           active_panel = left_panel;
           active_content = left_content;
           active_list = left_list;
           active_nfiles = left_nfiles;
-          right_select = active_select;
           active_select = left_select;
           print_dir(right_content, right_list, right_nfiles, -right_select);
         }
@@ -79,12 +85,25 @@ int main(void) {
             print_dir(active_content, active_list, active_nfiles, active_select);
         }
         break;
-      case KEY_ENTER:
+      case '\n':
         // открываем директорию или файл
+        unsigned char filetype = active_list[active_select]->d_type;
+        if (DT_DIR == filetype) {
+            snprintf(path_buffer, sizeof(path_buffer), "%.3839s/%s", active_path, active_list[active_select]->d_name);
+          active_path = path_buffer;
+
+          debug(active_path, path_buffer);
+
+          cleanup_namelist(active_list, active_nfiles);
+          list_dir(active_path, &active_list, &active_nfiles);
+          active_select = 1;
+          print_dir(active_content, active_list, active_nfiles, active_select);
+        }
 
         break;
       default:
         // Обработка случайных нажатий
+        mvprintw(0, 0, "Pressed %d", button_pressed);
     }
   } while ('q' != button_pressed);
 

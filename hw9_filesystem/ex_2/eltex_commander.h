@@ -30,6 +30,7 @@ void refresh_all(WINDOW *left_panel, WINDOW *left_content, WINDOW *right_panel,
                  WINDOW *right_content);
 
 
-void debug(WINDOW *left_panel, WINDOW *left_content, WINDOW *right_panel, WINDOW *right_content, int active_select);
+// void debug(WINDOW *left_panel, WINDOW *left_content, WINDOW *right_panel, WINDOW *right_content, int active_select);
+void debug(const char *path, char *path_buffer);
 
 #endif  // ELTEX_COMMANDER_H
