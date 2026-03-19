@@ -4,6 +4,10 @@
 
 int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
               int select) {
+        if (NULL == panel || NULL == namelist) {
+            fprintf(stderr, "Ошибка: print_dir - получен нулевой указатель.\n");
+            return -1;
+        }
   int err = 0, panel_length, offset = 0, is_active = 0;
   wclear(panel);  // вызывает мерцание, но без этого остаются артефакты от
                   // длинных имён

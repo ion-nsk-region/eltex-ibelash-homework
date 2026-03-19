@@ -1,8 +1,8 @@
 #include "eltex_commander.h"
 
-void debug(const char *path, char *path_buffer) {
-  if (NULL != path || NULL != path_buffer){
-     mvprintw(0, 0, "Path %s Buffer %s", path, path_buffer);
+void debug(char *path_buffer, char *namelist) {
+  if (NULL != namelist || NULL != path_buffer){
+     mvprintw(0, 0, "B %s N %s", path_buffer, namelist);
   } else {
      mvprintw(0, 0, "It is NULL");
   }
