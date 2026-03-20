@@ -20,11 +20,16 @@ int main(void) {
   sprintf(path_buffer, "./");
   left_path = realpath(path_buffer, NULL);
   if (NULL == left_path || 0 != list_dir(left_path, &left_list, &left_nfiles)) {
+    fprintf(stderr,
+            "Не удалось отобразить содержимое текущей директории. Выходим.");
     return -1;
   }
 
   right_path = realpath(getenv("HOME"), NULL);
-  if (0 != list_dir(right_path, &right_list, &right_nfiles)) {
+  if (NULL == right_path ||
+      0 != list_dir(right_path, &right_list, &right_nfiles)) {
+    fprintf(stderr,
+            "Не удалось отобразить содержимое домашней директории. Выходим.");
     return -2;
   }
 
@@ -36,6 +41,10 @@ int main(void) {
   print_all(left_panel, left_content, left_list, left_nfiles, right_panel,
             right_content, right_list, right_nfiles, active_content,
             active_select);
+
+  status_bar(
+      "q - выход, Tab - переключение между панелями, ↑ и ↓ - перемещение по "
+      "списку вверх и вниз, Enter - открыть директорию.");
 
   do {
     // Собственно вывод на экран
@@ -87,16 +96,20 @@ int main(void) {
         // открываем директорию или файл
         unsigned char filetype = active_list[active_select]->d_type;
         if (DT_DIR == filetype) {
+          char *fallback_path = active_path;
           snprintf(path_buffer, sizeof(path_buffer), "%.3839s/%s", active_path,
                    active_list[active_select]->d_name);
-          free(active_path);
           active_path = realpath(path_buffer, NULL);
-
-          debug(path_buffer, active_list[active_select]->d_name);
-
           cleanup_namelist(active_list, active_nfiles);
-          list_dir(active_path, &active_list, &active_nfiles);
-          active_select = 1;
+          if (0 == list_dir(active_path, &active_list, &active_nfiles)) {
+            active_select = 1;
+            free(fallback_path);
+          } else {
+            status_bar("Не удалось открыть директорию. Подробности в stderr.");
+            free(active_path);
+            active_path = fallback_path;
+            list_dir(active_path, &active_list, &active_nfiles);
+          }
           print_dir(active_content, active_list, active_nfiles, active_select);
           if (active_panel == left_panel) {
             switch_data(active_path, active_list, active_nfiles, active_select,
@@ -110,9 +123,8 @@ int main(void) {
         break;
       case 'q':
         ret = cleanup(left_panel, right_panel, left_content, right_content,
-                      left_list, left_nfiles, right_list, right_nfiles);
-        free(left_path);
-        free(right_path);
+                      left_list, left_nfiles, right_list, right_nfiles,
+                      left_path, right_path);
         break;
       default:
         // Обработка случайных нажатий

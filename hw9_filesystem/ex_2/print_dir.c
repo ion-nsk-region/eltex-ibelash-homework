@@ -25,24 +25,29 @@ int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
   for (int i = 0, ret = OK;
        i + offset < n_files && OK == ret && i - offset <= panel_length; i++) {
     unsigned char filetype = namelist[i + offset]->d_type;
-    /*
-    // TODO определяем тип файла через stat,
-    // если scandir не смогла получить эту информацию.
-    // TODO Выделить в функцию.
-
     if (DT_UNKNOWN == filetype) {
-      struct stat stat_buf;
-      char filepath[PATH_MAX];
-      sprintf(filepath, "%s/%s", dirpath, namelist[i + offset]->d_name);
-      lstat(filepath, &stat_buf);
-      switch(stat_buf.st_mode & S_IFMT) {
-          case S_IFREG: filetype = DT_REG; break;
-          case S_IFDIR: filetype = DT_DIR; break;
-          case S_IFLNK: filetype = DT_LNK; break;
-          default: filetype = 0;
-      }
+      status_bar(
+          "Не удалось определить тип для одного или нескольких файлов. "
+          "Подробности в stderr.");
+      fprintf(stderr, "Не удалось определить тип файла для %s",
+              namelist[i + offset]->d_name);
+      /*
+      // TODO определяем тип файла через stat,
+      // если scandir не смогла получить эту информацию.
+      // TODO Выделить в функцию.
+
+        struct stat stat_buf;
+        char filepath[PATH_MAX];
+        sprintf(filepath, "%s/%s", dirpath, namelist[i + offset]->d_name);
+        lstat(filepath, &stat_buf);
+        switch(stat_buf.st_mode & S_IFMT) {
+            case S_IFREG: filetype = DT_REG; break;
+            case S_IFDIR: filetype = DT_DIR; break;
+            case S_IFLNK: filetype = DT_LNK; break;
+            default: filetype = 0;
+        }
+      */
     }
-    */
     if (i == select && is_active) {
       wattron(panel, A_REVERSE);
     }
