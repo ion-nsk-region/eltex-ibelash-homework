@@ -8,10 +8,11 @@ int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
     fprintf(stderr, "Ошибка: print_dir - получен нулевой указатель.\n");
     return -1;
   }
-  int err = 0, panel_length, offset = 0, is_active = 0;
-  //wclear(panel);  // вызывает мерцание, но без этого остаются артефакты от
-                  // длинных имён
+  int err = 0, panel_length, panel_width, offset = 0, is_active = 0;
   panel_length = getmaxy(panel) - 1;
+  panel_width = getmaxx(panel);
+
+  // Если select < 0, то панель неактивна.
   if (0 <= select) {
     is_active = 1;
   } else {
@@ -23,15 +24,16 @@ int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
     select = panel_length;
   }
 
+  // очищаем содержимое, чтобы избавиться от артефактов.
   wmove(panel, 0, 0);
   wclrtobot(panel);
 
   for (int i = 0, ret = OK;
-       i + offset < n_files && OK == ret && i - offset <= panel_length; i++) {
+       i + offset < n_files && OK == ret && i <= panel_length; i++) {
     unsigned char filetype = namelist[i + offset]->d_type;
     if (DT_UNKNOWN == filetype) {
       status_bar(
-          "Не удалось определить тип для одного или нескольких файлов. "
+          "Не удалось определить тип файла. "
           "Подробности в stderr.");
       fprintf(stderr, "Не удалось определить тип файла для %s",
               namelist[i + offset]->d_name);
@@ -56,22 +58,27 @@ int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
     if (i == select && is_active) {
       wattron(panel, A_REVERSE);
     }
+    // TODO По идее, печать с форматированием строки надо выделить в функцию
+    // TODO добавить вывод размера и времени изменения файла
+    int width_name = panel_width - 2;
     if (DT_DIR == filetype) {
-      ret = mvwprintw(panel, i, 0, "/%s", namelist[i + offset]->d_name);
+      ret = mvwprintw(panel, i, 0, "/%.*s", width_name,
+                      namelist[i + offset]->d_name);
     } else if (DT_REG == filetype) {
-      ret = mvwprintw(panel, i, 0, " %s", namelist[i + offset]->d_name);
+      ret = mvwprintw(panel, i, 0, " %.*s", width_name,
+                      namelist[i + offset]->d_name);
     } else {
-      ret = mvwprintw(panel, i, 0, "?%s", namelist[i + offset]->d_name);
+      // TODO добавить обработку других известных типов файлов
+      ret = mvwprintw(panel, i, 0, "?%.*s", width_name,
+                      namelist[i + offset]->d_name);
+    }
+    if (ERR == ret) {
+      // perror("mvwprintw");
+      perror(namelist[i + offset]->d_name);
+      err = -1;
     }
     if (i == select && is_active) {
       wattroff(panel, A_REVERSE);
-    }
-
-    if (ERR == ret) {
-      // ошибка будет вываливаться каждый раз когда список файлов длиннее
-      // чем размер окна. Возможно здесь будет уместнее использовать пады.
-      perror("mvwprintw");
-      err = -1;
     }
   }
   return err;
