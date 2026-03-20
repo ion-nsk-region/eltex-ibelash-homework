@@ -1,8 +1,9 @@
 #include "eltex_commander.h"
 
-int create_panels(WINDOW *stdscr, WINDOW **left_panel, WINDOW **right_panel, WINDOW **left_content, WINDOW **right_content) {
+int create_panels(WINDOW *stdscr, WINDOW **left_panel, WINDOW **right_panel,
+                  WINDOW **left_content, WINDOW **right_content) {
   int t_y, t_x;  //< Размеры основного окна (терминала)
-                 
+
   getmaxyx(stdscr, t_y, t_x);
   *left_panel = newwin(t_y - 2, (t_x / 2), 1, 0);
   if (NULL == *left_panel) {
@@ -33,6 +34,6 @@ int create_panels(WINDOW *stdscr, WINDOW **left_panel, WINDOW **right_panel, WIN
             "Выходим.\n");
     return -1;
   }
-  
-  return 0; 
+
+  return 0;
 }

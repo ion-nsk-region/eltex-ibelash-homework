@@ -4,10 +4,10 @@
 
 int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
               int select) {
-        if (NULL == panel || NULL == namelist) {
-            fprintf(stderr, "Ошибка: print_dir - получен нулевой указатель.\n");
-            return -1;
-        }
+  if (NULL == panel || NULL == namelist) {
+    fprintf(stderr, "Ошибка: print_dir - получен нулевой указатель.\n");
+    return -1;
+  }
   int err = 0, panel_length, offset = 0, is_active = 0;
   wclear(panel);  // вызывает мерцание, но без этого остаются артефакты от
                   // длинных имён
@@ -26,8 +26,8 @@ int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
        i + offset < n_files && OK == ret && i - offset <= panel_length; i++) {
     unsigned char filetype = namelist[i + offset]->d_type;
     /*
-    // TODO определяем тип файла через stat, 
-    // если scandir не смогла получить эту информацию. 
+    // TODO определяем тип файла через stat,
+    // если scandir не смогла получить эту информацию.
     // TODO Выделить в функцию.
 
     if (DT_UNKNOWN == filetype) {

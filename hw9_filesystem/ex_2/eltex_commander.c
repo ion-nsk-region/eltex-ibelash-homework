@@ -7,7 +7,7 @@ int main(void) {
       *active_panel, *active_content;
   struct dirent **left_list = NULL, **right_list = NULL, **active_list = NULL;
   char path_buffer[PATH_MAX];
-  const char *active_path, *left_path, *right_path;
+  char *active_path = NULL, *left_path = NULL, *right_path = NULL;
 
   ret = initialize_terminal();
   if (0 > ret) return ret;
@@ -19,18 +19,19 @@ int main(void) {
   // Первоначально открываемые директории: текущая и домашняя
   sprintf(path_buffer, "./");
   left_path = realpath(path_buffer, NULL);
-  if (0 != list_dir(left_path, &left_list, &left_nfiles)) {
+  if (NULL == left_path || 0 != list_dir(left_path, &left_list, &left_nfiles)) {
     return -1;
   }
 
-  right_path = getenv("HOME");
+  right_path = realpath(getenv("HOME"), NULL);
   if (0 != list_dir(right_path, &right_list, &right_nfiles)) {
     return -2;
   }
 
   active_panel = left_panel;
   active_content = left_content;
-  switch_data(left_path, left_list, left_nfiles, left_select, &active_path, &active_list, &active_nfiles, &active_select);
+  switch_data(left_path, left_list, left_nfiles, left_select, &active_path,
+              &active_list, &active_nfiles, &active_select);
   // исходная отрисовка
   print_all(left_panel, left_content, left_list, left_nfiles, right_panel,
             right_content, right_list, right_nfiles, active_content,
@@ -50,14 +51,20 @@ int main(void) {
       case '\t':
         // переключаемся между панелями
         if (active_panel == left_panel) {
-          switch_data(active_path, active_list, active_nfiles, active_select, &left_path, &left_list, &left_nfiles, &left_select);
-          switch_data(right_path, right_list, right_nfiles, right_select, &active_path, &active_list, &active_nfiles, &active_select);
+          switch_data(active_path, active_list, active_nfiles, active_select,
+                      &left_path, &left_list, &left_nfiles, &left_select);
+          switch_data(right_path, right_list, right_nfiles, right_select,
+                      &active_path, &active_list, &active_nfiles,
+                      &active_select);
           active_panel = right_panel;
           active_content = right_content;
           print_dir(left_content, left_list, left_nfiles, -left_select);
         } else if (active_panel == right_panel) {
-          switch_data(active_path, active_list, active_nfiles, active_select, &right_path, &right_list, &right_nfiles, &right_select);
-          switch_data(left_path, left_list, left_nfiles, left_select, &active_path, &active_list, &active_nfiles, &active_select);
+          switch_data(active_path, active_list, active_nfiles, active_select,
+                      &right_path, &right_list, &right_nfiles, &right_select);
+          switch_data(left_path, left_list, left_nfiles, left_select,
+                      &active_path, &active_list, &active_nfiles,
+                      &active_select);
           active_panel = left_panel;
           active_content = left_content;
           print_dir(right_content, right_list, right_nfiles, -right_select);
@@ -82,6 +89,7 @@ int main(void) {
         if (DT_DIR == filetype) {
           snprintf(path_buffer, sizeof(path_buffer), "%.3839s/%s", active_path,
                    active_list[active_select]->d_name);
+          free(active_path);
           active_path = realpath(path_buffer, NULL);
 
           debug(path_buffer, active_list[active_select]->d_name);
@@ -90,17 +98,21 @@ int main(void) {
           list_dir(active_path, &active_list, &active_nfiles);
           active_select = 1;
           print_dir(active_content, active_list, active_nfiles, active_select);
+          if (active_panel == left_panel) {
+            switch_data(active_path, active_list, active_nfiles, active_select,
+                        &left_path, &left_list, &left_nfiles, &left_select);
+          } else if (active_panel == right_panel) {
+            switch_data(active_path, active_list, active_nfiles, active_select,
+                        &right_path, &right_list, &right_nfiles, &right_select);
+          }
         }
 
         break;
       case 'q':
-        if (active_panel == left_panel) {
-          switch_data(active_path, active_list, active_nfiles, active_select, &left_path, &left_list, &left_nfiles, &left_select);
-        } else if (active_panel == right_panel) {
-          switch_data(active_path, active_list, active_nfiles, active_select, &right_path, &right_list, &right_nfiles, &right_select);
-        }
         ret = cleanup(left_panel, right_panel, left_content, right_content,
                       left_list, left_nfiles, right_list, right_nfiles);
+        free(left_path);
+        free(right_path);
         break;
       default:
         // Обработка случайных нажатий
