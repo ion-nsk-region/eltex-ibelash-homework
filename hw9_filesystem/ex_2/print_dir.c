@@ -1,4 +1,4 @@
-#include <sys/stat.h>
+// #include <sys/stat.h>
 
 #include "eltex_commander.h"
 
@@ -9,7 +9,7 @@ int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
     return -1;
   }
   int err = 0, panel_length, offset = 0, is_active = 0;
-  wclear(panel);  // вызывает мерцание, но без этого остаются артефакты от
+  //wclear(panel);  // вызывает мерцание, но без этого остаются артефакты от
                   // длинных имён
   panel_length = getmaxy(panel) - 1;
   if (0 <= select) {
@@ -22,6 +22,10 @@ int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
     offset = select - panel_length;
     select = panel_length;
   }
+
+  wmove(panel, 0, 0);
+  wclrtobot(panel);
+
   for (int i = 0, ret = OK;
        i + offset < n_files && OK == ret && i - offset <= panel_length; i++) {
     unsigned char filetype = namelist[i + offset]->d_type;
@@ -48,6 +52,7 @@ int print_dir(WINDOW *panel, struct dirent **namelist, int n_files,
         }
       */
     }
+
     if (i == select && is_active) {
       wattron(panel, A_REVERSE);
     }
