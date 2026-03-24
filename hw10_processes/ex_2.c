@@ -41,15 +41,19 @@ int main(void) {
         printf(
             "Main: Нет, я - твой %d. С криком \"Ааааааа\" Process1 был "
             "завершён со статусом %d.\n",
-            getpid(), process_status);
+            getpid(), WEXITSTATUS(process_status));
       } else if (child_pid == process2_pid) {
-        printf("Main: Process2 завершён со статусом %d.\n", process_status);
+        printf("Main: Process2 завершён со статусом %d.\n",
+               WEXITSTATUS(process_status));
       } else if (child_pid == process3_pid) {
-        printf("Process1: Process3 завершён со статусом %d.\n", process_status);
+        printf("Process1: Process3 завершён со статусом %d.\n",
+               WEXITSTATUS(process_status));
       } else if (child_pid == process4_pid) {
-        printf("Process1: Process4 завершён со статусом %d.\n", process_status);
+        printf("Process1: Process4 завершён со статусом %d.\n",
+               WEXITSTATUS(process_status));
       } else if (child_pid == process5_pid) {
-        printf("Process2: Process5 завершён со статусом %d.\n", process_status);
+        printf("Process2: Process5 завершён со статусом %d.\n",
+               WEXITSTATUS(process_status));
       } else if (child_pid == -1) {
         perror("Processes wait");
       } else {
