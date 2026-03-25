@@ -11,6 +11,8 @@ int main(void) {
       child_pid = 0;
   int process_status;
 
+  printf("Main: PID %d, PPID %d\n", getpid(), getppid());
+
   // запускаем первый процесс
   errno = 0;
   process1_pid = fork();
@@ -20,9 +22,6 @@ int main(void) {
     process1(&process3_pid, &process4_pid);
   }
   if (0 < process1_pid || -1 == process1_pid) {
-    printf(
-        "Main: Оби-Ван никогда не рассказывал, что случилось с твоим отцом.\n");
-
     // запускаем второй процесс
     errno = 0;
     process2_pid = fork();
@@ -35,13 +34,10 @@ int main(void) {
 
   // обрабатываем выход из дочерних процессов
   do {
-    errno = 0;
     if (WIFEXITED(process_status) && 0 != child_pid) {
       if (child_pid == process1_pid) {
-        printf(
-            "Main: Нет, я - твой %d. С криком \"Ааааааа\" Process1 был "
-            "завершён со статусом %d.\n",
-            getpid(), WEXITSTATUS(process_status));
+        printf("Main: Process1 завершён со статусом %d.\n",
+               WEXITSTATUS(process_status));
       } else if (child_pid == process2_pid) {
         printf("Main: Process2 завершён со статусом %d.\n",
                WEXITSTATUS(process_status));
@@ -61,15 +57,16 @@ int main(void) {
                getppid());
       }
     }
+    errno = 0;
   } while (0 < (child_pid = wait(&process_status)));
+  if (-1 == child_pid && ECHILD != errno) {
+    perror("Wait");
+  }
   return 0;
 }
 
 void process1(pid_t *process3_pid, pid_t *process4_pid) {
-  printf(
-      "Process1: Он рассказал мне достаточно. "
-      "Он сказал мне (%d), что ты убил моего %d.\n",
-      getpid(), getppid());
+  printf("Process1: PID %d, PPID %d\n", getpid(), getppid());
   errno = 0;
   *process3_pid = fork();
   if (-1 == *process3_pid) {

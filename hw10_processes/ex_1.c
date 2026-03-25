@@ -12,14 +12,12 @@ int main(void) {
   if (-1 == child_pid) {
     perror("fork");
   } else if (0 == child_pid) {
-    printf("CHILD: I am a child with PID: %d and PPID: %d\n", getpid(),
-           getppid());
+    printf("CHILD: PID: %d PPID: %d\n", getpid(), getppid());
   } else {
-    printf("PARENT: I am a parent with PID: %d and PPID: %d\n", getpid(),
-           getppid());
+    printf("PARENT: PID: %d PPID: %d\n", getpid(), getppid());
     errno = 0;
     if (child_pid == wait(&status) && WIFEXITED(status)) {
-      printf("PARENT: Our child exited with status %d\n", WEXITSTATUS(status));
+      printf("PARENT: Child exited with status %d\n", WEXITSTATUS(status));
     } else {
       perror("wait");
     }
