@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <malloc.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -26,7 +27,7 @@ int main(void) {
     err = 0;
 
     // читаем команду и её аргументы
-    printf("Введите команду для запуска и её аргументы:\n");
+    printf("\nВведите команду для запуска и её аргументы: ");
     if (0 > (err = input(user_input, &user_input_length))) {
       // TODO сделать обработку очень длинного ввода, когда аргументов больше
       // чем BUFSIZ (err = -3)
@@ -34,7 +35,7 @@ int main(void) {
     }
 
     if (0 == err) {
-      arguments = (char **)malloc(user_input_length * sizeof(char *));
+      arguments = (char **)malloc((user_input_length + 1) * sizeof(char *));
       if (0 == parse_input(user_input, user_input_length, arguments)) {
         fprintf(stderr,
                 "Ошибка: не удалось разобрать аргументы. Попробуйте снова.\n");
@@ -97,16 +98,23 @@ int input(char user_input[BUFSIZ], int *user_input_length) {
 
   if (0 == err) {
     char *p = user_input;
+    int is_in_a_word = 0;
     while ('\n' != *p && p - user_input < BUFSIZ) {
+      // считаем слова
+      if (' ' == *p || '\t' == *p)
+        is_in_a_word = 0;
+      else if (0 == is_in_a_word) {
+        (*user_input_length)++;
+        is_in_a_word = 1;
+      }
       p++;
     }
     if (BUFSIZ == p - user_input && '\n' != *p) {
       // Пользовательский ввод больше буфера, требуется повторное чтение
       err = -3;
     } else {
-      // заменяем перенос строки на конец строки; считаем длину ввода
+      // заменяем перенос строки на конец строки
       *p = '\0';
-      *user_input_length = p - user_input;
     }
   }
 
@@ -200,7 +208,7 @@ int run_executable(char **arguments, int *exec_err) {
   errno = 0;
   if (-1 == execvp(arguments[0], arguments)) {
     int exec_error = errno;
-    perror("execvp");
+    // perror("execvp");
     // В случае ошибки exec, возвращаем её через канал
     errno = 0;
     if (-1 == write(exec_err[1], &exec_error, sizeof(int))) {
@@ -215,14 +223,14 @@ int run_executable(char **arguments, int *exec_err) {
 // ==========================================================================
 int elt_cd(char **args) {
   int err = 0;
-  if (args[1] == NULL) {
-    fprintf(stderr, "cd: отсутствует путь\n");
-    err = -1;
-  } else {
-    errno = 0;
-    if (0 != chdir(args[1])) {
-      perror("cd");
-    }
+  if (NULL == args[1] || 0 == strcmp("~", args[1])) {
+    args[1] = getenv("HOME");
   }
+  errno = 0;
+  if (0 != chdir(args[1])) {
+    perror("cd");
+    err = -1;
+  }
+
   return err;
 }
