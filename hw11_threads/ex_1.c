@@ -1,0 +1,96 @@
+#include <errno.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define N_STANDS 5
+#define GOODS_MIN 900
+#define GOODS_MAX 1100
+#define CUSTOMER_NEED_MIN 9900
+#define CUSTOMER_NEED_MAX 10100
+#define N_CUSTOMERS 3
+#define CUSTOMER_SLEEP 2
+#define LOADER_CARGO 200
+#define LOADER_SLEEP 1
+
+struct shop {
+  unsigned int shop_stand[N_STANDS];
+  pthread_mutex_t stand_occupation[N_STANDS];
+};
+
+void init_stands(unsigned int *shop_stand, unsigned int n_stands,
+                 unsigned int goods_min, unsigned int goods_max);
+void *load_stands(void *arg);
+void spawn_loader(struct shop *our_shop, pthread_t *loader_tid);
+
+int main(void) {
+  pthread_t loader_tid;
+  struct shop our_shop;
+  for (int i = 0; i < N_STANDS; i++) {
+    our_shop.stand_occupation[i] = PTHREAD_MUTEX_INITIALIZER;
+  }
+
+  init_stands(our_shop.shop_stand, N_STANDS, GOODS_MIN, GOODS_MAX);
+
+  spawn_loader(&our_shop, &loader_tid);
+  /*
+  printf("Покупатели заходят в магазин.\n");
+  spawn_customers(&shop_stand);
+
+  work_till_last_customer();
+  printf("Все покупатели закупились.\n");
+
+  printf("Отпускаем погрузчика домой.\n");
+  set_off_loader();
+  */
+
+  printf("Выходим.\n");
+
+  sleep(5);
+
+  return 0;
+}
+
+void init_stands(unsigned int *shop_stand, unsigned int n_stands,
+                 unsigned int goods_min, unsigned int goods_max) {
+  srand(time(NULL));
+
+  *shop_stand = goods_min + rand() % (goods_max - goods_min + 1);
+  printf("Исходное состояние ларьков:\n%u", *shop_stand);
+  for (unsigned int *p = (shop_stand + 1); p - shop_stand < n_stands; p++) {
+    *p = goods_min + rand() % (goods_max - goods_min + 1);
+    printf(" %u", *p);
+  }
+  printf("\n");
+}
+
+void spawn_loader(struct shop *our_shop, pthread_t *loader_tid) {
+  printf("Погрузчик выходит на работу.\n");
+  pthread_create(loader_tid, NULL, load_stands, our_shop);
+}
+
+void *load_stands(void *arg) {
+  struct shop *our_shop = arg;
+  int stand_num, ret;
+
+  while (1) {
+    stand_num = rand() % N_STANDS;
+    ret = pthread_mutex_trylock(*(our_shop->stand_occupation[stand_num]));
+    if (0 == ret) {
+      printf("Погрузчик зашёл в ларёк %u.\n", stand_num);
+      *our_shop->shop_stand = *(our_shop->shop_stand) + LOADER_CARGO;
+      pthread_mutex_unlock(*(our_shop->stand_occupation[stand_num]));
+      sleep(LOADER_SLEEP);
+    } else if (EBUSY == ret) {
+      // ларёк занят, идём в другой
+      printf("Погрузчик пытался зайти в ларёк %u, но там уже кто-то есть.\n",
+             stand_num);
+      // sleep(LOADER_SLEEP); // в задании как-то не уточнено, должен он спать
+      // при неудачной попытке, или нет.
+      break;
+    } else {
+      printf("Ошибка при попытке заблокировать мютекс: %d", ret);
+    }
+  }
+}
