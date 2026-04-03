@@ -28,7 +28,7 @@ int main(void) {
   pthread_t loader_tid;
   struct shop our_shop;
   for (int i = 0; i < N_STANDS; i++) {
-    our_shop.stand_occupation[i] = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_init(&our_shop.stand_occupation[i], NULL);
   }
 
   init_stands(our_shop.shop_stand, N_STANDS, GOODS_MIN, GOODS_MAX);
@@ -45,6 +45,11 @@ int main(void) {
   set_off_loader();
   */
 
+  /*
+  for (int i = 0; i < N_STANDS; i++) {
+    pthread_mutex_destroy(&our_shop.stand_occupation[i]);
+  }
+  */
   printf("Выходим.\n");
 
   sleep(5);
@@ -72,25 +77,29 @@ void spawn_loader(struct shop *our_shop, pthread_t *loader_tid) {
 
 void *load_stands(void *arg) {
   struct shop *our_shop = arg;
-  int stand_num, ret;
 
   while (1) {
+    unsigned int stand_num;
+    int ret;
     stand_num = rand() % N_STANDS;
-    ret = pthread_mutex_trylock(*(our_shop->stand_occupation[stand_num]));
+    ret = pthread_mutex_trylock(&our_shop->stand_occupation[stand_num]);
     if (0 == ret) {
       printf("Погрузчик зашёл в ларёк %u.\n", stand_num);
-      *our_shop->shop_stand = *(our_shop->shop_stand) + LOADER_CARGO;
-      pthread_mutex_unlock(*(our_shop->stand_occupation[stand_num]));
+      our_shop->shop_stand[stand_num] =
+          our_shop->shop_stand[stand_num] + LOADER_CARGO;
+      printf("\tВ ларке %u стало %u товара.\n", stand_num,
+             our_shop->shop_stand[stand_num]);
+      pthread_mutex_unlock(&our_shop->stand_occupation[stand_num]);
       sleep(LOADER_SLEEP);
     } else if (EBUSY == ret) {
       // ларёк занят, идём в другой
       printf("Погрузчик пытался зайти в ларёк %u, но там уже кто-то есть.\n",
              stand_num);
-      // sleep(LOADER_SLEEP); // в задании как-то не уточнено, должен он спать
-      // при неудачной попытке, или нет.
-      break;
+      // sleep(LOADER_SLEEP); // в задании как-то не уточнено, должен ли он
+      // спать при неудачной попытке, или нет.
     } else {
       printf("Ошибка при попытке заблокировать мютекс: %d", ret);
     }
   }
+  return 0;
 }
