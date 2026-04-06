@@ -21,12 +21,14 @@ struct shop {
 
 void init_stands(unsigned int *shop_stand, unsigned int n_stands,
                  unsigned int goods_min, unsigned int goods_max);
-void *load_stands(void *arg);
+void *loader(void *arg);
 void spawn_loader(struct shop *our_shop, pthread_t *loader_tid);
+void set_off_loader(pthread_t loader_tid);
 
 int main(void) {
   pthread_t loader_tid;
   struct shop our_shop;
+  printf("Создаём мютексы.\n");
   for (int i = 0; i < N_STANDS; i++) {
     pthread_mutex_init(&our_shop.stand_occupation[i], NULL);
   }
@@ -34,25 +36,23 @@ int main(void) {
   init_stands(our_shop.shop_stand, N_STANDS, GOODS_MIN, GOODS_MAX);
 
   spawn_loader(&our_shop, &loader_tid);
+  sleep(5);
   /*
   printf("Покупатели заходят в магазин.\n");
   spawn_customers(&shop_stand);
 
   work_till_last_customer();
   printf("Все покупатели закупились.\n");
-
-  printf("Отпускаем погрузчика домой.\n");
-  set_off_loader();
   */
 
-  /*
+  set_off_loader(loader_tid);
+
+  printf("Уничтожаем мютексы.\n");
   for (int i = 0; i < N_STANDS; i++) {
     pthread_mutex_destroy(&our_shop.stand_occupation[i]);
   }
-  */
-  printf("Выходим.\n");
 
-  sleep(5);
+  printf("Выходим.\n");
 
   return 0;
 }
@@ -72,10 +72,10 @@ void init_stands(unsigned int *shop_stand, unsigned int n_stands,
 
 void spawn_loader(struct shop *our_shop, pthread_t *loader_tid) {
   printf("Погрузчик выходит на работу.\n");
-  pthread_create(loader_tid, NULL, load_stands, our_shop);
+  pthread_create(loader_tid, NULL, loader, our_shop);
 }
 
-void *load_stands(void *arg) {
+void *loader(void *arg) {
   struct shop *our_shop = arg;
 
   while (1) {
@@ -90,7 +90,7 @@ void *load_stands(void *arg) {
       printf("\tВ ларке %u стало %u товара.\n", stand_num,
              our_shop->shop_stand[stand_num]);
       pthread_mutex_unlock(&our_shop->stand_occupation[stand_num]);
-      sleep(LOADER_SLEEP);
+      sleep(LOADER_SLEEP);  // точка отмены потока
     } else if (EBUSY == ret) {
       // ларёк занят, идём в другой
       printf("Погрузчик пытался зайти в ларёк %u, но там уже кто-то есть.\n",
@@ -102,4 +102,35 @@ void *load_stands(void *arg) {
     }
   }
   return 0;
+}
+
+void set_off_loader(pthread_t loader_tid) {
+  int ret;
+
+  printf("Отпускаем погрузчика домой.\n");
+  ret = pthread_cancel(loader_tid);
+  if (0 == ret) {
+    printf("Погрузчику сообщили, что работы больше нет.\n");
+  } else {
+    printf("Не получилось сообщить погрузчику. См. подробности в stderr\n");
+    errno = ret;
+    perror("pthread_cancel");
+    // падаем?
+  }
+
+  void *result;
+  ret = pthread_join(loader_tid, &result);
+  if (0 != ret) {
+    errno = ret;
+    perror("pthread_join");
+  }
+
+  if (PTHREAD_CANCELED == result) {
+    printf("Погрузчик ушёл домой.\n");
+  } else {
+    printf(
+        "Погрузчик всё ещё работает тихонько напевая:\n"
+        "Грузчик! Грузчик! Парень работящий - берёт, кладёт и тащит.\n");
+    // падаем?
+  }
 }
