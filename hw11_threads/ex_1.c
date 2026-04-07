@@ -24,6 +24,8 @@ void init_stands(unsigned int *shop_stand, unsigned int n_stands,
 void *loader(void *arg);
 void spawn_loader(struct shop *our_shop, pthread_t *loader_tid);
 void set_off_loader(pthread_t loader_tid);
+void spawn_customers(struct shop *our_shop,
+                     pthread_t *customers_tid[N_CUSTOMERS]);
 
 int main(void) {
   pthread_t loader_tid;
@@ -38,7 +40,6 @@ int main(void) {
   spawn_loader(&our_shop, &loader_tid);
   sleep(5);
   /*
-  printf("Покупатели заходят в магазин.\n");
   spawn_customers(&shop_stand);
 
   work_till_last_customer();
@@ -132,5 +133,33 @@ void set_off_loader(pthread_t loader_tid) {
         "Погрузчик всё ещё работает тихонько напевая:\n"
         "Грузчик! Грузчик! Парень работящий - берёт, кладёт и тащит.\n");
     // падаем?
+  }
+}
+
+void spawn_customers(struct shop *our_shop,
+                     pthread_t *customers_tid[N_CUSTOMERS]) {
+  printf("Покупатели заходят в магазин.\n");
+  for (int i = 0; i < N_CUSTOMERS; i++) {
+    pthread_create(customers_tid[i], NULL, customer, our_shop);
+  }
+}
+
+void *customer(void *arg) {
+  struct shop *our_shop = arg;
+  int need =
+      rand() % (CUSTOMER_NEED_MAX - CUSTOMER_NEED_MIN) + CUSTOMER_NEED_MIN;
+  pthread_t customer_tid = pthread_self();
+
+  while (0 < need) {
+	unsigned int stand_num;
+	int ret;
+	stand_num = rand() % N_STANDS;
+
+	ret = pthread_mutex_trylock(&our_shop->stand_occupation[stand_num]);
+	if (0 == ret) {
+		printf("Покупатель %d зашёл в ларёк %u где было %u единиц товара.\n", customer_tid, stand_num, our_shop->shop_stand[stand_num]);
+		need = need - our_shop->shop_stand[stand_num];
+		printf("\tПокупателю %d требуется ещё %u единиц товара.\n", customer_tid, need);
+	} else if
   }
 }
