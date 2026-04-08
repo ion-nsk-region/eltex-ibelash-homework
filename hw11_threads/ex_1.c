@@ -24,11 +24,13 @@ void init_stands(unsigned int *shop_stand, unsigned int n_stands,
 void *loader(void *arg);
 void spawn_loader(struct shop *our_shop, pthread_t *loader_tid);
 void set_off_loader(pthread_t loader_tid);
+void *customer(void *arg);
 void spawn_customers(struct shop *our_shop,
-                     pthread_t *customers_tid[N_CUSTOMERS]);
+                     pthread_t customers_tid[N_CUSTOMERS]);
+void work_till_last_customer(pthread_t customers_tid[N_CUSTOMERS]);
 
 int main(void) {
-  pthread_t loader_tid;
+  pthread_t loader_tid, customers_tid[N_CUSTOMERS];
   struct shop our_shop;
   printf("Создаём мютексы.\n");
   for (int i = 0; i < N_STANDS; i++) {
@@ -38,13 +40,10 @@ int main(void) {
   init_stands(our_shop.shop_stand, N_STANDS, GOODS_MIN, GOODS_MAX);
 
   spawn_loader(&our_shop, &loader_tid);
-  sleep(5);
-  /*
-  spawn_customers(&shop_stand);
 
-  work_till_last_customer();
-  printf("Все покупатели закупились.\n");
-  */
+  spawn_customers(&our_shop, customers_tid);
+
+  work_till_last_customer(customers_tid);
 
   set_off_loader(loader_tid);
 
@@ -91,7 +90,9 @@ void *loader(void *arg) {
       printf("\tВ ларке %u стало %u товара.\n", stand_num,
              our_shop->shop_stand[stand_num]);
       pthread_mutex_unlock(&our_shop->stand_occupation[stand_num]);
+      printf("Погрузчик ушёл на склад и вернётся через 1 секунду.\n");
       sleep(LOADER_SLEEP);  // точка отмены потока
+      printf("Погрузчик вернулся с товаром.\n");
     } else if (EBUSY == ret) {
       // ларёк занят, идём в другой
       printf("Погрузчик пытался зайти в ларёк %u, но там уже кто-то есть.\n",
@@ -99,23 +100,26 @@ void *loader(void *arg) {
       // sleep(LOADER_SLEEP); // в задании как-то не уточнено, должен ли он
       // спать при неудачной попытке, или нет.
     } else {
-      printf("Ошибка при попытке заблокировать мютекс: %d", ret);
+      printf(
+          "Погрузчик не смог заблокировать мютекс ларька %u. См. подробности в "
+          "stderr.",
+          stand_num);
+      errno = ret;
+      perror("pthread_mutex_trylock");
     }
   }
   return 0;
 }
 
 void set_off_loader(pthread_t loader_tid) {
-  int ret;
-
   printf("Отпускаем погрузчика домой.\n");
-  ret = pthread_cancel(loader_tid);
+  int ret = pthread_cancel(loader_tid);
   if (0 == ret) {
     printf("Погрузчику сообщили, что работы больше нет.\n");
   } else {
-    printf("Не получилось сообщить погрузчику. См. подробности в stderr\n");
     errno = ret;
     perror("pthread_cancel");
+    printf("Не получилось сообщить погрузчику. См. подробности в stderr\n");
     // падаем?
   }
 
@@ -137,10 +141,10 @@ void set_off_loader(pthread_t loader_tid) {
 }
 
 void spawn_customers(struct shop *our_shop,
-                     pthread_t *customers_tid[N_CUSTOMERS]) {
+                     pthread_t customers_tid[N_CUSTOMERS]) {
   printf("Покупатели заходят в магазин.\n");
   for (int i = 0; i < N_CUSTOMERS; i++) {
-    pthread_create(customers_tid[i], NULL, customer, our_shop);
+    pthread_create(&customers_tid[i], NULL, customer, our_shop);
   }
 }
 
@@ -151,15 +155,55 @@ void *customer(void *arg) {
   pthread_t customer_tid = pthread_self();
 
   while (0 < need) {
-	unsigned int stand_num;
-	int ret;
-	stand_num = rand() % N_STANDS;
+    unsigned int stand_num;
+    int ret;
+    stand_num = rand() % N_STANDS;
 
-	ret = pthread_mutex_trylock(&our_shop->stand_occupation[stand_num]);
-	if (0 == ret) {
-		printf("Покупатель %d зашёл в ларёк %u где было %u единиц товара.\n", customer_tid, stand_num, our_shop->shop_stand[stand_num]);
-		need = need - our_shop->shop_stand[stand_num];
-		printf("\tПокупателю %d требуется ещё %u единиц товара.\n", customer_tid, need);
-	} else if
+    ret = pthread_mutex_trylock(&our_shop->stand_occupation[stand_num]);
+    if (0 == ret) {
+      printf("Покупатель %lx зашёл в ларёк %u где было %u единиц товара.\n",
+             customer_tid, stand_num, our_shop->shop_stand[stand_num]);
+      need = need - our_shop->shop_stand[stand_num];
+      our_shop->shop_stand[stand_num] = 0;
+      pthread_mutex_unlock(&our_shop->stand_occupation[stand_num]);
+      printf("\tПокупателю %lx требуется ещё %d единиц товара.\n", customer_tid,
+             need);
+      printf("\tПокупатель %lx уснул на 2 секунды.\n", customer_tid);
+      sleep(CUSTOMER_SLEEP);
+      printf("Покупатель %lx проснулся. Его текущая потребность %d.\n",
+             customer_tid, need);
+    } else if (EBUSY == ret) {
+      printf(
+          "Покупатель %lx пытался зайти в ларёк %u, но там уже кто-то есть.\n",
+          customer_tid, stand_num);
+    } else {
+      errno = ret;
+      perror("pthread_mutex_trylock");
+      printf(
+          "Покупатель %lx не смог заблокировать мютекс ларька %u. "
+          "См. подробности в stderr.",
+          customer_tid, stand_num);
+    }
   }
+  printf("Покупатель %lx удовлетворил свою потребность.\n", customer_tid);
+  return (void *)5;
+}
+
+void work_till_last_customer(pthread_t customers_tid[N_CUSTOMERS]) {
+  void *status;
+  for (int i = 0; i < N_CUSTOMERS; i++) {
+    int ret;
+    if (0 == (ret = pthread_join(customers_tid[i], &status))) {
+      long int exit_code = (long int)status;
+      printf("Покупатель %lx покинул магазин со статусом %ld.\n",
+             customers_tid[i], exit_code);
+    } else {
+      errno = ret;
+      perror("pthread_join");
+      printf("Покупателю %lx стало плохо. См. подробности в stderr.",
+             customers_tid[i]);
+      // падаем?
+    }
+  }
+  printf("Все покупатели закупились.\n");
 }
