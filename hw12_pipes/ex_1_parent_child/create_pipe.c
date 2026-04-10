@@ -8,5 +8,5 @@ int create_pipe(int *my_pipe) {
     perror("pipe");
   }
 
-  return err; 
+  return err;
 }
