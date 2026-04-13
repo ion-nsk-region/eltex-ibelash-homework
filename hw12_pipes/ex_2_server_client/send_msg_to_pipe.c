@@ -23,6 +23,8 @@ int send_msg_to_pipe(char *pipe_path, int connection_timeout, char *msg) {
       if (-1 == pipe_fd && ENXIO != errno) {
         perror("open");
         err = -1;
+      } else if (0 == err && 0 == errno) {
+        printf("\nDEBUG: Успешно подключились.\n");
       }
       if (0 == err) {
         sleep(SLEEP_TIME);
@@ -32,13 +34,20 @@ int send_msg_to_pipe(char *pipe_path, int connection_timeout, char *msg) {
   }
 
   if (0 == err) {
+    printf("\nDEBUG: Пишем: %s\n", msg);
     errno = 0;
     ssize_t bytes_written = write(pipe_fd, msg, msg_length);
+    printf("\nDEBUG: bytes_written %ld\n", bytes_written);
     if (-1 == bytes_written) {
       perror("write");
       err = -1;
+    } else if (0 < bytes_written) {
+      printf("\nDEBUG: записали %s\n", msg);
+    } else {
+      printf("\nDEBUG: Не записали\n");
     }
   }
+  // close_pipe(pipe_fd);
 
   return err;
 }

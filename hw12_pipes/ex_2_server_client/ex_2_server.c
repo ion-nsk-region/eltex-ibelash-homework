@@ -4,7 +4,7 @@
 
 int main(void) {
   int err;
-  int conn_timeout = 60;  // время ожидания подключения
+  int conn_timeout = CONNECTION_TIMEOUT;
 
   err = create_pipe(PIPE_PATH);
   if (0 > err) {
@@ -16,11 +16,14 @@ int main(void) {
     if (-1 == (err = send_msg_to_pipe(PIPE_PATH, conn_timeout, MSG_TO_SEND))) {
       printf(
           "Ошибка: не удалось отправить сообщение через канал.\n"
-          "См. подробности в stderr.\nВыходим.");
+          "См. подробности в stderr.\nВыходим.\n");
     } else if (ETIME == err) {
       printf(
           "Ошибка: не удалось отправить сообщение через канал.\n"
-          "Время ожидания клиента истекло.\nВыходим.");
+          "Время ожидания клиента истекло.\nВыходим.\n");
+    }
+    if (0 != err) {
+      delete_pipe(PIPE_PATH);
     }
   }
 
