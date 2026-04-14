@@ -6,7 +6,10 @@ int main(void) {
   char msg[PIPE_BUF] = "";
 
   err = read_msg_from_pipe(PIPE_PATH, conn_timeout, msg);
-  if (ETIME == err) {
+  if (0 == err) {
+    // Вывод сообщения
+    printf("%s\n", msg);
+  } else if (ETIME == err) {
     printf(
         "Ошибка: не удалось получить сообщение через канал.\n"
         "Время ожидания сервера истекло.\nВыходим.\n");
@@ -14,8 +17,6 @@ int main(void) {
     printf(
         "Ошибка: не удалось получить сообщение через канал.\n"
         "Канал не существует.\nВыходим.\n");
-  } else if (0 == err) {
-    printf("Сообщение: %s\n", msg);
   } else {
     printf(
         "Ошибка: не удалось получить сообщение через канал. Код ошибки %d.\n"

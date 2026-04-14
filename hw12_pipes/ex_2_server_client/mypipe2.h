@@ -26,5 +26,6 @@ int close_pipe(int pipe_fd);
 int send_msg_to_pipe(char *pipe_path, int connection_timeout, char *msg);
 int read_msg_from_pipe(char *pipe_path, int conn_timeout, char *msg);
 int conn_timer(int connection_timeout, int n_attempts);
+int wait4server(char *pipe_path, int conn_timeout, int *pipe_fd);
 
 #endif // MYPIPE2_H
