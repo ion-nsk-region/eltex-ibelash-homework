@@ -1,3 +1,6 @@
+#ifndef MYPIPE2_H
+#define MYPIPE2_H
+
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -23,3 +26,5 @@ int close_pipe(int pipe_fd);
 int send_msg_to_pipe(char *pipe_path, int connection_timeout, char *msg);
 int read_msg_from_pipe(char *pipe_path, int conn_timeout, char *msg);
 int conn_timer(int connection_timeout, int n_attempts);
+
+#endif // MYPIPE2_H

@@ -1,3 +1,6 @@
+#ifndef EX1_H
+#define EX1_H
+
 #include <errno.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -28,3 +31,5 @@ void *customer(void *arg);
 void spawn_customers(struct shop *our_shop,
                      pthread_t customers_tid[N_CUSTOMERS]);
 void work_till_last_customer(pthread_t customers_tid[N_CUSTOMERS]);
+
+#endif // EX1_H
