@@ -6,6 +6,7 @@ int wait4server(char *pipe_path, int conn_timeout, int *pipe_fd) {
   *pipe_fd = -2;
 
   do {
+    ssize_t bytes_read;
     // Ожидаем если файл FIFO не существует,
     // или если к нему никто не подключен на запись
     errno = 0;
@@ -13,14 +14,21 @@ int wait4server(char *pipe_path, int conn_timeout, int *pipe_fd) {
       *pipe_fd = open(pipe_path, O_RDONLY | O_NONBLOCK);
     }
     if ((-1 == *pipe_fd && ENOENT == errno) ||
-        (0 == read(*pipe_fd, tmp_buf, PIPE_BUF) && 0 == errno)) {
+        (0 == (bytes_read = read(*pipe_fd, tmp_buf, PIPE_BUF)) && 0 == errno)) {
       sleep(SLEEP_TIME);
       err = conn_timer(conn_timeout, n_attempts++);  // возвращает 0 или ETIME
     } else if (-1 == *pipe_fd && ENOENT != errno) {
       perror("open");
       err = -1;
-    } else {
+    } else if (-1 == bytes_read && (EAGAIN == errno || EWOULDBLOCK == errno)) {
       is_server_up = 1;
+    } else if (-1 == bytes_read && EAGAIN != errno && EWOULDBLOCK != errno) {
+      perror("read");
+      err = -1;
+    } else {
+      // по идее, мы не должны тут оказаться.
+      printf("Сообщение было прочитано во временный буфер.\nСообщение: %s\n",
+             tmp_buf);
     }
   } while (0 == is_server_up && 0 == err);
 
