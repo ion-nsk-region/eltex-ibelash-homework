@@ -1,8 +1,9 @@
 #include "eltex_shell.h"
 
-int input(char user_input[BUFSIZ], int *user_input_length) {
+int input(char user_input[BUFSIZ], int *n_pipes, int *n_words) {
   int err = 0;
-  *user_input_length = 0;
+  *n_words = 0;
+  *n_pipes = 0;
 
   if (NULL == fgets(user_input, BUFSIZ, stdin)) {
     // ошибка во время ввода/прерванный ввод
@@ -21,9 +22,10 @@ int input(char user_input[BUFSIZ], int *user_input_length) {
       if (' ' == *p || '\t' == *p)
         is_in_a_word = 0;
       else if (0 == is_in_a_word) {
-        (*user_input_length)++;
+        (*n_words)++;
         is_in_a_word = 1;
       }
+      if ('|' == *p) (*n_pipes)++;
       p++;
     }
     if (BUFSIZ == p - user_input && '\n' != *p) {

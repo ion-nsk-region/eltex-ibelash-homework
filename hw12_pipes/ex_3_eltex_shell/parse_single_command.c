@@ -1,12 +1,10 @@
 #include "eltex_shell.h"
 
-int parse_input(char user_input[BUFSIZ], int user_input_length,
-                char **arguments) {
-  if (0 == user_input_length) {
-    return 0;
-  }
+int parse_single_command(char *input, char **arguments) {
   char **p = arguments;
-  char *token = strtok(user_input, " ");
+  char *token = strtok(input, " ");
+
+  if (NULL == token) return -1;
 
   while (NULL != token) {
     *p = token;
@@ -15,5 +13,5 @@ int parse_input(char user_input[BUFSIZ], int user_input_length,
   }
   *p = NULL;  // последний аргумент должен быть NULL для execvp
 
-  return p - arguments;
+  return p - arguments;  // n_words
 }

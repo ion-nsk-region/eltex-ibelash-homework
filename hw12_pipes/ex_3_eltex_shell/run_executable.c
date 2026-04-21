@@ -2,7 +2,7 @@
 
 int run_executable(char **arguments, int *exec_err) {
   int err = 0;
-  // закрываем канал на чтение, только пишем
+  // закрываем канал ошибок на чтение, только пишем
   errno = 0;
   if (-1 == close(exec_err[0])) {
     perror("close");
