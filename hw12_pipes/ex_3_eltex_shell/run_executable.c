@@ -12,13 +12,15 @@ int run_executable(char **arguments, int *exec_err) {
   // запускаем наш исполняемый файл
   errno = 0;
   if (-1 == execvp(arguments[0], arguments)) {
-    int exec_error = errno;
-    // perror("execvp");
-    // В случае ошибки exec, возвращаем её через канал
-    errno = 0;
-    if (-1 == write(exec_err[1], &exec_error, sizeof(int))) {
-      perror("write");
-    }
+    //    int exec_error = errno;
+    perror("execvp");
+    /*
+   // В случае ошибки exec, возвращаем её через канал
+   errno = 0;
+   if (-1 == write(exec_err[1], &exec_error, sizeof(int))) {
+     perror("write");
+   }
+   */
     _exit(0);
   }
 

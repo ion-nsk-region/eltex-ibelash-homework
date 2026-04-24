@@ -24,6 +24,7 @@ int main(void) {
                 "Ошибка: не удалось разобрать аргументы. Попробуйте снова.\n");
         err -= 1;
       }
+      // TODO починить парсингш аргументов для встроенных команд
       if (0 == strcmp("exit", arguments[0])) is_running = 0;
       if (0 == strcmp("cd", arguments[0])) {
         err = elt_cd(arguments);
@@ -32,7 +33,8 @@ int main(void) {
     }
 
     if (0 == err && is_running) {
-      err = create_pipes(n_pipes, exec_err, exec_pipe);
+      err = create_pipes(&exec_err, n_pipes + 1);
+      if (0 == err) err = create_pipes(&exec_pipe, n_pipes);
     }
 
     if (0 == err && is_running) {
