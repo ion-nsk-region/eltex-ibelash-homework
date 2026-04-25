@@ -10,10 +10,13 @@ int configure_child_channels(int *exec_pipe_in, int *exec_pipe_out) {
     errno = 0;
     if (0 == err && -1 == dup2(exec_pipe_in[0], 0)) {
       perror("dup2");
+      fprintf(stderr, "DEBUG: exec_pipe_in %p = %d\n", exec_pipe_in,
+              exec_pipe_in[0]);
       err = -1;
+    } else {
+      fprintf(stderr, "DEBUG: Настроили канал %d на чтение входных данных.\n",
+              exec_pipe_in[0]);
     }
-    fprintf(stderr, "DEBUG: Настроили канал %d на чтение входных данных.\n",
-            exec_pipe_in[0]);
   }
 
   if (0 == err && NULL != exec_pipe_out) {
@@ -22,10 +25,13 @@ int configure_child_channels(int *exec_pipe_in, int *exec_pipe_out) {
     errno = 0;
     if (0 == err && -1 == dup2(exec_pipe_out[1], 1)) {
       perror("dup2");
+      fprintf(stderr, "DEBUG: exec_pipe_out %p = %d\n", exec_pipe_out,
+              exec_pipe_out[1]);
       err = -1;
+    } else {
+      fprintf(stderr, "DEBUG: Настроили канал %d на вывод данных.\n",
+              exec_pipe_out[1]);
     }
-    fprintf(stderr, "DEBUG: Настроили канал %d на вывод данных.\n",
-            exec_pipe_out[1]);
   }
 
   return err;

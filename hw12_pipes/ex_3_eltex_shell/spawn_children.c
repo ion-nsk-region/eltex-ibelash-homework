@@ -28,12 +28,12 @@ int spawn_children(char **all_args, int n_pipes, int **exec_err,
       int *exec_pipe_out = NULL, *exec_pipe_in = NULL;
       parse_single_command(*all_args, arguments);
       if (NULL != exec_pipe) {
-        if (pid_ptr - executable_pid < n_pipes) {
-          exec_pipe_out = *exec_pipe;
-        }
         if (0 < pid_ptr - executable_pid) {
           exec_pipe_in = *exec_pipe;
           exec_pipe++;
+        }
+        if (pid_ptr - executable_pid < n_pipes) {
+          exec_pipe_out = *exec_pipe;
         }
       }
 
