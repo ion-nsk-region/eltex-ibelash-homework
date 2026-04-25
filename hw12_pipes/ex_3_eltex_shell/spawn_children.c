@@ -4,7 +4,7 @@ int spawn_children(char **all_args, int n_pipes, int **exec_err,
                    int **exec_pipe, int n_words) {
   int err = 0, n_children = n_pipes + 1;
   char **arguments;
-  int **error_pipe;
+  int **error_pipe_ptr, **exec_pipe_ptr;
   pid_t *pid_ptr, *executable_pid;
 
   errno = 0;
@@ -22,18 +22,19 @@ int spawn_children(char **all_args, int n_pipes, int **exec_err,
   }
 
   if (0 == err) {
-    for (pid_ptr = executable_pid, error_pipe = exec_err;
+    for (pid_ptr = executable_pid, error_pipe_ptr = exec_err,
+        exec_pipe_ptr = exec_pipe;
          pid_ptr - executable_pid < n_children;
-         pid_ptr++, error_pipe++, all_args++) {
+         pid_ptr++, error_pipe_ptr++, all_args++) {
       int *exec_pipe_out = NULL, *exec_pipe_in = NULL;
       parse_single_command(*all_args, arguments);
       if (NULL != exec_pipe) {
         if (0 < pid_ptr - executable_pid) {
-          exec_pipe_in = *exec_pipe;
-          exec_pipe++;
+          exec_pipe_in = *exec_pipe_ptr;
+          exec_pipe_ptr++;
         }
         if (pid_ptr - executable_pid < n_pipes) {
-          exec_pipe_out = *exec_pipe;
+          exec_pipe_out = *exec_pipe_ptr;
         }
       }
 
@@ -50,7 +51,7 @@ int spawn_children(char **all_args, int n_pipes, int **exec_err,
         }
         // - запускаем наш исполняемый файл
         if (0 == err) {
-          err = run_executable(arguments, *error_pipe);
+          err = run_executable(arguments, *error_pipe_ptr);
         } else {
           fprintf(stderr,
                   "Не удалось запустить процесс %s так как не были настроены "
@@ -68,11 +69,11 @@ int spawn_children(char **all_args, int n_pipes, int **exec_err,
                   exec_pipe_in[0], exec_pipe_in[1]);
         }
         // закрываем на запись канал ошибок
-        if (0 != close_pipe_end((*error_pipe)[1])) {
+        if (0 != close_pipe_end((*error_pipe_ptr)[1])) {
           fprintf(stderr,
                   "Ошибка: Родителю не удалось закрыть на запись канал ошибок "
                   "%d.\n",
-                  (*error_pipe)[1]);
+                  (*error_pipe_ptr)[1]);
         }
       }
     }  // for
@@ -80,16 +81,36 @@ int spawn_children(char **all_args, int n_pipes, int **exec_err,
 
   // TODO ждём все дочерние процессы
   if (0 == err && 0 < *executable_pid) {
-    for (pid_ptr = executable_pid, error_pipe = exec_err;
-         pid_ptr - executable_pid < n_children; pid_ptr++, error_pipe++) {
+    for (pid_ptr = executable_pid, error_pipe_ptr = exec_err;
+         pid_ptr - executable_pid < n_children; pid_ptr++, error_pipe_ptr++) {
       err = wait_and_handle_errors(*pid_ptr);
       // закрываем на чтение каналы ошибок
-      close_pipe_end((*error_pipe)[0]);
+      close_pipe_end((*error_pipe_ptr)[0]);
     }
   }
 
+  // освобождаем память
   if (0 != *executable_pid) {
     free(executable_pid);
+  }
+  if (NULL != arguments) {
+    free(arguments);
+  }
+  if (NULL != exec_err) {
+    for (int **p = exec_err; p - exec_err < n_children; p++) {
+      if (NULL != p && NULL != *p) {
+        free(*p);
+      }
+    }
+    free(exec_err);
+  }
+  if (NULL != exec_pipe) {
+    for (int **p = exec_pipe; p - exec_pipe < n_pipes; p++) {
+      if (NULL != p && NULL != *p) {
+        free(*p);
+      }
+    }
+    free(exec_pipe);
   }
 
   return err;

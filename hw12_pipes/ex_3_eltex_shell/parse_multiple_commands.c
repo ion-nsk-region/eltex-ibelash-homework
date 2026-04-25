@@ -11,7 +11,7 @@ int parse_multiple_commands(char *input, char **arguments) {
     p++;
     token = strtok(NULL, "|");
   }
-  *p = NULL;
+  //  *p = NULL;
 
   return p - arguments;  // n_commands
 }
