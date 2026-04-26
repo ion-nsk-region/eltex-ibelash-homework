@@ -17,7 +17,7 @@ int create_pipe(int **exec_pipe);
 int create_pipes(int ***ptr_pipes, int n_pipes);
 int elt_cd(char **args);
 int input(char user_input[BUFSIZ], int *n_pipes, int *n_words);
-int parse_multiple_commands(char *input, char **arguments);
+int parse_multiple_commands(char *input, int n_pipes, int n_words_total, char ****arguments);
 int parse_single_command(char *input, char **arguments);
 int run_executable(char **arguments, int *exec_err);
 int spawn_children(char **all_args, int n_pipes, int **exec_err,
