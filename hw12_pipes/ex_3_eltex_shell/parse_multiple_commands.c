@@ -21,9 +21,9 @@ int parse_multiple_commands(char *input, int n_pipes, int n_words_total,
   for (p = buf_cmds; p - buf_cmds <= n_pipes; p++, ptr++) {
     int n_words = parse_single_command(*p, buf_args);
     *ptr = (char **)malloc((n_words + 1) * sizeof(char *));
-    for (char **a = *ptr, **b = buf_args; a - *ptr <=n_words; a++, b++) {
+    for (char **a = *ptr, **b = buf_args; a - *ptr <= n_words; a++, b++) {
       *a = *b;
-    } 
+    }
   }
 
   *arguments = commands;

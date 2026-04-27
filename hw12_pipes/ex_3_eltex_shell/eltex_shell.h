@@ -20,8 +20,8 @@ int input(char user_input[BUFSIZ], int *n_pipes, int *n_words);
 int parse_multiple_commands(char *input, int n_pipes, int n_words_total, char ****arguments);
 int parse_single_command(char *input, char **arguments);
 int run_executable(char **arguments, int *exec_err);
-int spawn_children(char **all_args, int n_pipes, int **exec_err,
-                   int **exec_pipe, int n_words);
+int spawn_children(char ***all_args, int n_pipes, int **exec_err,
+                   int **exec_pipe);
 //int wait_and_handle_errors(pid_t executable_pid, int *exec_err);
 int wait_and_handle_errors(pid_t executable_pid);
 

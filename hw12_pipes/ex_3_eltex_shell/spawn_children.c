@@ -1,9 +1,8 @@
 #include "eltex_shell.h"
 
-int spawn_children(char **all_args, int n_pipes, int **exec_err,
-                   int **exec_pipe, int n_words) {
+int spawn_children(char ***all_args, int n_pipes, int **exec_err,
+                   int **exec_pipe) {
   int err = 0, n_children = n_pipes + 1;
-  char **arguments;
   int **error_pipe_ptr, **exec_pipe_ptr;
   pid_t *pid_ptr, *executable_pid;
 
@@ -14,20 +13,13 @@ int spawn_children(char **all_args, int n_pipes, int **exec_err,
     err = -1;
   }
 
-  errno = 0;
-  arguments = (char **)malloc((n_words + 1) * sizeof(char *));
-  if (NULL == arguments) {
-    perror("malloc");
-    err = -1;
-  }
-
   if (0 == err) {
+    char ***arg_ptr;
     for (pid_ptr = executable_pid, error_pipe_ptr = exec_err,
-        exec_pipe_ptr = exec_pipe;
+        exec_pipe_ptr = exec_pipe, arg_ptr = all_args;
          pid_ptr - executable_pid < n_children;
-         pid_ptr++, error_pipe_ptr++, all_args++) {
+         pid_ptr++, error_pipe_ptr++, arg_ptr++) {
       int *exec_pipe_out = NULL, *exec_pipe_in = NULL;
-      parse_single_command(*all_args, arguments);
       if (NULL != exec_pipe) {
         if (0 < pid_ptr - executable_pid) {
           exec_pipe_in = *exec_pipe_ptr;
@@ -51,12 +43,12 @@ int spawn_children(char **all_args, int n_pipes, int **exec_err,
         }
         // - запускаем наш исполняемый файл
         if (0 == err) {
-          err = run_executable(arguments, *error_pipe_ptr);
+          err = run_executable(*arg_ptr, *error_pipe_ptr);
         } else {
           fprintf(stderr,
                   "Не удалось запустить процесс %s так как не были настроены "
                   "каналы. Код ошибки %d.\n",
-                  *arguments, err);
+                  **arg_ptr, err);
         }
       } else if (0 < *pid_ptr) {
         // Родитель
@@ -92,25 +84,6 @@ int spawn_children(char **all_args, int n_pipes, int **exec_err,
   // освобождаем память
   if (0 != *executable_pid) {
     free(executable_pid);
-  }
-  if (NULL != arguments) {
-    free(arguments);
-  }
-  if (NULL != exec_err) {
-    for (int **p = exec_err; p - exec_err < n_children; p++) {
-      if (NULL != p && NULL != *p) {
-        free(*p);
-      }
-    }
-    free(exec_err);
-  }
-  if (NULL != exec_pipe) {
-    for (int **p = exec_pipe; p - exec_pipe < n_pipes; p++) {
-      if (NULL != p && NULL != *p) {
-        free(*p);
-      }
-    }
-    free(exec_pipe);
   }
 
   return err;
