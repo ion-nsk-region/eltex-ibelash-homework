@@ -1,8 +1,8 @@
 #include "eltex_shell.h"
 
-int parse_single_command(char *input, char **arguments) {
+int parse_single_command(char *user_input, char **arguments) {
   char **p = arguments;
-  char *token = strtok(input, " ");
+  char *token = strtok(user_input, " ");
 
   if (NULL == token) return -1;
 

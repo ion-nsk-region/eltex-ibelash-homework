@@ -1,0 +1,13 @@
+main  
+ \_ cleanup
+ \_ create_pipes -- create_pipe
+ \_ elt_cd
+ \_ input
+ \_ parse_multiple_commands -- parse_single_command
+ |
+ |                                        __ run_executable
+ |                                       /
+ \_ spawn_children -- spawn_single_child -- configure_child_channels -- close_pipe_end
+     \                                   \_____________________________//
+      \_ wait_all_children -- read_exec_err ___________________________/
+          \__ wait4child

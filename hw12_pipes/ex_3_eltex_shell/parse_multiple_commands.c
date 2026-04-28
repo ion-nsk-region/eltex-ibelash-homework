@@ -1,8 +1,8 @@
 #include "eltex_shell.h"
 
-int parse_multiple_commands(char *input, int n_pipes, int n_words_total,
+int parse_multiple_commands(char *user_input, int n_pipes, int n_words_total,
                             char ****arguments) {
-  char *one_command = strtok(input, "|");
+  char *one_command = strtok(user_input, "|");
   if (NULL == one_command) {
     return -1;
   }
