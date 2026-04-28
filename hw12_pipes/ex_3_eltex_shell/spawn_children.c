@@ -3,8 +3,7 @@
 int spawn_children(char ***all_args, int n_pipes, int **exec_err,
                    int **exec_pipe) {
   int err = 0, n_children = n_pipes + 1;
-  int **error_pipe_ptr;
-  pid_t *pid_ptr, *executable_pid;
+  pid_t *executable_pid;
 
   errno = 0;
   executable_pid = (pid_t *)malloc(sizeof(pid_t) * (n_children));
@@ -15,7 +14,8 @@ int spawn_children(char ***all_args, int n_pipes, int **exec_err,
 
   if (0 == err) {
     char ***arg_ptr;
-    int **exec_pipe_ptr;
+    int **exec_pipe_ptr, **error_pipe_ptr;
+    pid_t *pid_ptr;
     for (pid_ptr = executable_pid, error_pipe_ptr = exec_err,
         exec_pipe_ptr = exec_pipe, arg_ptr = all_args;
          pid_ptr - executable_pid < n_children;
@@ -31,55 +31,14 @@ int spawn_children(char ***all_args, int n_pipes, int **exec_err,
         }
       }
 
-      errno = 0;
-      *pid_ptr = fork();
-      if (-1 == *pid_ptr) {
-        perror("fork");
-        err -= 1;
-      } else if (0 == *pid_ptr) {
-        // Дочерний процесс:
-        // - конфигурируем каналы
-        if (0 == err && NULL != exec_pipe) {
-          err = configure_child_channels(exec_pipe_in, exec_pipe_out);
-        }
-        // - запускаем наш исполняемый файл
-        if (0 == err) {
-          err = run_executable(*arg_ptr, *error_pipe_ptr);
-        } else {
-          fprintf(stderr,
-                  "Не удалось запустить процесс %s так как не были настроены "
-                  "каналы. Код ошибки %d.\n",
-                  **arg_ptr, err);
-        }
-      } else if (0 < *pid_ptr) {
-        // Родитель
-        // закрываем межпроцессный канал - родитель им пользоваться не будет.
-        if (NULL != exec_pipe_in && (0 != close_pipe_end(exec_pipe_in[0]) ||
-                                     0 != close_pipe_end(exec_pipe_in[1]))) {
-          fprintf(stderr,
-                  "Ошибка: Родителю не удалось отсоединиться от канала {%d %d}"
-                  "дочерних процессов. См. подробности в stderr.\n",
-                  exec_pipe_in[0], exec_pipe_in[1]);
-        }
-        // закрываем на запись канал ошибок
-        if (0 != close_pipe_end((*error_pipe_ptr)[1])) {
-          fprintf(stderr,
-                  "Ошибка: Родителю не удалось закрыть на запись канал ошибок "
-                  "%d.\n",
-                  (*error_pipe_ptr)[1]);
-        }
-      }
+      err = spawn_single_child(arg_ptr, exec_pipe_in, exec_pipe_out,
+                               error_pipe_ptr, pid_ptr);
     }  // for
   }
 
   // ждём все дочерние процессы
   if (0 == err && 0 < *executable_pid) {
-    for (pid_ptr = executable_pid, error_pipe_ptr = exec_err;
-         pid_ptr - executable_pid < n_children; pid_ptr++, error_pipe_ptr++) {
-      err = wait_and_handle_errors(*pid_ptr);
-      // закрываем на чтение каналы ошибок
-      close_pipe_end((*error_pipe_ptr)[0]);
-    }
+    wait_all_children(executable_pid, exec_err, n_children);
   }
 
   // освобождаем память

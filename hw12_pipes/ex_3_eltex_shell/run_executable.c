@@ -13,7 +13,7 @@ int run_executable(char **arguments, int *exec_err) {
   errno = 0;
   if (-1 == execvp(arguments[0], arguments)) {
     int exec_error = errno;
-    perror("execvp");
+    // perror("execvp");
 
     // В случае ошибки exec, возвращаем её через канал
     errno = 0;
