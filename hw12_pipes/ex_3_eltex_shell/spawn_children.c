@@ -3,7 +3,7 @@
 int spawn_children(char ***all_args, int n_pipes, int **exec_err,
                    int **exec_pipe) {
   int err = 0, n_children = n_pipes + 1;
-  int **error_pipe_ptr, **exec_pipe_ptr;
+  int **error_pipe_ptr;
   pid_t *pid_ptr, *executable_pid;
 
   errno = 0;
@@ -15,6 +15,7 @@ int spawn_children(char ***all_args, int n_pipes, int **exec_err,
 
   if (0 == err) {
     char ***arg_ptr;
+    int **exec_pipe_ptr;
     for (pid_ptr = executable_pid, error_pipe_ptr = exec_err,
         exec_pipe_ptr = exec_pipe, arg_ptr = all_args;
          pid_ptr - executable_pid < n_children;
@@ -71,7 +72,7 @@ int spawn_children(char ***all_args, int n_pipes, int **exec_err,
     }  // for
   }
 
-  // TODO ждём все дочерние процессы
+  // ждём все дочерние процессы
   if (0 == err && 0 < *executable_pid) {
     for (pid_ptr = executable_pid, error_pipe_ptr = exec_err;
          pid_ptr - executable_pid < n_children; pid_ptr++, error_pipe_ptr++) {

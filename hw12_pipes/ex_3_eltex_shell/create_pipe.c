@@ -14,14 +14,5 @@ int create_pipe(int **ptr_pipe) {
     err = -2;
   }
 
-  // TODO специфично для канала ошибок. Вынести в конфигурацию канала.
-  /*
-  errno = 0;
-  if (0 == err && -1 == fcntl((*ptr_pipe)[1], F_SETFD,
-                              fcntl((*ptr_pipe)[1], F_GETFD) | FD_CLOEXEC)) {
-    perror("fcntl");
-    err = -3;
-  }
-  */
   return err;
 }

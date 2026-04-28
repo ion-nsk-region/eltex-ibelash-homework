@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+void cleanup(char ****arguments, int ***exec_err, int ***exec_pipe, int n_pipes);
 int close_pipe_end(int pipe_end);
 int configure_child_channels(int *exec_pipe_in, int *exec_pipe_out);
 int create_pipe(int **exec_pipe);
