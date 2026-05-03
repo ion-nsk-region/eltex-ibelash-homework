@@ -19,7 +19,7 @@ struct msgbuf {
     char mtext[MSG_LENGTH];
 };
 
-int connect2mq(char *mq_name, int *mq_id);
+int connect2mq(char *mq_name, int mq_flags, int *mq_id);
 int conn_timer(int connection_timeout, int sleep_time, int n_attempts);
 int read_mq_msg(int mq_id, long msg_type, char *msg);
 int send_mq_msg(int mq_id, char *msg, size_t msg_length);

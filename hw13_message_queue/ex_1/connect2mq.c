@@ -1,6 +1,6 @@
 #include "mq_chat.h"
 
-int connect2mq(char *mq_name, int *mq_id) {
+int connect2mq(char *mq_name, int mq_flags, int *mq_id) {
   int err = 0;
 
   if (NULL != mq_name) {
@@ -13,7 +13,7 @@ int connect2mq(char *mq_name, int *mq_id) {
       int n_attempts = 0;
       do {
         errno = 0;
-        *mq_id = msgget(key, 0);
+        *mq_id = msgget(key, mq_flags);
       } while (-1 == *mq_id && ENOENT == errno &&
                ETIME != (err = conn_timer(CONNECTION_TIMEOUT, SLEEP_TIME,
                                           n_attempts++)));
