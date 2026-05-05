@@ -10,4 +10,3 @@ int conn_timer(int connection_timeout, int sleep_time, int n_attempts) {
 
   return err;
 }
-

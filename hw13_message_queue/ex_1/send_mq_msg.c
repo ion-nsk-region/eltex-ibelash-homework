@@ -1,9 +1,9 @@
 #include "mq_chat.h"
 
-int send_mq_msg(int mq_id, char *msg, size_t msg_length) {
+int send_mq_msg(int mq_id, const char *msg, size_t msg_length) {
   int err = 0;
   struct msgbuf msg_buf;
-  msg_buf.mtype = 1; // Любое число больше ноля 
+  msg_buf.mtype = 1;  // Любое число больше ноля
 
   strncpy(msg_buf.mtext, msg, msg_length);
 
@@ -13,5 +13,5 @@ int send_mq_msg(int mq_id, char *msg, size_t msg_length) {
     err = errno;
   }
 
-  return err; 
+  return err;
 }

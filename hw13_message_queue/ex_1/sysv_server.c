@@ -27,11 +27,11 @@ int main(void) {
         err = conn_timer(CONNECTION_TIMEOUT, SLEEP_TIME, n_attempts++);
     } while (last_sender_pid == my_pid && 0 == err);
 
-      if (0 != (err = read_mq_msg(mq_id, 0, &reply))) {
-        printf("Ошибка read_mq_msg: %d\n", err);
-      } else {
-        printf("%s\n", reply);
-      }
+    if (0 != (err = read_mq_msg(mq_id, 0, &reply))) {
+      printf("Ошибка read_mq_msg: %d\n", err);
+    } else {
+      printf("%s\n", reply);
+    }
   }
 
   // Удаляем очередь
@@ -45,7 +45,7 @@ int main(void) {
   } else if (0 == is_empty) {
     printf(
         "Предупреждение: Очередь не была удалена.\n"
-        "Она не пуста и содержит %ld сообщений.\n"
+        "Она не пуста и содержит %lu сообщений.\n"
         "Запустите клиента для прочтения сообщений или перезагрузите компьютер "
         "для удаления вручную.\n",
         mq_num);

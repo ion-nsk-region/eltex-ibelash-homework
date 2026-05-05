@@ -25,6 +25,6 @@ int delete_mq(int mq_id);
 int get_last_sender_pid(int mq_id, pid_t *last_sender_pid);
 int is_mq_empty(int mq_id, long unsigned int *mq_num);
 int read_mq_msg(int mq_id, long msg_type, char **msg);
-int send_mq_msg(int mq_id, char *msg, size_t msg_length);
+int send_mq_msg(int mq_id, const char *msg, size_t msg_length);
 
 #endif // MQ_CHAT_H
