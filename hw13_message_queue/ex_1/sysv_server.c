@@ -56,6 +56,10 @@ int main(void) {
   }
 
   // Выходим
+  if (NULL != reply) {
+    free(reply);
+    reply = NULL;
+  }
   printf("Выходим.\n");
 
   return err;
