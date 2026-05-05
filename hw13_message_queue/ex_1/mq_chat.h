@@ -21,7 +21,10 @@ struct msgbuf {
 
 int connect2mq(char *mq_name, int mq_flags, int *mq_id);
 int conn_timer(int connection_timeout, int sleep_time, int n_attempts);
-int read_mq_msg(int mq_id, long msg_type, char *msg);
+int delete_mq(int mq_id);
+int get_last_sender_pid(int mq_id, pid_t *last_sender_pid);
+int is_mq_empty(int mq_id, long unsigned int *mq_num);
+int read_mq_msg(int mq_id, long msg_type, char **msg);
 int send_mq_msg(int mq_id, char *msg, size_t msg_length);
 
 #endif // MQ_CHAT_H
