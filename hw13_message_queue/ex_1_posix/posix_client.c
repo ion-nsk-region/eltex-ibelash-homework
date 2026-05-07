@@ -20,7 +20,7 @@ int main(void) {
 
   // считываем сообщение и выводим на экран
   if (0 == err && 0 != mq_id) {
-    if (0 != (err = read_mq_msg(mq_id, 0, &msg))) {
+    if (0 != (err = read_mq_msg(mq_id, &msg))) {
       printf("Ошибка read_mq_msg: %d\n", err);
     } else {
       printf("%s\n", msg);

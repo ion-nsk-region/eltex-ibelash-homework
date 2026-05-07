@@ -7,7 +7,7 @@ int connect2mq(char *mq_name, int mq_flags, mqd_t *mq_id) {
       int n_attempts = 0;
       do {
         errno = 0;
-        if (0 == mq_flags & O_CREAT) {
+        if (0 == (mq_flags & O_CREAT)) {
         *mq_id = mq_open(mq_name, mq_flags);
         } else {
         mode_t mq_perm = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
