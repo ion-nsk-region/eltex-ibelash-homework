@@ -21,7 +21,7 @@ int read_mq_msg(mqd_t mq_id, char **msg) {
   if (0 == err) {
     errno = 0;
     if (-1 == mq_receive(mq_id, *msg, msg_size, NULL)) {
-      perror("msgrcv");
+      perror("mq_receive");
       err = errno;
     }
   }
