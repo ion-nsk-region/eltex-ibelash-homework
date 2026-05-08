@@ -24,11 +24,11 @@ client: $(MAIN_CLIENT).exe
 
 $(MAIN_SERVER).exe: $(MAIN_SERVER).c $(LIB)
 	@echo "\nСобираем исполняемый файл сервера. Флаги компиляции: $(CFLAGS)"
-	$(CC) $(CFLAGS) -o $@ $< -L. -l:$(LIB)
+	$(CC) $(CFLAGS) -o $@ $< -L. -l:$(LIB) -lrt
 
 $(MAIN_CLIENT).exe: $(MAIN_CLIENT).c $(LIB)
 	@echo "\nСобираем исполняемый файл клиента. Флаги компиляции: $(CFLAGS)"
-	$(CC) $(CFLAGS) -o $@ $< -L. -l:$(LIB)
+	$(CC) $(CFLAGS) -o $@ $< -L. -l:$(LIB) -lrt
 
 $(LIB): msg_lib $(LIB)($(OBJ))
 

@@ -17,6 +17,7 @@ int create_mq(char *mq_name, mqd_t *mq_id) {
       mq_flags = O_WRONLY | O_CLOEXEC;
       errno = 0;
       *mq_id = mq_open(mq_name, mq_flags);
+      printf("Очередь очищена и открыта для записи.\n");
     } else {
       printf(
           "Ошибка: не удалось очистить существующую очередь.\n"

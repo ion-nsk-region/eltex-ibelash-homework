@@ -5,8 +5,12 @@ int read_mq_msg(mqd_t mq_id, char **msg) {
   long msg_size = 0;
   struct mq_attr attr;
 
+  if (0 >= mq_id) {
+    err = -1;
+  }
+
   errno = 0;
-  if (-1 == (err = mq_getattr(mq_id, &attr))) {
+  if (0 == err && -1 == (err = mq_getattr(mq_id, &attr))) {
     perror("mq_getattr");
   } else if (0 == err) {
     msg_size = attr.mq_msgsize;

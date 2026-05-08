@@ -33,20 +33,21 @@ int main(void) {
     errno = 0;
     if (-1 == (err = mq_close(mq_id))) {
       perror("mq_close");
-    }
+    } else
+      mq_id = 0;
   }
 
   // отвечаем серверу
   if (0 == err) {
     err = create_mq(client_mq_name, &mq_id);
   }
-  if (0 == err && 0 != mq_id &&
+  if (0 == err && 0 < mq_id &&
       (0 != (err = send_mq_msg(mq_id, reply, sizeof(reply))))) {
     printf("Ошибка send_mq_msg: %d\n", err);
   }
 
   // Удаляем очередь
-  if (0 == err) {
+  if (0 == err && 0 < mq_id) {
     long int mq_n_messages = 0;
     int is_empty = 0, n_attempts = 0;
     do {
@@ -57,7 +58,8 @@ int main(void) {
       errno = 0;
       if (-1 == (err = mq_close(mq_id))) {
         perror("mq_close");
-      }
+      } else
+        mq_id = 0;
       if (0 == err && 0 != (err = delete_mq(client_mq_name))) {
         printf(
             "Ошибка: не удалось удалить очередь сообщений.\n"
@@ -78,6 +80,6 @@ int main(void) {
   }
 
   // выходим
-  printf("Выходим.\n");
+  // printf("Выходим.\n");
   return err;
 }

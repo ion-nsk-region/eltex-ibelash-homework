@@ -14,7 +14,7 @@ int clear_mq(const char *mq_name) {
     err = -1;
   }
 
-  if (0 == err) {
+  if (0 == err && -1 != mq_id) {
     errno = 0;
     if (-1 == (err = mq_getattr(mq_id, &attr))) {
       perror("mq_getattr");
@@ -29,7 +29,7 @@ int clear_mq(const char *mq_name) {
     }
   }
 
-  if (0 == err) {
+  if (0 == err && -1 != mq_id) {
     while (0 == is_mq_empty(mq_id, NULL) && 0 == err) {
       errno = 0;
       if (-1 == mq_receive(mq_id, msg, msg_size, NULL) && EAGAIN != errno) {
