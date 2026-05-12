@@ -1,11 +1,11 @@
 #include "mq_chat.h"
 
-int create_mq(char *mq_name, mqd_t *mq_id) {
+int create_mq(char *mq_name, enum mq_mode mq_io_mode, mqd_t *mq_id) {
   int err = 0, mq_flags;
 
   if (NULL != mq_name) {
     mode_t mq_perm = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
-    mq_flags = O_WRONLY | O_CLOEXEC | O_CREAT | O_EXCL;
+    mq_flags = mq_io_mode | O_CLOEXEC | O_CREAT | O_EXCL;
     errno = 0;
     *mq_id = mq_open(mq_name, mq_flags, mq_perm, NULL);
   }
@@ -14,10 +14,10 @@ int create_mq(char *mq_name, mqd_t *mq_id) {
     printf("Предупреждение: очередь уже существует.\n");
     // проверяем что очередь пуста и опустошаем при необходимости
     if (0 == (err = clear_mq(mq_name))) {
-      mq_flags = O_WRONLY | O_CLOEXEC;
+      mq_flags = mq_io_mode | O_CLOEXEC;
       errno = 0;
       *mq_id = mq_open(mq_name, mq_flags);
-      printf("Очередь очищена и открыта для записи.\n");
+      printf("Очередь очищена и открыта для работы.\n");
     } else {
       printf(
           "Ошибка: не удалось очистить существующую очередь.\n"

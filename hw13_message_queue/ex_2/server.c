@@ -8,7 +8,7 @@ int main(void) {
   char *reply = NULL;
 
   // Создаём очередь
-  err = create_mq(server_mq_name, &mq_id);
+  err = create_mq(server_mq_name, WRITE, &mq_id);
 
   // Отправляем сообщение
   if (0 == err && 0 != mq_id &&
@@ -58,7 +58,7 @@ int main(void) {
   // Читаем ответ
   if (0 == err && is_client_active) {
     char *client_mq_name = CLIENT_MQ_NAME;
-    err = connect2mq(client_mq_name, &mq_id);
+    err = connect2mq(client_mq_name, READ, &mq_id);
     if (ETIME == err) {
       printf("Ошибка: время ожидания ответа от клиента истекло.\n");
     } else if (0 != err) {
