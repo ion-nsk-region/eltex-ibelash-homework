@@ -1,6 +1,6 @@
 #include "mq_chat.h"
 
-int send_mq_msg(mqd_t mq_id, const char *msg, size_t msg_length) {
+int send_mq_msg(mqd_t mq_id, const unsigned char *msg, size_t msg_length) {
   int err = 0;
 
   errno = 0;

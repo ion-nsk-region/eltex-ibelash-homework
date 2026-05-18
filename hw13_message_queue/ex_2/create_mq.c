@@ -11,21 +11,19 @@ int create_mq(char *mq_name, enum mq_mode mq_io_mode, mqd_t *mq_id) {
   }
 
   if (-1 == *mq_id && EEXIST == errno) {
-    printf("Предупреждение: очередь уже существует.\n");
+    fprintf(stderr, "Предупреждение: очередь уже существует.\n");
     // проверяем что очередь пуста и опустошаем при необходимости
     if (0 == (err = clear_mq(mq_name))) {
       mq_flags = mq_io_mode | O_CLOEXEC;
       errno = 0;
       *mq_id = mq_open(mq_name, mq_flags);
-      printf("Очередь очищена и открыта для работы.\n");
+      fprintf(stderr, "Очередь очищена и открыта для работы.\n");
     } else {
-      printf(
+      fprintf(stderr,
           "Ошибка: не удалось очистить существующую очередь.\n"
           "Перезагрузите компьютер чтобы удалить эту очередь.\n");
     }
-  }
-
-  if (-1 == *mq_id) {
+  } else if (-1 == *mq_id) {
     perror("mq_open");
     err = -1;
   }

@@ -23,17 +23,18 @@ struct msgbuf {
 
 enum mq_mode {
     READ = O_RDONLY,
-    WRITE = O_WRONLY
+    WRITE = O_WRONLY,
+    READ_WRITE = O_RDWR
 };
 
+unsigned char *allocate_msg_buffer(mqd_t mq_id, long *msg_buffer_size);
 int clear_mq(const char *mq_name);
 int connect2mq(char *mq_name, enum mq_mode mq_io_mode, mqd_t *mq_id);
 int conn_timer(int connection_timeout, int sleep_time, int n_attempts);
 int create_mq(char *mq_name, enum mq_mode mq_io_mode, mqd_t *mq_id);
 int delete_mq(const char *mq_name);
-int get_last_sender_pid(mqd_t mq_id, pid_t *last_sender_pid);
 int is_mq_empty(mqd_t mq_id, long int *mq_n_messages);
-int read_mq_msg(mqd_t mq_id, char **msg);
-int send_mq_msg(mqd_t mq_id, const char *msg, size_t msg_length);
+int read_mq_msg(mqd_t mq_id, unsigned char **msg);
+int send_mq_msg(mqd_t mq_id, const unsigned char *msg, size_t msg_length);
 
 #endif // MQ_CHAT_H
