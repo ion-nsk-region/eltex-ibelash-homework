@@ -1,6 +1,6 @@
 #include "mq_chat.h"
 
-unsigned har *allocate_msg_buffer(mqd_t mq_id, long *msg_buffer_size) {
+unsigned char *allocate_msg_buffer(mqd_t mq_id, long *msg_buffer_size) {
   struct mq_attr attr;
   unsigned char *msg_buffer = NULL;
 
@@ -12,7 +12,7 @@ unsigned har *allocate_msg_buffer(mqd_t mq_id, long *msg_buffer_size) {
       perror("mq_getattr");
     }
   }
-  if (0 < msg_buffer_size) {
+  if (0 < *msg_buffer_size) {
     errno = 0;
     msg_buffer = (unsigned char *)malloc(*msg_buffer_size);
     if (NULL == msg_buffer) {

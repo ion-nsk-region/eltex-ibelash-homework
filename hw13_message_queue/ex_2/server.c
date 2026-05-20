@@ -23,14 +23,27 @@ int main(void) {
   } while ('q' != getchar());
 
   // отправляем сообщение потоку о выходе
-  pid_t server_pid = getpid();
   long msg_buffer_size = 0;
-  unsigned char *msg_buffer = allocate_msg_buffer(mq_id, &msg_buffer_size);
+  char *msg_buffer = (char *)allocate_msg_buffer(mq_id, &msg_buffer_size);
   if (NULL != msg_buffer) {
-    snprintf(msg_buffer, msg_buffer_size, "%ld%s", server_pid, "/quit");
+  struct mq_msg msg;
+  msg.sender_pid = getpid();
+  msg.mtext_size = sizeof("/quit");
+  msg.mtext = "/quit";
+  long msg_size = sizeof(pid_t) + sizeof(long int) + msg.mtext_size;
+  if (msg_size > msg_buffer_size) {
+    fprintf(stderr, "Ошибка: размер отправляемого сообщения больше размера буфера очереди сообщений. Необходимо настроить очередь сообщений для приёма сообщений большего размера.\n");
+    err = -1;
+  } else {
+    size_t offset = 0;
+    memcpy(msg_buffer + offset, &msg.sender_pid, sizeof(pid_t));
+    offset += sizeof(pid_t);
+    memcpy(msg_buffer + offset, &msg.mtext_size, sizeof(long int));
+    offset += sizeof(long int);
+    memcpy(msg_buffer + offset, &msg.mtext, msg.mtext_size);
     err = send_mq_msg(mq_id, msg_buffer, msg_buffer_size);
   }
-  
+  }
 
   void *status;
   if(0 == (err = pthread_join(server_queue_handler_tid, &status))) {

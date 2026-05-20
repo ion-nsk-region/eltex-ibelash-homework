@@ -4,8 +4,7 @@ int clear_mq(const char *mq_name) {
   int err = 0;
   mqd_t mq_id;
   long msg_size = 0;
-  unsigned char *msg = NULL;
-  struct mq_attr attr;
+  char *msg = NULL;
 
   errno = 0;
   int mq_flags = O_RDONLY | O_CLOEXEC | O_NONBLOCK;
@@ -15,7 +14,7 @@ int clear_mq(const char *mq_name) {
   }
 
   if (0 == err && -1 != mq_id) {
-    msg = allocate_msg_buffer(mq_id);
+    msg = (char *)allocate_msg_buffer(mq_id, 0);
     if (NULL == msg) {
       printf("Не удалось выделить память под буфер чтения сообщений. См. подробности в stderr.\n");
       err = -1;
