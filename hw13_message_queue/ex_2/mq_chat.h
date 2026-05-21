@@ -34,11 +34,15 @@ int connect2mq(char *mq_name, enum mq_mode mq_io_mode, mqd_t *mq_id);
 int conn_timer(int connection_timeout, int sleep_time, int n_attempts);
 int create_mq(char *mq_name, enum mq_mode mq_io_mode, mqd_t *mq_id);
 int delete_mq(const char *mq_name);
+void deserialize_msg(char *msg_buffer, struct mq_msg *msg);
 int is_mq_empty(mqd_t mq_id, long int *mq_n_messages);
 pid_t pid_from_string(unsigned char *string);
 unsigned char *pid_to_string(void);
 int read_mq_msg(mqd_t mq_id, char **msg);
 int send_mq_msg(mqd_t mq_id, const char *msg, size_t msg_length);
+void serialize_msg(struct mq_msg msg, char *msg_buffer);
 void *server_queue_handler(void *server_mq_name);
+int server_queue_handler_exit(mqd_t server_mq_id);
+void wait_for_quit(void);
 
 #endif // MQ_CHAT_H

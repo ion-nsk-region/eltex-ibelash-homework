@@ -18,32 +18,10 @@ int main(void) {
   }
   
   // завершаем работу при нажатии "q"
-  do {
-    printf("Нажмите 'q' для завершения работы сервера.\n");
-  } while ('q' != getchar());
+  wait_for_quit();
 
   // отправляем сообщение потоку о выходе
-  long msg_buffer_size = 0;
-  char *msg_buffer = (char *)allocate_msg_buffer(mq_id, &msg_buffer_size);
-  if (NULL != msg_buffer) {
-  struct mq_msg msg;
-  msg.sender_pid = getpid();
-  msg.mtext_size = sizeof("/quit");
-  msg.mtext = "/quit";
-  long msg_size = sizeof(pid_t) + sizeof(long int) + msg.mtext_size;
-  if (msg_size > msg_buffer_size) {
-    fprintf(stderr, "Ошибка: размер отправляемого сообщения больше размера буфера очереди сообщений. Необходимо настроить очередь сообщений для приёма сообщений большего размера.\n");
-    err = -1;
-  } else {
-    size_t offset = 0;
-    memcpy(msg_buffer + offset, &msg.sender_pid, sizeof(pid_t));
-    offset += sizeof(pid_t);
-    memcpy(msg_buffer + offset, &msg.mtext_size, sizeof(long int));
-    offset += sizeof(long int);
-    memcpy(msg_buffer + offset, &msg.mtext, msg.mtext_size);
-    err = send_mq_msg(mq_id, msg_buffer, msg_buffer_size);
-  }
-  }
+  server_queue_handler_exit(mq_id);
 
   void *status;
   if(0 == (err = pthread_join(server_queue_handler_tid, &status))) {
