@@ -13,27 +13,30 @@ void *server_queue_handler(void *server_mq_name) {
     is_running = 0;
   }
   while (is_running) {
-    // читаем входящие от клиентов
     if (0 != (err = read_mq_msg(mq_id, &msg_buffer))) {
-        printf("Ошибка read_mq_msg: %d\n", err);
-    } 
+      printf("Ошибка read_mq_msg: %d\n", err);
+    }
 
     deserialize_msg(msg_buffer, &msg);
     free(msg_buffer);
-    if (msg.sender_pid == server_pid && 0 == strncmp("/quit", msg.mtext, 6)) {
-        is_running = 0;
+    msg_buffer = NULL;
+
+    if (msg.sender_pid == server_pid && 0 == strncmp(":quit", msg.mtext, 6)) {
+      is_running = 0;
+    } else if (0 == strncmp(":join", msg.mtext, 6)) {
+      handle_new_client(msg.sender_pid);
+    } else if (0 == strncmp(":disconnected", msg.mtext, 14)) {
+      // handle_disconnected_client(msg.sender_pid);
+    } else {
+      // push_msg_to_history(msg);
+      // msg_to_all(msg);
     }
-    fprintf(stderr, "DEBUG получено сообщение от %d размером %ld байт: %s\n%p\n", msg.sender_pid, msg.mtext_size, msg.mtext, msg.mtext);
+
+    fprintf(stderr,
+            "DEBUG получено сообщение от %d размером %ld байт: %s\n%p\n",
+            msg.sender_pid, msg.mtext_size, msg.mtext, msg.mtext);
     free(msg.mtext);
-
-    // switch
-    //  создаём очередь для нового клиента, если её нет, 
-    //  и отправляем последние 100 сообщений.
-
-    //  обрабатываем служебные команды (подключился, отключился, завершение работы)
-
-    //  рассылаем новое сообщение
-    
+    msg.mtext = NULL;
   };
   return (void *)0;
 }

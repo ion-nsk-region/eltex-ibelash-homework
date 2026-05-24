@@ -6,7 +6,9 @@ unsigned char *allocate_msg_buffer(mqd_t mq_id, long *msg_buffer_size) {
   int err = 0;
 
   if (NULL == msg_buffer_size) {
-    fprintf(stderr, "Ошибка allocate_msg_buffer: Не указана переменная для передачи размера выделенного буфера.\n");
+    fprintf(stderr,
+            "Ошибка allocate_msg_buffer: Не указана переменная для передачи "
+            "размера выделенного буфера.\n");
     err = -1;
   }
   if (0 == err && 0 >= *msg_buffer_size) {
@@ -23,7 +25,6 @@ unsigned char *allocate_msg_buffer(mqd_t mq_id, long *msg_buffer_size) {
     msg_buffer = (unsigned char *)malloc(*msg_buffer_size);
     if (NULL == msg_buffer) {
       perror("malloc");
-      err = -1;
     }
   }
 
