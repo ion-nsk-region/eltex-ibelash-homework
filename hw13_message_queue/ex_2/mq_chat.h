@@ -16,7 +16,8 @@
 #define SERVER_MQ_NAME "/server.exe"
 #define CLIENT_MQ_NAME "/client.exe"
 #define MQ_NAME_LENGTH 16
-#define MAX_NICKNAME_LENGTH 255
+#define MAX_NICKNAME_LENGTH 256
+#define COMMAND_LENGTH 6 // ":join " или ":nick " - нужно при извлечении никнейма
 
 struct mq_msg {
     pid_t sender_pid;

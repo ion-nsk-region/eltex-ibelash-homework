@@ -23,7 +23,7 @@ void *server_queue_handler(void *server_mq_name) {
 
     if (msg.sender_pid == server_pid && 0 == strncmp(":quit", msg.mtext, 6)) {
       is_running = 0;
-    } else if (0 == strncmp(":join", msg.mtext, 6)) {
+    } else if (0 == strncmp(":join", msg.mtext, 5)) {
       handle_new_client(msg);
     } else if (0 == strncmp(":disconnected", msg.mtext, 14)) {
       // handle_disconnected_client(msg.sender_pid);
