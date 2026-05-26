@@ -24,7 +24,7 @@ void *server_queue_handler(void *server_mq_name) {
     if (msg.sender_pid == server_pid && 0 == strncmp(":quit", msg.mtext, 6)) {
       is_running = 0;
     } else if (0 == strncmp(":join", msg.mtext, 6)) {
-      handle_new_client(msg.sender_pid);
+      handle_new_client(msg);
     } else if (0 == strncmp(":disconnected", msg.mtext, 14)) {
       // handle_disconnected_client(msg.sender_pid);
     } else {
@@ -32,11 +32,27 @@ void *server_queue_handler(void *server_mq_name) {
       // msg_to_all(msg);
     }
 
-    fprintf(stderr,
-            "DEBUG получено сообщение от %d размером %ld байт: %s\n%p\n",
-            msg.sender_pid, msg.mtext_size, msg.mtext, msg.mtext);
+    fprintf(stderr, "DEBUG получено сообщение от %d размером %ld байт: %s\n",
+            msg.sender_pid, msg.mtext_size, msg.mtext);
     free(msg.mtext);
     msg.mtext = NULL;
   };
+
+  if (0 != mq_id) {
+    errno = 0;
+    if (-1 == mq_close(mq_id)) {
+      perror("mq_close");
+    } else {
+      mq_id = 0;
+      if (0 != (err = delete_mq(server_mq_name))) {
+        printf(
+            "Ошибка: не удалось удалить очередь сообщений для обработки"
+            " сообщений от клиентов.\n"
+            "См. подробности в stderr.\n"
+            "Перезагрузите компьютер для удаления вручную.\n");
+      }
+    }
+  }
+
   return (void *)0;
 }

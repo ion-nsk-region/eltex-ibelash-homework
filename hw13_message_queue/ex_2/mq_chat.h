@@ -15,6 +15,8 @@
 #define SLEEP_TIME 1 // в секундах
 #define SERVER_MQ_NAME "/server.exe"
 #define CLIENT_MQ_NAME "/client.exe"
+#define MQ_NAME_LENGTH 16
+#define MAX_NICKNAME_LENGTH 255
 
 struct mq_msg {
     pid_t sender_pid;
@@ -35,6 +37,8 @@ int conn_timer(int connection_timeout, int sleep_time, int n_attempts);
 int create_mq(char *mq_name, enum mq_mode mq_io_mode, mqd_t *mq_id);
 int delete_mq(const char *mq_name);
 void deserialize_msg(const char *msg_buffer, struct mq_msg *msg);
+int get_nickname(char *mtext, char *nickname);
+int handle_new_client(struct mq_msg new_client_msg);
 int is_mq_empty(mqd_t mq_id, long int *mq_n_messages);
 pid_t pid_from_string(unsigned char *string);
 unsigned char *pid_to_string(void);

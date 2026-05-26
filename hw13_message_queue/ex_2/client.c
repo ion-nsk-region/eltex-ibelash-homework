@@ -11,7 +11,7 @@ int main(void) {
   mqd_t mq_id = 0;
 
   // подключаемся к очереди
-  err = connect2mq(server_mq_name, READ, &mq_id);
+  err = connect2mq(server_mq_name, WRITE, &mq_id);
   if (ETIME == err) {
     printf("Ошибка: время ожидания сервера истекло.\n");
   } else if (0 != err) {
