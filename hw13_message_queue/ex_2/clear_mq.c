@@ -1,21 +1,19 @@
 #include "mq_chat.h"
 
-int clear_mq(const char *mq_name) {
+int clear_mq(char *mq_name) {
   int err = 0;
-  mqd_t mq_id;
+  int mq_id;
   long msg_size = 0;
-  char *msg = NULL;
+  struct msgbuf msg_buf;
 
-  errno = 0;
   int mq_flags = O_RDONLY | O_CLOEXEC | O_NONBLOCK;
-  if (-1 == (mq_id = mq_open(mq_name, mq_flags))) {
-    perror("mq_open");
-    err = -1;
+  if (0 != (err = connect2mq(mq_name, mq_flags, &mq_id))) {
+    printf("Ошибка connect2mq. Не удалось подключиться к очереди %s. См. подробности в stderr.", mq_name);
   }
 
   if (0 == err && -1 != mq_id) {
-    msg = (char *)allocate_msg_buffer(mq_id, &msg_size);
-    if (NULL == msg) {
+    msg_buf.mtext = (char *)allocate_msg_buffer(&msg_size);
+    if (NULL == msg_buf.mtext) {
       printf(
           "Не удалось выделить память под буфер чтения сообщений. См. "
           "подробности в stderr.\n");
@@ -24,17 +22,17 @@ int clear_mq(const char *mq_name) {
   }
 
   if (0 == err && -1 != mq_id) {
+    int msg_flags = IPC_NOWAIT | MSG_NOERROR;
     while (0 == is_mq_empty(mq_id, NULL) && 0 == err) {
       errno = 0;
-      if (-1 == mq_receive(mq_id, msg, msg_size, NULL) && EAGAIN != errno) {
-        perror("mq_receive");
+      if (-1 == msgrcv(mq_id, &msg_buf, msg_size, 0, msg_flags) && ENOMSG != errno) {
+        perror("msgrcv");
         err = -1;
       }
     }
   }
 
-  if (NULL != msg) free(msg);
-  if (-1 != mq_id) mq_close(mq_id);
+  if (NULL != msg_buf.mtext) free(msg_buf.mtext);
 
   return err;
 }

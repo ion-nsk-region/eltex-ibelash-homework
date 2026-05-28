@@ -2,9 +2,9 @@
 
 void *server_queue_handler(void *server_mq_name) {
   int err = 0, is_running = 1;
-  mqd_t mq_id = 0;
+  int mq_id = 0;
   char *msg_buffer = NULL;
-  struct mq_msg msg = {0, 0, NULL};
+  struct msgbuf msg = {0, 0, 0, NULL};
   pid_t server_pid = getpid();
 
   err = connect2mq((char *)server_mq_name, READ, &mq_id);

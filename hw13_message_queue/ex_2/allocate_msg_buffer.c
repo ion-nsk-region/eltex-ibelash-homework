@@ -1,7 +1,7 @@
 #include "mq_chat.h"
 
-unsigned char *allocate_msg_buffer(mqd_t mq_id, long *msg_buffer_size) {
-  struct mq_attr attr;
+unsigned char *allocate_msg_buffer(long *msg_buffer_size) {
+  long max_msg_size = 0;
   unsigned char *msg_buffer = NULL;
   int err = 0;
 
@@ -13,13 +13,19 @@ unsigned char *allocate_msg_buffer(mqd_t mq_id, long *msg_buffer_size) {
   }
   if (0 == err && 0 >= *msg_buffer_size) {
     errno = 0;
-    if (0 == mq_getattr(mq_id, &attr)) {
-      *msg_buffer_size = attr.mq_msgsize;
-    } else {
-      perror("mq_getattr");
-      err = -1;
+    FILE *fp = fopen("/proc/sys/kernel/msgmax", "r");
+    if (fp == NULL) {
+        perror("Не удалось открыть /proc/sys/kernel/msgmax");
+        err = -1;
+    } else if (1 != fscanf(fp, "%ld", &max_msg_size)) {
+        fprintf(stderr, "Ошибка чтения из /proc/sys/kernel/msgmax\n");
+        err = -1;
     }
+    fclose(fp);
+
+    *msg_buffer_size = max_msg_size - sizeof(pid_t) - sizeof(long int);
   }
+
   if (0 == err && 0 < *msg_buffer_size) {
     errno = 0;
     msg_buffer = (unsigned char *)malloc(*msg_buffer_size);

@@ -3,10 +3,10 @@
 int main(void) {
   int err = 0;
   char *server_mq_name = SERVER_MQ_NAME;
-  mqd_t mq_id = 0;
+  int mq_id = 0;
   pthread_t server_queue_handler_tid;
 
-  // очередь для чтения входящих сообщений от клиентов
+  // очередь для чтения входящих сообщений от клиентов и общения с самим собой
   if (0 != (err = create_mq(server_mq_name, READ_WRITE, &mq_id))) {
     fprintf(stderr,
             "Ошибка: не удалось создать очередь сообщений для обработки"

@@ -1,22 +1,29 @@
 #include "mq_chat.h"
 
-int create_mq(char *mq_name, enum mq_mode mq_io_mode, mqd_t *mq_id) {
+int create_mq(char *mq_name, enum mq_mode mq_io_mode, int *mq_id) {
   int err = 0, mq_flags;
+  key_t key;
 
   if (NULL != mq_name) {
-    mode_t mq_perm = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
-    mq_flags = mq_io_mode | O_CLOEXEC | O_CREAT | O_EXCL;
     errno = 0;
-    *mq_id = mq_open(mq_name, mq_flags, mq_perm, NULL);
+    if (-1 == (key = ftok(mq_name, PROJ_ID))) {
+            perror("ftok");
+            err = -1;
+    } else {
+    mode_t mq_perm = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
+    mq_flags = mq_io_mode | mq_perm | O_CLOEXEC | O_CREAT | O_EXCL;
+    errno = 0;
+    *mq_id = msgget(key, mq_flags);
+    }
   }
 
-  if (-1 == *mq_id && EEXIST == errno) {
+  if (0 == err && -1 == *mq_id && EEXIST == errno) {
     fprintf(stderr, "Предупреждение: очередь уже существует.\n");
     // проверяем что очередь пуста и опустошаем при необходимости
     if (0 == (err = clear_mq(mq_name))) {
       mq_flags = mq_io_mode | O_CLOEXEC;
       errno = 0;
-      *mq_id = mq_open(mq_name, mq_flags);
+      *mq_id = msgget(key, mq_flags);
       fprintf(stderr, "Очередь очищена и открыта для работы.\n");
     } else {
       fprintf(stderr,
@@ -24,7 +31,7 @@ int create_mq(char *mq_name, enum mq_mode mq_io_mode, mqd_t *mq_id) {
               "Перезагрузите компьютер чтобы удалить эту очередь.\n");
     }
   } else if (-1 == *mq_id) {
-    perror("mq_open");
+    perror("msgget");
     err = -1;
   }
 
