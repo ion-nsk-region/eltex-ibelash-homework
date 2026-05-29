@@ -1,14 +1,14 @@
 #include "mq_chat.h"
 
-int handle_new_client(struct mq_msg new_client_msg) {
+int handle_new_client(struct msgbuf new_client_msg) {
   int err = 0;
-  mqd_t mq_id = 0;
+  int mq_id = 0;
 
   // создать очередь
   char mq_name[MQ_NAME_LENGTH];
   snprintf(mq_name, MQ_NAME_LENGTH, "/client%d", new_client_msg.sender_pid);
 
-  if (0 != (err = create_mq(mq_name, WRITE, &mq_id))) {
+  if (0 != (err = create_mq(mq_name, &mq_id))) {
     fprintf(stderr,
             "Ошибка: не удалось создать очередь для нового клиента. См. "
             "подробности в stderr.\n");

@@ -4,23 +4,23 @@ int clear_mq(char *mq_name) {
   int err = 0;
   int mq_id;
   long msg_size = 0;
-  struct msgbuf msg_buf;
+  char *msg_buf = NULL;
 
-  int mq_flags = O_RDONLY | O_CLOEXEC | O_NONBLOCK;
-  if (0 != (err = connect2mq(mq_name, mq_flags, &mq_id))) {
+  if (0 != (err = connect2mq(mq_name, &mq_id))) {
     printf("Ошибка connect2mq. Не удалось подключиться к очереди %s. См. подробности в stderr.", mq_name);
   }
 
+ 
   if (0 == err && -1 != mq_id) {
-    msg_buf.mtext = (char *)allocate_msg_buffer(&msg_size);
-    if (NULL == msg_buf.mtext) {
+    msg_buf = (char *)allocate_msg_buffer(&msg_size);
+    if (NULL == msg_buf) {
       printf(
-          "Не удалось выделить память под буфер чтения сообщений. См. "
-          "подробности в stderr.\n");
+          "Не удалось выделить память под буфер чтения сообщений."
+          " См. подробности в stderr.\n");
       err = -1;
     }
   }
-
+ 
   if (0 == err && -1 != mq_id) {
     int msg_flags = IPC_NOWAIT | MSG_NOERROR;
     while (0 == is_mq_empty(mq_id, NULL) && 0 == err) {
@@ -32,7 +32,7 @@ int clear_mq(char *mq_name) {
     }
   }
 
-  if (NULL != msg_buf.mtext) free(msg_buf.mtext);
+  if (NULL != msg_buf) free(msg_buf);
 
   return err;
 }

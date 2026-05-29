@@ -20,6 +20,20 @@
 #define MQ_NAME_LENGTH 16
 #define MAX_NICKNAME_LENGTH 256
 #define COMMAND_LENGTH 6 // ":join " или ":nick " - нужно при извлечении никнейма
+/*
+struct msgbuf {
+    long mtype; //! 1 - сообщения от сервера; 2+ - сообщения от клиентов.
+    char *mtext;
+};
+*/
+/*
+struct msgbuf {
+    long mtype; //! 1 - сообщения от сервера; 2+ - сообщения от клиентов.
+    pid_t sender_pid;
+    long int mtext_size;
+    char mtext[8180];
+};
+*/
 
 struct msgbuf {
     long mtype; //! 1 - сообщения от сервера; 2+ - сообщения от клиентов.
@@ -28,28 +42,40 @@ struct msgbuf {
     char *mtext;
 };
 
+/*
+struct mq_msg {
+    pid_t sender_pid;
+    long int text_size;
+    char *text;
+}
+*/
+/*
 enum mq_mode {
     READ = O_RDONLY,
     WRITE = O_WRONLY,
     READ_WRITE = O_RDWR
 };
+*/
 
 unsigned char *allocate_msg_buffer(long *msg_buffer_size);
 int clear_mq(char *mq_name);
-int connect2mq(char *mq_name, int mq_flags, int *mq_id);
+int connect2mq(char *mq_name, int *mq_id);
 int conn_timer(int connection_timeout, int sleep_time, int n_attempts);
-int create_mq(char *mq_name, enum mq_mode mq_io_mode, int *mq_id);
+int create_mq(char *mq_name, int *mq_id);
 int delete_mq(int mq_id);
 void deserialize_msg(const char *msg_buffer, struct msgbuf *msg);
+int free_msg_buffer(struct msgbuf *buffer);
 int get_last_sender_pid(int mq_id, pid_t *last_sender_pid);
+long get_max_msg_size(void);
 int get_nickname(char *mtext, char *nickname);
 int handle_new_client(struct msgbuf new_client_msg);
 int is_mq_empty(int mq_id, long unsigned int *mq_num);
 pid_t pid_from_string(unsigned char *string);
 unsigned char *pid_to_string(void);
-int read_mq_msg(int mq_id, long msg_type, char **msg);
-int send_mq_msg(int mq_id, const char *msg, size_t msg_length);
-void serialize_msg(struct msgbuf msg, char *msg_buffer);
+// int read_mq_msg(int mq_id, long msg_type, struct msgbuf *msg);
+int read_mq_msg(int mq_id, long msg_type, struct msgbuf **msg);
+int send_mq_msg(int mq_id, struct msgbuf *msg);
+// void serialize_msg(struct msgbuf msg, char *msg_buffer);
 void *server_queue_handler(void *server_mq_name);
 int server_queue_handler_exit(int server_mq_id);
 void wait_for_quit(void);

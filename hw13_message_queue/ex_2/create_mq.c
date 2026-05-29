@@ -1,7 +1,7 @@
 #include "mq_chat.h"
 
-int create_mq(char *mq_name, enum mq_mode mq_io_mode, int *mq_id) {
-  int err = 0, mq_flags;
+int create_mq(char *mq_name, int *mq_id) {
+  int err = 0;
   key_t key;
 
   if (NULL != mq_name) {
@@ -11,7 +11,7 @@ int create_mq(char *mq_name, enum mq_mode mq_io_mode, int *mq_id) {
             err = -1;
     } else {
     mode_t mq_perm = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
-    mq_flags = mq_io_mode | mq_perm | O_CLOEXEC | O_CREAT | O_EXCL;
+    int mq_flags = mq_perm | IPC_CREAT | IPC_EXCL;
     errno = 0;
     *mq_id = msgget(key, mq_flags);
     }
@@ -21,9 +21,8 @@ int create_mq(char *mq_name, enum mq_mode mq_io_mode, int *mq_id) {
     fprintf(stderr, "Предупреждение: очередь уже существует.\n");
     // проверяем что очередь пуста и опустошаем при необходимости
     if (0 == (err = clear_mq(mq_name))) {
-      mq_flags = mq_io_mode | O_CLOEXEC;
       errno = 0;
-      *mq_id = msgget(key, mq_flags);
+      *mq_id = msgget(key, 0);
       fprintf(stderr, "Очередь очищена и открыта для работы.\n");
     } else {
       fprintf(stderr,
