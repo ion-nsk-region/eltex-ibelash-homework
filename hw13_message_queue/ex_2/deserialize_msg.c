@@ -1,25 +1,21 @@
 #include "mq_chat.h"
 
-void deserialize_msg(const char *msg_buffer, struct msgbuf *msg) {
+void deserialize_msg(const char *mdata, size_t mdata_size, struct chat_msg *msg) {
   size_t offset = 0;
   
-  printf("DEBUG: deserialize\n  mtype %ld\n", *(long int *)(msg_buffer + offset));
-  memcpy(&msg->mtype, msg_buffer + offset, sizeof(long int));
-  offset += sizeof(long int);
-  
-  printf("  sender_pid %d\n", *(pid_t *)(msg_buffer + offset));
-  memcpy(&msg->sender_pid, msg_buffer + offset, sizeof(pid_t));
+  memcpy(&msg->sender, mdata + offset, sizeof(pid_t));
   offset += sizeof(pid_t);
+  
+  memcpy(&msg->cmd, mdata + offset, sizeof(enum chat_command));
+  offset += sizeof(enum chat_command);
 
-  printf("  mtext_size %ld\n", *(long int *)(msg_buffer + offset));
-  memcpy(&msg->mtext_size, msg_buffer + offset, sizeof(long int));
-  offset += sizeof(long int);
+  // вычисляем размер текстовой части и выделяем для неё память
+  size_t content_size = mdata_size - offset;
   errno = 0;
-  msg->mtext = malloc(msg->mtext_size);
-  if (NULL == msg->mtext) {
+  msg->content = malloc(content_size);
+  if (NULL == msg->content) {
     perror("malloc");
   } else {
-    printf("  mtext %s\n", (char *)(msg_buffer + offset));
-    memcpy(msg->mtext, msg_buffer + offset, msg->mtext_size);
+    memcpy(msg->content, mdata + offset, content_size);
   }
 }

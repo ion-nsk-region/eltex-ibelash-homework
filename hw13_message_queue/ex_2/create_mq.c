@@ -3,6 +3,7 @@
 int create_mq(char *mq_name, int *mq_id) {
   int err = 0;
   key_t key;
+  mode_t mq_perm = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 
   if (NULL != mq_name) {
     errno = 0;
@@ -10,7 +11,6 @@ int create_mq(char *mq_name, int *mq_id) {
             perror("ftok");
             err = -1;
     } else {
-    mode_t mq_perm = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
     int mq_flags = mq_perm | IPC_CREAT | IPC_EXCL;
     errno = 0;
     *mq_id = msgget(key, mq_flags);
@@ -22,7 +22,7 @@ int create_mq(char *mq_name, int *mq_id) {
     // проверяем что очередь пуста и опустошаем при необходимости
     if (0 == (err = clear_mq(mq_name))) {
       errno = 0;
-      *mq_id = msgget(key, 0);
+      *mq_id = msgget(key, mq_perm);
       fprintf(stderr, "Очередь очищена и открыта для работы.\n");
     } else {
       fprintf(stderr,

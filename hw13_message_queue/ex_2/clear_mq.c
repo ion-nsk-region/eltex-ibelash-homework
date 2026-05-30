@@ -4,7 +4,8 @@ int clear_mq(char *mq_name) {
   int err = 0;
   int mq_id;
   long msg_size = 0;
-  char *msg_buf = NULL;
+  // char *msg_buf = NULL;
+  struct msgbuf *msg_buf = NULL;
 
   if (0 != (err = connect2mq(mq_name, &mq_id))) {
     printf("Ошибка connect2mq. Не удалось подключиться к очереди %s. См. подробности в stderr.", mq_name);
@@ -12,7 +13,8 @@ int clear_mq(char *mq_name) {
 
  
   if (0 == err && -1 != mq_id) {
-    msg_buf = (char *)allocate_msg_buffer(&msg_size);
+    long max_msg_size = get_max_msg_size();
+    msg_buf = malloc(sizeof(struct msgbuf) + max_msg_size);
     if (NULL == msg_buf) {
       printf(
           "Не удалось выделить память под буфер чтения сообщений."
@@ -32,7 +34,7 @@ int clear_mq(char *mq_name) {
     }
   }
 
-  if (NULL != msg_buf) free(msg_buf);
+  //free_msg_buffer(msg_buf);
 
   return err;
 }
