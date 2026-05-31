@@ -2,11 +2,10 @@
 
 int server_queue_handler_exit(int server_mq_id) {
   int err = 0;
-  struct msgbuf msg;
-  msg.mtype = 1;
-  msg.sender_pid = getpid();
-  msg.mtext_size = sizeof(":quit");
-  msg.mtext = ":quit";
+  struct chat_msg msg;
+  msg.sender = getpid(); 
+  msg.cmd = QUIT;
+  msg.content = NULL;
 
   if (0 != (err = send_mq_msg(server_mq_id, msg))) {
     printf(

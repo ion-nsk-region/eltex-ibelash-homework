@@ -6,10 +6,10 @@ int main(void) {
   char *server_mq_name = SERVER_MQ_NAME;
   pid_t my_pid = getpid();
 
-  mqd_t server_mq_id = 0;
+  int server_mq_id = -1;
 
   // подключаемся к очереди сервера
-  err = connect2mq(server_mq_name, WRITE, &server_mq_id);
+  err = connect2mq(server_mq_name, &server_mq_id);
   if (ETIME == err) {
     printf("Ошибка: время ожидания сервера истекло.\n");
   } else if (0 != err) {
@@ -18,26 +18,20 @@ int main(void) {
 
   // подключаемся к чату
   if (0 == err && 0 < server_mq_id) {
-    // struct mq_msg join_msg = {my_pid, 132, ":join Pablo Diego José Francisco de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima Trinidad Ruiz y Picasso"};
-    struct mq_msg join_msg = {my_pid, 280, ":join Забавно, но моё полное имя Пабло Диего Хосе Франциско де Паула Хуан Непомучено Мария де лос Ремедиос Чиприано де ла Сантисима Тринидад Руиз и Пикассо"};
+    // struct mq_msg join_msg = {my_pid, 132, ":join Pablo Diego José Francisco
+    // de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima
+    // Trinidad Ruiz y Picasso"};
+    struct chat_msg join_msg = {
+        my_pid, JOIN,
+        "Забавно, но моё полное имя Пабло Диего Хосе Франциско де Паула Хуан "
+        "Непомучено Мария де лос Ремедиос Чиприано де ла Сантисима Тринидад "
+        "Руиз и Пикассо"};
 
-    long total_msg_size =
-        sizeof(pid_t) + sizeof(long int) + join_msg.mtext_size;
-    char *msg_buffer =
-        (char *)allocate_msg_buffer(server_mq_id, &total_msg_size);
-    if (NULL != msg_buffer) {
-      serialize_msg(join_msg, msg_buffer);
-      if (0 != (err = send_mq_msg(server_mq_id, msg_buffer, total_msg_size))) {
-        printf("Ошибка send_mq_msg: %d\n", err);
-      }
-
-      free(msg_buffer);
-      msg_buffer = NULL;
-    } else {
-      err = -1;
+    if (0 != (err = send_mq_msg(server_mq_id, join_msg))) {
+      printf("Ошибка send_mq_msg: %d\n", err);
     }
   }
-
+/*
   // отключаемся от очереди сервера
   if (0 == err && 0 != server_mq_id) {
     errno = 0;
@@ -46,7 +40,7 @@ int main(void) {
     } else
       server_mq_id = 0;
   }
-
+*/
   /*
     // считываем сообщение и выводим на экран
     if (0 == err && 0 != server_mq_id) {

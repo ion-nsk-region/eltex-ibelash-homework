@@ -2,8 +2,8 @@
 
 void *server_queue_handler(void *server_mq_name) {
   int err = 0, is_running = 1;
-  int mq_id = 0;
-  struct msgbuf msg = {0, 0, 0, NULL};
+  int mq_id = -1;
+  struct chat_msg *msg = NULL;
   pid_t server_pid = getpid();
 
   err = connect2mq((char *)server_mq_name, &mq_id);
@@ -16,24 +16,33 @@ void *server_queue_handler(void *server_mq_name) {
       printf("Ошибка read_mq_msg: %d\n", err);
     }
 
-    if (msg.sender_pid == server_pid && 0 == strncmp(":quit", msg.mtext, 6)) {
-      is_running = 0;
-    } else if (0 == strncmp(":join", msg.mtext, 5)) {
-      // handle_new_client(msg);
-    } else if (0 == strncmp(":disconnected", msg.mtext, 14)) {
-      // handle_disconnected_client(msg.sender_pid);
-    } else {
-      // push_msg_to_history(msg);
-      // msg_to_all(msg);
+    switch (msg->cmd) {
+      case QUIT:
+        if (msg->sender == server_pid) is_running = 0;
+        break;
+      case JOIN:
+        handle_new_client(*msg);
+        break;
+      case DISCONNECTED:
+        // handle_disconnected_client(msg.sender_pid);
+        break;
+      case MSG:
+        // push_msg_to_history(msg);
+        // msg_to_all(msg);
+        break;
+      default:
+        printf("Получена неизвестная команда с кодом %d.\n", msg->cmd);
     }
 
-    fprintf(stderr, "DEBUG получено сообщение от %d размером %ld байт: %s\n",
-            msg.sender_pid, msg.mtext_size, msg.mtext);
-    //free(msg.mtext);
-    //msg.mtext = NULL;
-  };
+    const char *commands[] = {"JOIN", "QUIT", "DISCONNECTED", "MSG"};
+    fprintf(stderr, "DEBUG получено сообщение от %d с командой %s: %s\n",
+            msg->sender, commands[msg->cmd], msg->content);
+    free(msg->content);
+    free(msg);
+    msg = NULL;
+  }; // while (is_running)
 
-  if (0 != mq_id) {
+  if (-1 < mq_id) {
     if (0 != (err = delete_mq(mq_id))) {
       printf(
           "Ошибка: не удалось удалить очередь для обработки"
@@ -43,5 +52,5 @@ void *server_queue_handler(void *server_mq_name) {
     }
   }
 
-  return (void *)0;
+  return (void *)(intptr_t)err;
 }
