@@ -7,7 +7,7 @@ int server_queue_handler_exit(int server_mq_id) {
   msg.cmd = QUIT;
   msg.content = NULL;
 
-  if (0 != (err = send_mq_msg(server_mq_id, msg))) {
+  if (0 != (err = send_mq_msg(server_mq_id, 1, msg))) {
     printf(
         "Ошибка: не удалось отправить сообщение потоку о выходе. "
         "См. подробности в stderr.\n");

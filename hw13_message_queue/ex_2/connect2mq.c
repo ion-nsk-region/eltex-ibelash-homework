@@ -17,7 +17,6 @@ int connect2mq(char *mq_name, int *mq_id) {
       } while (-1 == *mq_id && ENOENT == errno &&
                ETIME != (err = conn_timer(CONNECTION_TIMEOUT, SLEEP_TIME,
                                           n_attempts++)));
-
       if (-1 == *mq_id && ETIME != err) {
         perror("msgget");
         err = -1;

@@ -4,9 +4,10 @@ int main(void) {
   int err = 0;
 
   char *server_mq_name = SERVER_MQ_NAME;
+  char *client_mq_name = CLIENT_MQ_NAME;
   pid_t my_pid = getpid();
 
-  int server_mq_id = -1;
+  int server_mq_id = -1, client_mq_id = -1;
 
   // подключаемся к очереди сервера
   err = connect2mq(server_mq_name, &server_mq_id);
@@ -15,44 +16,44 @@ int main(void) {
   } else if (0 != err) {
     printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
   }
+  // подключаемся к очереди для клиентов
+  err = connect2mq(client_mq_name, &client_mq_id);
+  if (ETIME == err) {
+    printf("Ошибка: время ожидания сервера истекло.\n");
+  } else if (0 != err) {
+    printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
+  }
 
   // подключаемся к чату
-  if (0 == err && 0 < server_mq_id) {
-    // struct mq_msg join_msg = {my_pid, 132, ":join Pablo Diego José Francisco
-    // de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima
-    // Trinidad Ruiz y Picasso"};
-    struct chat_msg join_msg = {
+  if (0 == err && -1 < server_mq_id) {
+    struct chat_msg join_msg = {my_pid, JOIN, "Pablo Diego José Francisco "
+     "de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima "
+     "Trinidad Ruiz y Picasso"};
+    /* // перегруз по длине никнейма.
+     * struct chat_msg join_msg = {
         my_pid, JOIN,
         "Забавно, но моё полное имя Пабло Диего Хосе Франциско де Паула Хуан "
         "Непомучено Мария де лос Ремедиос Чиприано де ла Сантисима Тринидад "
         "Руиз и Пикассо"};
+    */
 
-    if (0 != (err = send_mq_msg(server_mq_id, join_msg))) {
+    if (0 != (err = send_mq_msg(server_mq_id, 1, join_msg))) {
       printf("Ошибка send_mq_msg: %d\n", err);
     }
   }
-/*
-  // отключаемся от очереди сервера
-  if (0 == err && 0 != server_mq_id) {
-    errno = 0;
-    if (-1 == (err = mq_close(server_mq_id))) {
-      perror("mq_close");
-    } else
-      server_mq_id = 0;
-  }
-*/
-  /*
     // считываем сообщение и выводим на экран
-    if (0 == err && 0 != server_mq_id) {
-      if (0 != (err = read_mq_msg(server_mq_id, &msg))) {
+    if (0 == err && -1 < client_mq_id) {
+      struct chat_msg *reply_from_server;
+      if (0 != (err = read_mq_msg(client_mq_id, my_pid, &reply_from_server))) {
         printf("Ошибка read_mq_msg: %d\n", err);
       } else {
-        printf("%s\n", msg);
-        free(msg);
+        printf("%s\n", reply_from_server->content);
+        free(reply_from_server);
       }
     }
 
 
+  /*
     // отвечаем серверу
     if (0 == err) {
       err = create_mq(client_mq_name, WRITE, &server_mq_id);

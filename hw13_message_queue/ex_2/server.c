@@ -3,14 +3,20 @@
 int main(void) {
   int err = 0;
   char *server_mq_name = SERVER_MQ_NAME;
-  int mq_id = 0;
+  int server_mq_id = -1, client_mq_id = -1;
   pthread_t server_queue_handler_tid;
 
   // очередь для чтения входящих сообщений от клиентов и общения с самим собой
-  if (0 != (err = create_mq(server_mq_name, &mq_id))) {
+  if (0 != (err = create_mq(server_mq_name, &server_mq_id))) {
     fprintf(stderr,
             "Ошибка: не удалось создать очередь для обработки "
             "сообщений от клиентов. См. подробности в stderr.\n");
+  }
+  // очередь для исходящих сообщений для клиентов
+  if (0 != (err = create_mq(CLIENT_MQ_NAME, &client_mq_id))) {
+    fprintf(stderr,
+            "Ошибка: не удалось создать очередь для исходящих "
+            "сообщений для клиентов. См. подробности в stderr.\n");
   }
 
   // создаём поток для обработки сообщений от клиентов
@@ -28,7 +34,7 @@ int main(void) {
     wait_for_quit();
 
     // отправляем сообщение потоку о выходе
-    server_queue_handler_exit(mq_id);
+    server_queue_handler_exit(server_mq_id);
 
     void *status;
     if (0 == (err = pthread_join(server_queue_handler_tid, &status))) {
@@ -43,15 +49,6 @@ int main(void) {
       fprintf(stderr, "pthread_join: %s\n", strerror(err));
     }
   }
-  // очищаем выделенные ресурсы
-  /*
-  if (0 == err) {
-    server_cleanup();
-  }
-*/
-
-  // Выходим
-  //  printf("Выходим.\n");
 
   return err;
 }

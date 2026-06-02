@@ -18,12 +18,12 @@ int create_mq(char *mq_name, int *mq_id) {
   }
 
   if (0 == err && -1 == *mq_id && EEXIST == errno) {
-    fprintf(stderr, "Предупреждение: очередь уже существует.\n");
+    fprintf(stderr, "Предупреждение: очередь %s уже существует.\n", mq_name);
     // проверяем что очередь пуста и опустошаем при необходимости
     if (0 == (err = clear_mq(mq_name))) {
       errno = 0;
       *mq_id = msgget(key, mq_perm);
-      fprintf(stderr, "Очередь очищена и открыта для работы.\n");
+      fprintf(stderr, "Очередь %s очищена и открыта для работы с id %d.\n", mq_name, *mq_id);
     } else {
       fprintf(stderr,
               "Ошибка: не удалось очистить существующую очередь.\n"

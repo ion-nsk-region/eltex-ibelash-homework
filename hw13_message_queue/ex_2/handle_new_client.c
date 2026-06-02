@@ -1,22 +1,28 @@
 #include "mq_chat.h"
 
-int handle_new_client(struct chat_msg new_client_msg) {
+int handle_new_client(int client_mq_id, struct chat_msg client_msg, struct user *users, int *n_users) {
   int err = 0;
 
   // Достать ник
-  char new_client_nickname[MAX_NICKNAME_LENGTH];
-  err = get_nickname(new_client_msg.content, new_client_nickname);
+  char client_nickname[MAX_NICKNAME_LENGTH];
+  size_t client_nickname_length;
+  err = get_nickname(client_msg.content, client_nickname, &client_nickname_length);
+    // TODO добавить защиту, чтобы клиенты не могли использовать никнейм "server".
 
-  printf("DEBUG Подключается пользователь %s.\n", new_client_nickname);
+  printf("DEBUG Подключается пользователь %s.\n", client_nickname);
 
-  // TODO добавить пользователя в список участников чата
-  // new_client_msg.sender, new_client_nickname
+  // Добавить пользователя в список участников чата
+  if (0 == err && 0 != (err = user_add(client_msg.sender, client_nickname, client_nickname_length, users, n_users))) {
+    printf("Ошибка: не удалось добавить пользователя в список. "
+                    "См. подробности в stderr.\n");
+  }
 
-  // TODO отправить список участников чата
+  // TODO отправить пользователю список участников чата
+  send_users_list(client_mq_id, client_msg.sender, users, *n_users);
 
   // TODO отправить историю сообщений (последние 100)
 
-  // TODO уведомить других участников о новом пошьзователе
+  // TODO уведомить других участников о новом пользователе
 
   return err;
 }

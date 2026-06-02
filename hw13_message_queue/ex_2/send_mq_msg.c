@@ -1,6 +1,6 @@
 #include "mq_chat.h"
 
-int send_mq_msg(int mq_id, struct chat_msg msg) {
+int send_mq_msg(int mq_id, long to_whom, struct chat_msg msg) {
   int err = 0;
   // вычисляем размер данных и выделяем память для буфера
   size_t content_size = 0;
@@ -11,7 +11,7 @@ int send_mq_msg(int mq_id, struct chat_msg msg) {
   struct msgbuf *msg_buf = malloc(sizeof(struct msgbuf) + total_msg_size);
 
   // записываем данные в буфер
-  msg_buf->mtype = msg.sender;
+  msg_buf->mtype = to_whom;
   msg_buf->msize = total_msg_size;
   serialize_msg(&msg, content_size, msg_buf->mdata);
 
