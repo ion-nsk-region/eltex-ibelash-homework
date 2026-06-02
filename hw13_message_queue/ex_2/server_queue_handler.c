@@ -4,6 +4,8 @@ void *server_queue_handler(void *server_mq_name) {
   int err = 0, is_running = 1, n_users = 0;
   int server_mq_id = -1, client_mq_id = -1;
   struct chat_msg *msg = NULL;
+  struct chat_msg history[MAX_HISTORY_SIZE];
+  char last_msg_id = 0;
   struct user *users = NULL;
   pid_t server_pid = getpid();
 
@@ -35,6 +37,8 @@ void *server_queue_handler(void *server_mq_name) {
   while (is_running) {
     if (0 != (err = read_mq_msg(server_mq_id, 0, &msg))) {
       printf("Ошибка read_mq_msg: %d\n", err);
+    } else {
+      history_add(msg, history, &last_msg_id);
     }
 
     switch (msg->cmd) {
@@ -42,7 +46,7 @@ void *server_queue_handler(void *server_mq_name) {
         if (msg->sender == server_pid) is_running = 0;
         break;
       case JOIN:
-        handle_new_client(client_mq_id, *msg, users, &n_users);
+        handle_new_client(client_mq_id, *msg, users, &n_users, history, last_msg_id);
         break;
       case DISCONNECTED:
         // handle_disconnected_client(msg.sender_pid);
@@ -55,10 +59,9 @@ void *server_queue_handler(void *server_mq_name) {
         printf("Получена неизвестная команда с кодом %d.\n", msg->cmd);
     }
 
-    const char *commands[] = {"JOIN", "QUIT", "DISCONNECTED", "MSG"};
     fprintf(stderr, "DEBUG получено сообщение от %d с командой %s: %s\n",
             msg->sender, commands[msg->cmd], msg->content);
-    free(msg->content);
+    // free(msg->content); // оно остаётся в истории
     free(msg);
     msg = NULL;
   };  // while (is_running)

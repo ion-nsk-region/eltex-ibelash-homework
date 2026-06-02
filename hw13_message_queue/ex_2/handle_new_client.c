@@ -1,6 +1,6 @@
 #include "mq_chat.h"
 
-int handle_new_client(int client_mq_id, struct chat_msg client_msg, struct user *users, int *n_users) {
+int handle_new_client(int client_mq_id, struct chat_msg client_msg, struct user *users, int *n_users, struct chat_msg *history, char last_msg_id) {
   int err = 0;
 
   // Достать ник
@@ -17,10 +17,11 @@ int handle_new_client(int client_mq_id, struct chat_msg client_msg, struct user 
                     "См. подробности в stderr.\n");
   }
 
-  // TODO отправить пользователю список участников чата
+  // отправить пользователю список участников чата
   send_users_list(client_mq_id, client_msg.sender, users, *n_users);
 
   // TODO отправить историю сообщений (последние 100)
+  send_history(client_mq_id, client_msg.sender, history, last_msg_id);
 
   // TODO уведомить других участников о новом пользователе
 
