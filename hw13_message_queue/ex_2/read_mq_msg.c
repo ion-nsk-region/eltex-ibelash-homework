@@ -3,13 +3,11 @@
 int read_mq_msg(int mq_id, long msg_type, struct chat_msg **msg) {
   int err = 0;
   size_t max_msg_size = get_max_msg_size();
-  size_t msg_buf_size;
   struct msgbuf *msg_buf;
 
   if (-1 != mq_id) {
-    msg_buf_size = sizeof(struct msgbuf) + max_msg_size;
     errno = 0;
-    msg_buf = malloc(msg_buf_size);
+    msg_buf = (struct msgbuf *)malloc(sizeof(long) + max_msg_size);
     if (NULL == msg_buf) {
       err = errno;
       perror("malloc");
@@ -18,7 +16,7 @@ int read_mq_msg(int mq_id, long msg_type, struct chat_msg **msg) {
 
   errno = 0;
   if (0 == err &&
-      -1 == msgrcv(mq_id, msg_buf, msg_buf_size, msg_type, 0)) {
+      -1 == msgrcv(mq_id, msg_buf, max_msg_size, msg_type, 0)) {
     err = errno;
     perror("msgrcv");
   }

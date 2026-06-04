@@ -1,6 +1,6 @@
 #include "mq_chat.h"
 
-int user_add(pid_t pid, char *nickname, size_t nickname_length,
+int user_add(pid_t pid, const char *nickname, size_t nickname_length,
              struct user *users, int *n_users) {
   int err = 0;
 
@@ -15,7 +15,7 @@ int user_add(pid_t pid, char *nickname, size_t nickname_length,
       // Собственно добавляем:
       strncpy(user->nickname, nickname, nickname_length + 1);
       user->pid = pid;
-      (*n_users)++;
+      ++(*n_users);
     }
   } else {
     fprintf(stderr,

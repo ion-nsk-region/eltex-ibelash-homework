@@ -17,7 +17,7 @@ int get_nickname(char *mtext, char *nickname, size_t *nickname_length) {
     err = -1;
   }
 
-  *nickname_length = 0;
+  if(0 == err) *nickname_length = 0;
   while (0 == err && '\0' != *mtext_ptr &&
          MAX_NICKNAME_LENGTH > *nickname_length) {
     *nickname_ptr = *mtext_ptr;

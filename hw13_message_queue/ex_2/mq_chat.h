@@ -19,18 +19,21 @@
 #define CLIENT_MQ_NAME "./client.exe"
 #define MQ_NAME_LENGTH 16
 #define MAX_NICKNAME_LENGTH 256
+#define MAX_PID_STR_LENGTH 12 // размер строки для текстового представления pid
+#define MAX_CMD_STR_LENGTH 3 // размер строки для текстового представления номера комманды чата
 #define MAX_CHAT_USERS 20
 #define MAX_HISTORY_SIZE 100
 
 struct msgbuf {
-  long mtype;  //! 1 - сообщения от сервера; (pid_t)2+ - сообщения от клиентов.
+  long mtype;  //! 1 - сервер; (pid_t)2+ - клиенты.
   size_t msize;
   char mdata[];
 };
 
-enum chat_command { JOIN, QUIT, LIST, DISCONNECTED, MSG };
+// при изменении "enum chat_command" также необходимо изменить массив "commands" в server_queue_handler
+enum chat_command { NO_COMMAND, //! пустые ячейки истории.
+        JOIN, QUIT, LIST, HISTORY, MSG };
 
-const char *commands[] = {"JOIN", "QUIT", "LIST", "DISCONNECTED", "MSG" };
 
 struct chat_msg {
   pid_t sender;
@@ -53,23 +56,30 @@ void deserialize_msg(const char *mdata, size_t mdata_size,
 int get_last_sender_pid(int mq_id, pid_t *last_sender_pid);
 long get_max_msg_size(void);
 int get_nickname(char *mtext, char *nickname, size_t *nickname_length);
-int handle_new_client(int client_mq_id, struct chat_msg client_msg, struct user *users, int *n_users, struct chat_msg *history, char last_msg_id);
+int handle_new_client(int client_mq_id, struct chat_msg client_msg, struct user *users, int *n_users, struct chat_msg *history, int last_msg_id);
+int history_send(int client_mq_id, long to_whom,
+                  struct chat_msg *history, int last_msg_id);
+int history_to_string(struct chat_msg *history, int *start_msg_id, int last_msg_id, char *buffer, size_t buffer_size);
+void history_update(struct chat_msg msg, struct chat_msg *history, int *last_msg_id);
 int is_mq_empty(int mq_id, long unsigned int *mq_num);
+int msg_to_all(int client_mq_id, struct chat_msg msg, struct user *users,
+                int n_users);
 pid_t pid_from_string(unsigned char *string);
 unsigned char *pid_to_string(void);
 int read_mq_msg(int mq_id, long msg_type, struct chat_msg **msg);
 int send_mq_msg(int mq_id, long to_whom, struct chat_msg msg);
+int send_user_joined_notification(int client_mq_id, struct user *users, int n_users, char *client_nickname, size_t client_nickname_length);
 int send_users_list(int client_mq_id, long to_whom, struct user *users,
                     int n_users);
 void serialize_msg(const struct chat_msg *msg, size_t content_size,
                    char *mdata);
-int server_cleanup(int server_mq_id, int client_mq_id);
+int server_cleanup(int server_mq_id, int client_mq_id, struct user *users, int n_users, struct chat_msg *history);
 void *server_queue_handler(void *server_mq_name);
 int server_queue_handler_exit(int server_mq_id);
-int user_add(pid_t pid, char *nickname, size_t nickname_length,
+int user_add(pid_t pid, const char *nickname, size_t nickname_length,
              struct user *users, int *n_users);
-int users_list_to_string(struct user *users, int n_users,
-                         size_t max_buffer_size, char *buffer);
+int users_list_to_string(struct user *users, int n_users, char *buffer,
+                         size_t buffer_size);
 void wait_for_quit(void);
 
 #endif  // MQ_CHAT_H

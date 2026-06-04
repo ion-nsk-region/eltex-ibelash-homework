@@ -1,15 +1,14 @@
 #include "mq_chat.h"
-#define MAX_PID_STR_LENGTH 12
 
-int users_list_to_string(struct user *users, int n_users,
-                         size_t max_buffer_size, char *buffer) {
+int users_list_to_string(struct user *users, int n_users, char *buffer,
+                         size_t buffer_size) {
   int err = 0;
-  size_t bytes_available = max_buffer_size;
+  size_t bytes_available = buffer_size - 1;
 
   if (NULL == buffer) {
     fprintf(stderr,
-            "Ошибка: users_list_to_string не указан адрес результирующей "
-            "строки.\n");
+            "Ошибка: users_list_to_string "
+            "не указан адрес результирующей строки.\n");
     err = -1;
   }
 
@@ -31,14 +30,15 @@ int users_list_to_string(struct user *users, int n_users,
         *buf_ptr = 0x1E;  // Record separator = разделитель записей
         ++buf_ptr;
         bytes_available =
-            bytes_available - (sizeof(pid_t) + 1) - (nickname_length + 1);
+            bytes_available - (pid_str_length + 1) - (nickname_length + 1);
       } else {
         fprintf(stderr,
                 "Ошибка: недостаточно места в буфере для полного списка "
                 "пользователей.\n");
-        err = -1;
+        err = ERANGE;
       }
     }
+    *buf_ptr = '\0';
   }
 
   return err;
