@@ -1,6 +1,7 @@
 #include "mq_chat.h"
 
-void serialize_msg(const struct chat_msg *msg, size_t content_size, char *mdata) {
+void serialize_msg(const struct chat_msg *msg, size_t content_size,
+                   char *mdata) {
   size_t offset = 0;
   memcpy(mdata + offset, &msg->sender, sizeof(pid_t));
   offset += sizeof(pid_t);

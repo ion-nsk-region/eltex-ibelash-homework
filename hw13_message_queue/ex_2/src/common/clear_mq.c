@@ -15,7 +15,7 @@ int clear_mq(char *mq_name) {
   }
 
   if (0 == err && -1 != mq_id) {
-    buffer_size = sizeof(struct msgbuf) + max_msg_size;      
+    buffer_size = sizeof(struct msgbuf) + max_msg_size;
     errno = 0;
     msg_buf = malloc(buffer_size);
     if (NULL == msg_buf) {
@@ -36,7 +36,7 @@ int clear_mq(char *mq_name) {
     }
   }
 
-  if(NULL != msg_buf) free(msg_buf);
+  if (NULL != msg_buf) free(msg_buf);
 
   return err;
 }

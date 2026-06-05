@@ -3,7 +3,7 @@
 int server_queue_handler_exit(int server_mq_id) {
   int err = 0;
   struct chat_msg msg;
-  msg.sender = getpid(); 
+  msg.sender = getpid();
   msg.cmd = QUIT;
   msg.content = NULL;
 

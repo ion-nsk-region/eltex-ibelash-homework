@@ -2,46 +2,68 @@ ifndef BUILD_MODE
     BUILD_MODE = Release
 endif
 
+COMMON_FLAGS = -Wall -Wextra -Werror -Iinclude
+
 ifeq ($(BUILD_MODE), Release)
-        CFLAGS = -Wall -Wextra -Werror
+        CFLAGS = $(COMMON_FLAGS)
 else ifeq ($(BUILD_MODE), Debug)
-        CFLAGS = -g -Wall -Wextra -Werror
+        CFLAGS = $(COMMON_FLAGS) -g 
 else ifeq ($(BUILD_MODE), Asan)
-        CFLAGS = -g -fsanitize=address -Wall -Wextra -Werror
+        CFLAGS = $(COMMON_FLAGS) -g -fsanitize=address
 endif
 
+
+SRC_DIR = src
+BUILD_DIR = build
+LIB_DIR = lib
+
 MAIN_SERVER = server
+SERVER_LIBS = -pthread
+SERVER_SRCS = $(wildcard $(SRC_DIR)/server/*.c)
+SERVER_OBJ := $(patsubst $(SRC_DIR)/server/%.c, $(BUILD_DIR)/%.o, $(SERVER_SRCS))
+
 MAIN_CLIENT = client
-LIB = libmq_chat.a
-SRCS = $(filter-out $(MAIN_SERVER).c $(MAIN_CLIENT).c, $(wildcard *.c))
-OBJ := $(SRCS:.c=.o)
+CLIENT_LIBS = -lncursesw -pthread
+CLIENT_SRCS = $(wildcard $(SRC_DIR)/client/*.c)
+CLIENT_OBJ := $(patsubst $(SRC_DIR)/client/%.c, $(BUILD_DIR)/%.o, $(CLIENT_SRCS))
 
-all: code_check $(MAIN_SERVER).exe $(MAIN_CLIENT).exe
+LIB_NAME = mq_chat
+STATIC_LIB = $(LIB_DIR)/lib$(LIB_NAME).a
+LIB_SRCS = $(wildcard $(SRC_DIR)/common/*.c)
+LIB_OBJ := $(patsubst $(SRC_DIR)/common/%.c, $(BUILD_DIR)/%.o, $(LIB_SRCS))
+LDFLAGS = -L$(LIB_DIR) -l$(LIB_NAME)
 
-server: $(MAIN_SERVER).exe
+all: code_check directories server client 
 
-client: $(MAIN_CLIENT).exe
+directories:
+	mkdir -p $(BUILD_DIR) $(LIB_DIR)
 
-$(MAIN_SERVER).exe: $(MAIN_SERVER).c $(LIB)
+server: $(BUILD_DIR)/$(MAIN_SERVER).exe
+
+client: $(BUILD_DIR)/$(MAIN_CLIENT).exe
+
+$(BUILD_DIR)/$(MAIN_SERVER).exe: $(SERVER_SRCS) $(STATIC_LIB)
 	@echo "\nСобираем исполняемый файл сервера. Флаги компиляции: $(CFLAGS)"
-	$(CC) $(CFLAGS) -o $@ $< -L. -l:$(LIB) -lrt -lpthread
+	$(CC) $(CFLAGS) $(SERVER_SRCS) -o $@ $(SERVER_LIBS) $(LDFLAGS)
 
-$(MAIN_CLIENT).exe: $(MAIN_CLIENT).c $(LIB)
+$(BUILD_DIR)/$(MAIN_CLIENT).exe: $(CLIENT_SRCS) $(STATIC_LIB)
 	@echo "\nСобираем исполняемый файл клиента. Флаги компиляции: $(CFLAGS)"
-	$(CC) $(CFLAGS) -o $@ $< -L. -l:$(LIB) -lrt
+	$(CC) $(CFLAGS) $(CLIENT_SRCS) -o $@ $(CLIENT_LIBS) $(LDFLAGS)
 
-$(LIB): msg_lib $(LIB)($(OBJ))
+$(BUILD_DIR)/%.o: $(SRC_DIR)/common/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-msg_lib:
+$(STATIC_LIB): $(LIB_OBJ) 
 	@echo "\nСоздаём объектные файлы для статической библиотеки и собираем её."
+	ar rcs $@ $^
 
-code_check: $(SRCS) $(MAIN_SERVER).c $(MAIN_CLIENT).c
-	-cppcheck --enable=all --suppress=missingIncludeSystem $^
-	#-clang-format -n --style=Google $^
+code_check: $(SERVER_SRCS) $(SRC_DIR)/server/$(MAIN_SERVER).c $(CLIENT_SRCS) $(SRC_DIR)/client/$(MAIN_CLIENT).c $(LIB_SRCS)
+	-cppcheck --enable=all --suppress=missingIncludeSystem -Iinclude $^
+	#-clang-format -n --style=Google -Iinclude $^
 	clang-format -i --style=Google $^
 
 clean:
-	rm -vf *.exe *.c~ *.a *.o *.h~
+	rm -vrf $(BUILD_DIR) $(LIB_DIR)
 
-.PHONY: all clean code_check msg_lib server client
+.PHONY: all clean code_check server client directories
 

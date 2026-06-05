@@ -1,7 +1,7 @@
 #include "mq_chat.h"
 
 int get_nickname(char *mtext, char *nickname, size_t *nickname_length) {
-  int err = 0; 
+  int err = 0;
   char *nickname_ptr = nickname, *mtext_ptr = mtext;
 
   if (NULL == mtext_ptr) {
@@ -13,11 +13,12 @@ int get_nickname(char *mtext, char *nickname, size_t *nickname_length) {
     err = -1;
   }
   if (NULL == nickname_length) {
-    fprintf(stderr, "Ошибка: не указана выходная переменная для длины никнейма.\n");
+    fprintf(stderr,
+            "Ошибка: не указана выходная переменная для длины никнейма.\n");
     err = -1;
   }
 
-  if(0 == err) *nickname_length = 0;
+  if (0 == err) *nickname_length = 0;
   while (0 == err && '\0' != *mtext_ptr &&
          MAX_NICKNAME_LENGTH > *nickname_length) {
     *nickname_ptr = *mtext_ptr;

@@ -15,8 +15,7 @@ int read_mq_msg(int mq_id, long msg_type, struct chat_msg **msg) {
   }
 
   errno = 0;
-  if (0 == err &&
-      -1 == msgrcv(mq_id, msg_buf, max_msg_size, msg_type, 0)) {
+  if (0 == err && -1 == msgrcv(mq_id, msg_buf, max_msg_size, msg_type, 0)) {
     err = errno;
     perror("msgrcv");
   }

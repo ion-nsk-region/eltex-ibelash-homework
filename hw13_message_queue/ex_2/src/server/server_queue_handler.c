@@ -45,12 +45,14 @@ void *server_queue_handler(void *server_mq_name) {
 
     switch (msg->cmd) {
       case QUIT:
-        if (msg->sender == server_pid) is_running = 0;
-        else {// handle_disconnected_client();
+        if (msg->sender == server_pid)
+          is_running = 0;
+        else {  // handle_disconnected_client();
         }
         break;
       case JOIN:
-        handle_new_client(client_mq_id, *msg, users, &n_users, history, last_msg_id);
+        handle_new_client(client_mq_id, *msg, users, &n_users, history,
+                          last_msg_id);
         break;
       case MSG:
         msg_to_all(client_mq_id, *msg, users, n_users);
@@ -59,17 +61,18 @@ void *server_queue_handler(void *server_mq_name) {
         printf("Получена неизвестная команда с кодом %d.\n", msg->cmd);
     }
 
-    // при изменении массива "commands" также необходимо изменить "enum chat_command" в заголовочном файле.
-    const char *commands[] = {"NO_COMMAND", "JOIN", "QUIT", "LIST", "HISTORY", "MSG" };
+    // при изменении массива "commands" также необходимо изменить "enum
+    // chat_command" в заголовочном файле.
+    const char *commands[] = {"NO_COMMAND", "JOIN",    "QUIT",
+                              "LIST",       "HISTORY", "MSG"};
     fprintf(stderr, "DEBUG получено сообщение от %d с командой %s: %s\n",
             msg->sender, commands[msg->cmd], msg->content);
     free(msg);
     msg = NULL;
   };  // while (is_running)
 
-
   // очищаем выделенные ресурсы
-    err = server_cleanup(server_mq_id, client_mq_id, users, n_users, history);
+  err = server_cleanup(server_mq_id, client_mq_id, users, n_users, history);
 
   return (void *)(intptr_t)err;
 }

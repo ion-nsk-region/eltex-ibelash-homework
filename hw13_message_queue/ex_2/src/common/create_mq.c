@@ -8,12 +8,12 @@ int create_mq(char *mq_name, int *mq_id) {
   if (NULL != mq_name) {
     errno = 0;
     if (-1 == (key = ftok(mq_name, PROJ_ID))) {
-            perror("ftok");
-            err = -1;
+      perror("ftok");
+      err = -1;
     } else {
-    int mq_flags = mq_perm | IPC_CREAT | IPC_EXCL;
-    errno = 0;
-    *mq_id = msgget(key, mq_flags);
+      int mq_flags = mq_perm | IPC_CREAT | IPC_EXCL;
+      errno = 0;
+      *mq_id = msgget(key, mq_flags);
     }
   }
 
@@ -23,7 +23,8 @@ int create_mq(char *mq_name, int *mq_id) {
     if (0 == (err = clear_mq(mq_name))) {
       errno = 0;
       *mq_id = msgget(key, mq_perm);
-      fprintf(stderr, "Очередь %s очищена и открыта для работы с id %d.\n", mq_name, *mq_id);
+      fprintf(stderr, "Очередь %s очищена и открыта для работы с id %d.\n",
+              mq_name, *mq_id);
     } else {
       fprintf(stderr,
               "Ошибка: не удалось очистить существующую очередь.\n"

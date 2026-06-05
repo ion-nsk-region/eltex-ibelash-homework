@@ -13,7 +13,8 @@ int handle_new_client(int client_mq_id, struct chat_msg client_msg,
   // TODO добавить защиту, чтобы клиенты не могли использовать никнейм "server".
 
   // уведомить других участников о новом пользователе
-  send_user_joined_notification(client_mq_id, users, *n_users, client_nickname, client_nickname_length);
+  send_user_joined_notification(client_mq_id, users, *n_users, client_nickname,
+                                client_nickname_length);
 
   // Добавить пользователя в список участников чата
   if (0 == err &&

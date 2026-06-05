@@ -1,7 +1,7 @@
 #include "mq_chat.h"
 
-int history_send(int client_mq_id, long to_whom,
-                  struct chat_msg *history, int last_msg_id) {
+int history_send(int client_mq_id, long to_whom, struct chat_msg *history,
+                 int last_msg_id) {
   int err = 0, err_packing = 0;
   size_t buffer_size = get_max_msg_size() - sizeof(struct chat_msg);
 
@@ -22,10 +22,10 @@ int history_send(int client_mq_id, long to_whom,
   do {
     if (0 == err) {
       if (ERANGE == err_packing) {
-              int n_attempts = 0;
-        while (0 == is_mq_empty(client_mq_id, NULL) && ETIME != conn_timer(CONNECTION_TIMEOUT, SLEEP_TIME, ++n_attempts));
-            
-        
+        int n_attempts = 0;
+        while (0 == is_mq_empty(client_mq_id, NULL) &&
+               ETIME !=
+                   conn_timer(CONNECTION_TIMEOUT, SLEEP_TIME, ++n_attempts));
       }
       err_packing = history_to_string(history, &start_msg_id, last_msg_id,
                                       buffer, buffer_size);

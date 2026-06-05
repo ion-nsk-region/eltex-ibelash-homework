@@ -23,11 +23,11 @@ int send_mq_msg(int mq_id, long to_whom, struct chat_msg msg) {
     serialize_msg(&msg, content_size, msg_buf->mdata);
 
     // отправляем сообщение
-    //int flags = IPC_NOWAIT;
+    // int flags = IPC_NOWAIT;
     int flags = 0;
     errno = 0;
-    if (-1 ==
-        msgsnd(mq_id, msg_buf, sizeof(msg_buf->msize) + msg_buf->msize, flags)) {
+    if (-1 == msgsnd(mq_id, msg_buf, sizeof(msg_buf->msize) + msg_buf->msize,
+                     flags)) {
       perror("msgsnd");
       err = errno;
     }
