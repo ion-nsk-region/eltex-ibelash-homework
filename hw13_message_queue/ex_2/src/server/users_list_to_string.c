@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int users_list_to_string(struct user *users, int n_users, char *buffer,
                          size_t buffer_size) {

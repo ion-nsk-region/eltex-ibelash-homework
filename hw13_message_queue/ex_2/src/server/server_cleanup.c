@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int server_cleanup(int server_mq_id, int client_mq_id, struct user *users,
                    int n_users, struct chat_msg *history) {

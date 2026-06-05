@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int server_queue_handler_exit(int server_mq_id) {
   int err = 0;

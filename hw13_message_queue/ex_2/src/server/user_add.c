@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int user_add(pid_t pid, const char *nickname, size_t nickname_length,
              struct user *users, int *n_users) {

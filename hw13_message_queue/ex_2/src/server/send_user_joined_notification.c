@@ -1,7 +1,7 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int send_user_joined_notification(int client_mq_id, struct user *users,
-                                  int n_users, char *client_nickname,
+                                  int n_users, const char *client_nickname,
                                   size_t client_nickname_length) {
   int err = 0;
   size_t user_joined_content_length =

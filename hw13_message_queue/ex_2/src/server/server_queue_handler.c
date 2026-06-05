@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 void *server_queue_handler(void *server_mq_name) {
   int err = 0, is_running = 1, n_users = 0;

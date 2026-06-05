@@ -35,8 +35,13 @@ LDFLAGS = -L$(LIB_DIR) -l$(LIB_NAME)
 
 all: code_check directories server client 
 
-directories:
-	mkdir -p $(BUILD_DIR) $(LIB_DIR)
+directories: $(BUILD_DIR) $(LIB_DIR)
+
+$(BUILD_DIR):
+	mkdir -p $@ 
+	
+$(LIB_DIR):
+	mkdir -p $@
 
 server: $(BUILD_DIR)/$(MAIN_SERVER).exe
 
@@ -54,7 +59,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/common/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(STATIC_LIB): $(LIB_OBJ) 
-	@echo "\nСоздаём объектные файлы для статической библиотеки и собираем её."
+	@echo "\nСобираем статическую библиотеку."
 	ar rcs $@ $^
 
 code_check: $(SERVER_SRCS) $(SRC_DIR)/server/$(MAIN_SERVER).c $(CLIENT_SRCS) $(SRC_DIR)/client/$(MAIN_CLIENT).c $(LIB_SRCS)

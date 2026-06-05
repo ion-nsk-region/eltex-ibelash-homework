@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 void history_update(struct chat_msg msg, struct chat_msg *history,
                     int *last_msg_id) {

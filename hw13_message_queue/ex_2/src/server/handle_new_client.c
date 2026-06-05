@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int handle_new_client(int client_mq_id, struct chat_msg client_msg,
                       struct user *users, int *n_users,

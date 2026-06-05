@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int history_to_string(struct chat_msg *history, int *start_msg_id,
                       int last_msg_id, char *buffer, size_t buffer_size) {
@@ -46,7 +46,7 @@ int history_to_string(struct chat_msg *history, int *start_msg_id,
         fprintf(
             stderr,
             "Предупреждение: недостаточно места в буфере для всей "
-            "истории.\nbytes_avaialble %ld, start %d, current %ld, last %d\n",
+            "истории.\nbytes_avaialble %zu, start %d, current %td, last %d\n",
             bytes_available, *start_msg_id, msg - history, last_msg_id);
         err = ERANGE;
         *start_msg_id =

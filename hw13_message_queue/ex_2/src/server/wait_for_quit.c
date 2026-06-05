@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 void wait_for_quit(void) {
   int keyboard_input;

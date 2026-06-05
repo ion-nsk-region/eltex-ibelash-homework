@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int msg_to_all(int client_mq_id, struct chat_msg msg, struct user *users,
                int n_users) {

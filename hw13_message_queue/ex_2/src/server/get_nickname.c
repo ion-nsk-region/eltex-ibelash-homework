@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int get_nickname(char *mtext, char *nickname, size_t *nickname_length) {
   int err = 0;

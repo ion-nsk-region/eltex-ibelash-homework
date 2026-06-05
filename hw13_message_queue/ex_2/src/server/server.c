@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int main(void) {
   int err = 0;

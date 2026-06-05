@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int send_users_list(int client_mq_id, long to_whom, struct user *users,
                     int n_users) {

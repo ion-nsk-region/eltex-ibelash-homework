@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "server.h"
 
 int history_send(int client_mq_id, long to_whom, struct chat_msg *history,
                  int last_msg_id) {
