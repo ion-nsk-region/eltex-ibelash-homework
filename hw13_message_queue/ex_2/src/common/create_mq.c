@@ -7,13 +7,28 @@ int create_mq(char *mq_name, int *mq_id) {
 
   if (NULL != mq_name) {
     errno = 0;
-    if (-1 == (key = ftok(mq_name, PROJ_ID))) {
-      perror("ftok");
-      err = -1;
+    FILE *f = fopen(mq_name, "r");
+    if (NULL == f) {
+      err = errno;
+      perror("fopen");
+      fprintf(stderr,
+              "Ошибка: не удалось создать очередь связанную с файлом %s. "
+              "Перейдите в директорию с этим файлом и запустите программу.\n",
+              mq_name);
     } else {
-      int mq_flags = mq_perm | IPC_CREAT | IPC_EXCL;
+      fclose(f);
+    }
+
+    if (0 == err) {
       errno = 0;
-      *mq_id = msgget(key, mq_flags);
+      if (-1 == (key = ftok(mq_name, PROJ_ID))) {
+        perror("ftok");
+        err = -1;
+      } else {
+        int mq_flags = mq_perm | IPC_CREAT | IPC_EXCL;
+        errno = 0;
+        *mq_id = msgget(key, mq_flags);
+      }
     }
   }
 
@@ -30,7 +45,7 @@ int create_mq(char *mq_name, int *mq_id) {
               "Ошибка: не удалось очистить существующую очередь.\n"
               "Перезагрузите компьютер чтобы удалить эту очередь.\n");
     }
-  } else if (-1 == *mq_id) {
+  } else if (0 == err && -1 == *mq_id) {
     perror("msgget");
     err = -1;
   }
