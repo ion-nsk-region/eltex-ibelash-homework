@@ -45,9 +45,17 @@ void *server_queue_handler(void *server_mq_name) {
 
     switch (msg->cmd) {
       case QUIT:
-        if (msg->sender == server_pid)
+        if (msg->sender == server_pid) {
+          clear_mq(CLIENT_MQ_NAME);
+          struct chat_msg msg_quit;
+          msg_quit.sender = getpid();
+          msg_quit.cmd = QUIT;
+          msg_quit.content = NULL;
+          msg_to_all(client_mq_id, msg_quit, users, n_users);
+          sleep(1); // даём клиентам возможность прочитать сообщение о выходе
+
           is_running = 0;
-        else {  // handle_disconnected_client();
+        } else {  // handle_disconnected_client();
         }
         break;
       case JOIN:

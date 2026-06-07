@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define CONNECTION_TIMEOUT 60  // в секундах
+#define CONNECTION_TIMEOUT 10  // в секундах
 #define SLEEP_TIME 1           // в секундах
 #define SERVER_MQ_NAME "./server.exe"
 #define PROJ_ID 1

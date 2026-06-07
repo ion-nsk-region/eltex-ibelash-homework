@@ -1,47 +1,48 @@
 #include "client.h"
+
 #include "client_ui.h"
 
 int main(void) {
   int err = 0;
   pthread_mutex_t refresh_lock;
   pthread_cond_t refresh_cond;
-  pthread_t reader_tid, sender_tid;
+  pthread_t reader_tid = pthread_self(), sender_tid = pthread_self();
   struct chat_msg *msg = NULL;
   int ch = 0;
-  struct ui ui;
+//  struct ui ui;
 
   err = spawn_threads(&refresh_lock, &refresh_cond, &msg, &ch, &reader_tid,
                       &sender_tid);
-
+/*
   if (0 == err) err = initialize_terminal();
   if (0 == err) err = create_windows(&ui);
   if (0 == err) {
     handle_resize(ui);
     refresh_windows(ui);
   }
-
+*/
   // ==============================================
-    char *server_mq_name = SERVER_MQ_NAME;
-    int server_mq_id = -1;
-    pid_t my_pid = getpid();
-    // подключаемся к очереди сервера
-    err = connect2mq(server_mq_name, &server_mq_id);
-    if (ETIME == err) {
-      printf("Ошибка: время ожидания сервера истекло.\n");
-    } else if (0 != err) {
-      printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
+  char *server_mq_name = SERVER_MQ_NAME;
+  int server_mq_id = -1;
+  pid_t my_pid = getpid();
+  // подключаемся к очереди сервера
+  err = connect2mq(server_mq_name, &server_mq_id);
+  if (ETIME == err) {
+    printf("Ошибка: время ожидания сервера истекло.\n");
+  } else if (0 != err) {
+    printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
+  }
+  // подключаемся к чату
+  if (0 == err && -1 < server_mq_id) {
+    struct chat_msg join_msg = {my_pid, JOIN,
+                                "Pablo Diego José Francisco "
+                                "de Paula Juan Nepomuceno María de los "
+                                "Remedios Cipriano de la Santísima "
+                                "Trinidad Ruiz y Picasso"};
+    if (0 != (err = send_mq_msg(server_mq_id, 1, join_msg))) {
+      printf("Ошибка send_mq_msg: %d\n", err);
     }
-    // подключаемся к чату
-    if (0 == err && -1 < server_mq_id) {
-      struct chat_msg join_msg = {my_pid, JOIN,
-                                  "Pablo Diego José Francisco "
-                                  "de Paula Juan Nepomuceno María de los "
-                                  "Remedios Cipriano de la Santísima "
-                                  "Trinidad Ruiz y Picasso"};
-      if (0 != (err = send_mq_msg(server_mq_id, 1, join_msg))) {
-        printf("Ошибка send_mq_msg: %d\n", err);
-      }
-    }
+  }
 
   // ==============================================
 
@@ -50,11 +51,14 @@ int main(void) {
 
     pthread_mutex_lock(&refresh_lock);
     while (is_running) {
-      if (NULL != msg && NO_COMMAND != msg->cmd) handle_msg(msg, ui);
+      if (NULL != msg && NO_COMMAND != msg->cmd) {
+             console_handle_msg(msg);
+       //       handle_msg(msg, ui);
+      }
 
       // if (0 != ch) handle_input(ch);
 
-      refresh_windows(ui);
+  //    refresh_windows(ui);
 
       // готовимся к следующей итерации
       if (NULL != msg) {
@@ -76,7 +80,7 @@ int main(void) {
   close_threads(reader_tid, sender_tid);
   pthread_mutex_destroy(&refresh_lock);
   pthread_cond_destroy(&refresh_cond);
-  destroy_windows(ui);
+  // destroy_windows(ui);
 
   // TODO уничтожить окна
   // TODO уничтожить мютекс и условную переменную

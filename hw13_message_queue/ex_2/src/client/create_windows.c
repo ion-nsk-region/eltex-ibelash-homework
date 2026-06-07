@@ -31,5 +31,5 @@ int create_windows(struct ui *ui) {
     err = -1;
   }
 
-      return err;
+  return err;
 }

@@ -34,5 +34,4 @@ void handle_resize(struct ui ui) {
   box(users_list, ACS_VLINE, ACS_HLINE);
   box(msg_input, ACS_VLINE, ACS_HLINE);
   */
-
 }
