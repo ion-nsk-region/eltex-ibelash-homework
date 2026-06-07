@@ -21,6 +21,7 @@ int initialize_terminal(void);
 int init_colors(void);
 int handle_msg(struct chat_msg *msg, struct ui ui);
 void handle_resize(struct ui ui);
+void print_help(struct ui ui);
 void refresh_windows(struct ui ui);
 
 #endif // CLIENT_UI_H

@@ -17,8 +17,9 @@ int create_windows(struct ui *ui) {
   if (NULL == ui->history) {
     fprintf(stderr, "Не удалось создать окно с историей сообщений.\n");
     err = -1;
+  } else {
+    scrollok(ui->history, TRUE);  // включаем cкролинг содержимого
   }
-  scrollok(ui->history, TRUE); // включаем cкролинг содержимого
 
   ui->users_list = newwin(top_height, users_list_width, 0, history_width);
   if (NULL == ui->users_list) {
@@ -30,6 +31,8 @@ int create_windows(struct ui *ui) {
   if (NULL == ui->msg_input) {
     fprintf(stderr, "Не удалось создать окно для ввода сообщения.\n");
     err = -1;
+  } else {
+    keypad(ui->msg_input, TRUE);
   }
 
   return err;

@@ -1,5 +1,4 @@
 #include "client.h"
-
 #include "client_ui.h"
 
 int main(void) {
@@ -17,6 +16,7 @@ int main(void) {
   if (0 == err) err = create_windows(&ui);
   if (0 == err) {
     handle_resize(ui);
+    print_help(ui);
     wmove(ui.msg_input, 1, 0); // устанавливаем курсор в начало поля
     refresh_windows(ui);
   }
@@ -53,6 +53,7 @@ int main(void) {
             perror("malloc");
             is_running = 0;
     }
+    size_t input_buf_length = 0;
 
     pthread_mutex_lock(&refresh_lock);
     while (is_running) {
@@ -61,7 +62,7 @@ int main(void) {
               handle_msg(msg, ui);
       }
 
-      if (0 != ch) handle_input(ui.msg_input, server_mq_id, ch, input_buf);
+      if (0 != ch) handle_input(ui, server_mq_id, ch, input_buf, &input_buf_length);
 
       refresh_windows(ui);
 

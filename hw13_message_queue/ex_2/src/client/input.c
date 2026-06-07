@@ -5,6 +5,8 @@ void *input(void *arg) {
   struct input_args *args = (struct input_args *)arg;
 
   while (EOF != (buf_char = getchar())) {
+    //  while (EOF != (buf_char = wgetch(ui.msg_input))) { // TODO перейти на
+    //  wgetch, чтобы забирать управляющие клавиши, включая KEY_RESIZE.
     pthread_mutex_lock(args->refresh_lock);
     *(args->ch) = buf_char;
     pthread_cond_signal(args->refresh_cond);
