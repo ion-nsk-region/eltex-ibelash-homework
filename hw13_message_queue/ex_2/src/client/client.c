@@ -6,21 +6,21 @@ int main(void) {
   int err = 0;
   pthread_mutex_t refresh_lock;
   pthread_cond_t refresh_cond;
-  pthread_t reader_tid = pthread_self(), sender_tid = pthread_self();
+  pthread_t reader_tid = pthread_self(), input_tid = pthread_self();
   struct chat_msg *msg = NULL;
   int ch = 0;
-//  struct ui ui;
+  struct ui ui;
 
   err = spawn_threads(&refresh_lock, &refresh_cond, &msg, &ch, &reader_tid,
-                      &sender_tid);
-/*
+                      &input_tid);
   if (0 == err) err = initialize_terminal();
   if (0 == err) err = create_windows(&ui);
   if (0 == err) {
     handle_resize(ui);
+    wmove(ui.msg_input, 1, 0); // устанавливаем курсор в начало поля
     refresh_windows(ui);
   }
-*/
+  
   // ==============================================
   char *server_mq_name = SERVER_MQ_NAME;
   int server_mq_id = -1;
@@ -48,17 +48,22 @@ int main(void) {
 
   if (0 == err) {
     int is_running = 1;
+    char *input_buf = malloc(get_max_msg_size() - sizeof(struct chat_msg));
+    if (NULL == input_buf) {
+            perror("malloc");
+            is_running = 0;
+    }
 
     pthread_mutex_lock(&refresh_lock);
     while (is_running) {
       if (NULL != msg && NO_COMMAND != msg->cmd) {
-             console_handle_msg(msg);
-       //       handle_msg(msg, ui);
+       //      console_handle_msg(msg);
+              handle_msg(msg, ui);
       }
 
-      // if (0 != ch) handle_input(ch);
+      if (0 != ch) handle_input(ui.msg_input, server_mq_id, ch, input_buf);
 
-  //    refresh_windows(ui);
+      refresh_windows(ui);
 
       // готовимся к следующей итерации
       if (NULL != msg) {
@@ -73,17 +78,16 @@ int main(void) {
       if (27 == ch || EOF == ch || (NULL != msg && QUIT == msg->cmd)) {
         is_running = 0;
       }
-    }
+    } // while
     pthread_mutex_unlock(&refresh_lock);
+    if (NULL != input_buf) free(input_buf);
   }
 
-  close_threads(reader_tid, sender_tid);
+  close_threads(reader_tid, input_tid);
   pthread_mutex_destroy(&refresh_lock);
   pthread_cond_destroy(&refresh_cond);
-  // destroy_windows(ui);
+  destroy_windows(ui);
 
-  // TODO уничтожить окна
-  // TODO уничтожить мютекс и условную переменную
 
   // ==============================================================
   /*

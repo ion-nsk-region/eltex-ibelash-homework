@@ -2,12 +2,11 @@
 
 void *reader(void *arg) {
   int err = 0;
-  struct reader_args *args = (struct reader_args*)arg;
+  struct reader_args *args = (struct reader_args *)arg;
   int client_mq_id = -1;
   pid_t my_pid = getpid();
 
   err = connect2mq(CLIENT_MQ_NAME, &client_mq_id);
-  printf("DEBUG: получен mq_id = %d.\n", client_mq_id);
   if (ETIME == err) {
     printf("Ошибка: время ожидания сервера истекло.\n");
   } else if (0 != err) {
@@ -15,7 +14,8 @@ void *reader(void *arg) {
   }
 
   if (0 == err && -1 < client_mq_id) {
-    //    while (*(args->is_running)) {
+    //    while (*(args->is_running)) { // не подходит так как поток блокируется
+    //    на чтении и не дойдёт до проверки условия.
     while (1) {
       struct chat_msg *reply_from_server;
       if (0 != (err = read_mq_msg(client_mq_id, my_pid, &reply_from_server))) {
@@ -31,10 +31,10 @@ void *reader(void *arg) {
   } else {
     struct chat_msg *quit = malloc(sizeof(struct chat_msg));
     quit->cmd = QUIT;
-        pthread_mutex_lock(args->refresh_lock);
-        *(args->msg) = quit;
-        pthread_cond_signal(args->refresh_cond);
-        pthread_mutex_unlock(args->refresh_lock);
+    pthread_mutex_lock(args->refresh_lock);
+    *(args->msg) = quit;
+    pthread_cond_signal(args->refresh_cond);
+    pthread_mutex_unlock(args->refresh_lock);
   }
 
   return (void *)0;

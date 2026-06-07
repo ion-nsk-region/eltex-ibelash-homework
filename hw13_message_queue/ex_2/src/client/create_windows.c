@@ -18,6 +18,7 @@ int create_windows(struct ui *ui) {
     fprintf(stderr, "Не удалось создать окно с историей сообщений.\n");
     err = -1;
   }
+  scrollok(ui->history, TRUE); // включаем cкролинг содержимого
 
   ui->users_list = newwin(top_height, users_list_width, 0, history_width);
   if (NULL == ui->users_list) {

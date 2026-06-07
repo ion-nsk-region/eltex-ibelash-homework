@@ -2,7 +2,7 @@
 
 int spawn_threads(pthread_mutex_t *refresh_lock, pthread_cond_t *refresh_cond,
                   struct chat_msg **msg, int *ch, pthread_t *reader_tid,
-                  pthread_t *sender_tid) {
+                  pthread_t *input_tid) {
   int err = 0;
   pthread_mutex_init(refresh_lock, NULL);
   pthread_cond_init(refresh_cond, NULL);
@@ -16,23 +16,20 @@ int spawn_threads(pthread_mutex_t *refresh_lock, pthread_cond_t *refresh_cond,
   if (0 != (err = pthread_create(reader_tid, NULL, reader, reader_args))) {
     perror("reader pthread_create");
   } else {
-    printf("DEBUG запущен поток с tid %ld\n", *reader_tid);
+    // printf("DEBUG запущен поток с tid %ld\n", *reader_tid);
   }
 
   // запускаем поток для обработки пользовательского ввода и отправки сообщений
   if (0 == err) {
-    struct sender_args sender_args;
-    sender_args.refresh_lock = refresh_lock;
-    sender_args.refresh_cond = refresh_cond;
-    sender_args.ch = ch;
-    if (NULL != sender_args.ch && NULL != sender_tid) {
-      ;
-    }
+    struct input_args *input_args = malloc(sizeof(struct input_args));
+    input_args->refresh_lock = refresh_lock;
+    input_args->refresh_cond = refresh_cond;
+    input_args->ch = ch;
 
-    //    if (0 != (err = pthread_create(sender_tid, NULL, sender,
-    //    &sender_args))) {
-    //      perror("sender pthread_create");
-    //    }
+    if (0 != (err = pthread_create(input_tid, NULL, input,
+    input_args))) {
+      perror("input pthread_create");
+    }
   }
 
   return err;
