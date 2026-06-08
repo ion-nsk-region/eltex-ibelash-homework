@@ -25,8 +25,8 @@ int handle_new_client(int client_mq_id, struct chat_msg client_msg,
         "См. подробности в stderr.\n");
   }
 
-  // отправить пользователю список участников чата
-  send_users_list(client_mq_id, client_msg.sender, users, *n_users);
+  // отправить всем новый список участников чата
+  send_users_list(client_mq_id, users, *n_users);
 
   // отправить историю сообщений (последние MAX_HISTORY_SIZE)
   if (NULL != history && 0 < last_msg_id) {

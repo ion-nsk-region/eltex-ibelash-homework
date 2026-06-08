@@ -4,8 +4,6 @@ int spawn_threads(pthread_mutex_t *refresh_lock, pthread_cond_t *refresh_cond,
                   struct chat_msg **msg, int *ch, pthread_t *reader_tid,
                   pthread_t *input_tid) {
   int err = 0;
-  pthread_mutex_init(refresh_lock, NULL);
-  pthread_cond_init(refresh_cond, NULL);
 
   // запускаем поток для чтения сообщений от сервера
   struct reader_args *reader_args = malloc(sizeof(struct reader_args));

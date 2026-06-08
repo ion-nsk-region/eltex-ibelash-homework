@@ -56,6 +56,7 @@ void deserialize_msg(const char *mdata, size_t mdata_size,
 int get_last_sender_pid(int mq_id, pid_t *last_sender_pid);
 long get_max_msg_size(void);
 int is_mq_empty(int mq_id, long unsigned int *mq_num);
+char *pid_to_nick(struct user *users, int n_users, pid_t pid);
 int read_mq_msg(int mq_id, long msg_type, struct chat_msg **msg);
 int send_mq_msg(int mq_id, long to_whom, struct chat_msg msg);
 void serialize_msg(const struct chat_msg *msg, size_t content_size,

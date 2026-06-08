@@ -12,8 +12,7 @@ void history_update(struct chat_msg msg, struct chat_msg *history, int *last_msg
 int msg_to_all(int client_mq_id, struct chat_msg msg, struct user *users,
                 int n_users);
 int send_user_joined_notification(int client_mq_id, struct user *users, int n_users, const char *client_nickname, size_t client_nickname_length);
-int send_users_list(int client_mq_id, long to_whom, struct user *users,
-                    int n_users);
+int send_users_list(int client_mq_id, struct user *users, int n_users);
 int server_cleanup(int server_mq_id, int client_mq_id, struct user *users, int n_users, struct chat_msg *history);
 void *server_queue_handler(void *server_mq_name);
 int server_queue_handler_exit(int server_mq_id);

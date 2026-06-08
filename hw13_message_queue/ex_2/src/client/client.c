@@ -9,21 +9,8 @@ int main(void) {
   int ch = 0;
   struct ui ui = {NULL, NULL, NULL};
 
-  err = spawn_threads(&refresh_lock, &refresh_cond, &msg, &ch, &reader_tid,
-                      &input_tid);
-  if (0 == err) err = initialize_terminal();
-  if (0 == err) err = create_windows(&ui);
-  if (0 == err) {
-    handle_resize(ui);
-    print_help(ui);
-    wmove(ui.msg_input, 1, 0);  // устанавливаем курсор в начало поля
-    refresh_windows(ui);
-  }
-
-  // ==============================================
   char *server_mq_name = SERVER_MQ_NAME;
   int server_mq_id = -1;
-  pid_t my_pid = getpid();
   // подключаемся к очереди сервера
   err = connect2mq(server_mq_name, &server_mq_id);
   if (ETIME == err) {
@@ -31,58 +18,67 @@ int main(void) {
   } else if (0 != err) {
     printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
   }
-  // подключаемся к чату
-  if (0 == err && -1 < server_mq_id) {
-    struct chat_msg join_msg = {my_pid, JOIN,
-                                "Pablo Diego José Francisco "
-                                "de Paula Juan Nepomuceno María de los "
-                                "Remedios Cipriano de la Santísima "
-                                "Trinidad Ruiz y Picasso"};
-    if (0 != (err = send_mq_msg(server_mq_id, 1, join_msg))) {
-      printf("Ошибка send_mq_msg: %d\n", err);
-    }
-  }
-
-  // ==============================================
 
   if (0 == err) {
+    pthread_mutex_init(&refresh_lock, NULL);
+    pthread_cond_init(&refresh_cond, NULL);
+    pthread_mutex_lock(
+        &refresh_lock);  // блокируем изменение переменных в потоках
+    err = spawn_threads(&refresh_lock, &refresh_cond, &msg, &ch, &reader_tid,
+                        &input_tid);
+  }
+  if (0 == err) err = nickname_prompt(server_mq_id);
+  if (0 == err) err = initialize_terminal();
+  if (0 == err) err = create_windows(&ui);
+  if (0 == err) {
+    handle_resize(ui);
+    print_help(ui);
+    wmove(ui.msg_input, 1, 0);  // устанавливаем курсор в начало поля
+    refresh_windows(ui);
+
     int is_running = 1;
     struct user users[MAX_CHAT_USERS] = {};
     int n_users = 0;
     char *input_buf = malloc(get_max_msg_size() - sizeof(struct chat_msg));
     if (NULL == input_buf) {
       perror("malloc");
-      is_running = 0;
+      err = -1;
     }
     size_t input_buf_length = 0;
+    if (0 != err) is_running = 0;
 
-    pthread_mutex_lock(&refresh_lock);
     while (is_running) {
-      if (NULL != msg && NO_COMMAND != msg->cmd) {
-        //      console_handle_msg(msg);
-        handle_msg(msg, ui, users, &n_users);
-      }
-
-      if (0 != ch)
-        handle_input(ui, server_mq_id, ch, input_buf, &input_buf_length);
-
-      refresh_windows(ui);
-
       // ждём сигналов от потоков и обрабатываем условия выхода
-      while (0 == ch && (NULL == msg || QUIT != msg->cmd)) { // NB: защищаемся от ложных пробуждений, которые инициирует ОС, а не наш поток.
+       
+      // Рекомендуется оборачивать pthread_cond_wait в цикл, чтобы
+      // защититься от ложных пробуждений, которые может инициировать
+      // операционная система, а не наши потоки.
+      while (0 == ch && NULL == msg) {
         pthread_cond_wait(&refresh_cond, &refresh_lock);
       }
+
       if (27 == ch || EOF == ch || (NULL != msg && QUIT == msg->cmd)) {
         is_running = 0;
       }
 
-      // готовимся к следующей итерации
-      if (NULL != msg) {
-        if (NULL != msg->content) free(msg->content);
-        free(msg);
-        msg = NULL;
+      if (is_running && NULL != msg && NO_COMMAND != msg->cmd) {
+        handle_msg(msg, ui, users, &n_users);
       }
-      ch = 0;
+
+      if (is_running && 0 != ch)
+        handle_input(ui, server_mq_id, ch, input_buf, &input_buf_length);
+
+      refresh_windows(ui);
+
+      // готовимся к следующей итерации
+      if (is_running) {
+        if (NULL != msg) {
+          if (NULL != msg->content) free(msg->content);
+          free(msg);
+          msg = NULL;
+        }
+        ch = 0;
+      }
     }  // while
     pthread_mutex_unlock(&refresh_lock);
     if (NULL != input_buf) free(input_buf);
@@ -92,6 +88,14 @@ int main(void) {
   pthread_mutex_destroy(&refresh_lock);
   pthread_cond_destroy(&refresh_cond);
   destroy_windows(ui);
+  if (NULL != msg && QUIT == msg->cmd) {
+    printf("\nСервер завершил свою работу. Выходим.\n");
+  } else if (27 == ch) {
+    // TODO отправить сообщение серверу, чтобы он убрал нас из списка
+    printf("\nНажали Esc. Выходим.\n");
+  } else {
+    printf("\nПриключилась какая-то оказия. Выходим.\n");
+  }
 
   // ==============================================================
   /*
