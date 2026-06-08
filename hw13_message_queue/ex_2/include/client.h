@@ -21,7 +21,7 @@ struct input_args {
 void close_threads(pthread_t reader_tid, pthread_t input_tid);
 void console_handle_msg(struct chat_msg *msg);
 void handle_input(struct ui ui, int server_mq_id, int ch, char *input_buf, size_t *input_buf_length);
-int handle_msg(struct chat_msg *msg, struct ui ui);
+int handle_msg(struct chat_msg *msg, struct ui ui, struct user *users, int *n_users);
 void *input(void *arg);
 void on_key_backspace(struct ui ui, char *input_buf, size_t *input_buf_length);
 void on_key_enter(struct ui ui, int server_mq_id, char *input_buf,

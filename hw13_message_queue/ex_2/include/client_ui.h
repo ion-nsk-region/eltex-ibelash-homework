@@ -19,9 +19,10 @@ int create_windows(struct ui *ui);
 void destroy_windows(struct ui ui);
 int initialize_terminal(void);
 int init_colors(void);
-int handle_msg(struct chat_msg *msg, struct ui ui);
+int handle_msg(struct chat_msg *msg, struct ui ui, struct user *users, int *n_users);
 void handle_resize(struct ui ui);
 void print_help(struct ui ui);
 void refresh_windows(struct ui ui);
+void update_users_list(WINDOW* users_list, char *content, struct user *users, int *n_users);
 
 #endif // CLIENT_UI_H

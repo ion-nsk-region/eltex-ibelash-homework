@@ -25,10 +25,9 @@ int spawn_threads(pthread_mutex_t *refresh_lock, pthread_cond_t *refresh_cond,
     input_args->refresh_lock = refresh_lock;
     input_args->refresh_cond = refresh_cond;
     input_args->ch = ch;
-//    input_args->win = NULL;
+    //    input_args->win = NULL;
 
-    if (0 != (err = pthread_create(input_tid, NULL, input,
-    input_args))) {
+    if (0 != (err = pthread_create(input_tid, NULL, input, input_args))) {
       perror("input pthread_create");
     }
   }

@@ -1,5 +1,4 @@
 #include "client.h"
-#include "client_ui.h"
 
 int main(void) {
   int err = 0;
@@ -8,7 +7,7 @@ int main(void) {
   pthread_t reader_tid = pthread_self(), input_tid = pthread_self();
   struct chat_msg *msg = NULL;
   int ch = 0;
-  struct ui ui;
+  struct ui ui = {NULL, NULL, NULL};
 
   err = spawn_threads(&refresh_lock, &refresh_cond, &msg, &ch, &reader_tid,
                       &input_tid);
@@ -17,10 +16,10 @@ int main(void) {
   if (0 == err) {
     handle_resize(ui);
     print_help(ui);
-    wmove(ui.msg_input, 1, 0); // устанавливаем курсор в начало поля
+    wmove(ui.msg_input, 1, 0);  // устанавливаем курсор в начало поля
     refresh_windows(ui);
   }
-  
+
   // ==============================================
   char *server_mq_name = SERVER_MQ_NAME;
   int server_mq_id = -1;
@@ -48,23 +47,34 @@ int main(void) {
 
   if (0 == err) {
     int is_running = 1;
+    struct user users[MAX_CHAT_USERS] = {};
+    int n_users = 0;
     char *input_buf = malloc(get_max_msg_size() - sizeof(struct chat_msg));
     if (NULL == input_buf) {
-            perror("malloc");
-            is_running = 0;
+      perror("malloc");
+      is_running = 0;
     }
     size_t input_buf_length = 0;
 
     pthread_mutex_lock(&refresh_lock);
     while (is_running) {
       if (NULL != msg && NO_COMMAND != msg->cmd) {
-       //      console_handle_msg(msg);
-              handle_msg(msg, ui);
+        //      console_handle_msg(msg);
+        handle_msg(msg, ui, users, &n_users);
       }
 
-      if (0 != ch) handle_input(ui, server_mq_id, ch, input_buf, &input_buf_length);
+      if (0 != ch)
+        handle_input(ui, server_mq_id, ch, input_buf, &input_buf_length);
 
       refresh_windows(ui);
+
+      // ждём сигналов от потоков и обрабатываем условия выхода
+      while (0 == ch && (NULL == msg || QUIT != msg->cmd)) { // NB: защищаемся от ложных пробуждений, которые инициирует ОС, а не наш поток.
+        pthread_cond_wait(&refresh_cond, &refresh_lock);
+      }
+      if (27 == ch || EOF == ch || (NULL != msg && QUIT == msg->cmd)) {
+        is_running = 0;
+      }
 
       // готовимся к следующей итерации
       if (NULL != msg) {
@@ -73,13 +83,7 @@ int main(void) {
         msg = NULL;
       }
       ch = 0;
-
-      // ждём сигналов от потоков и обрабатываем условия выхода
-      pthread_cond_wait(&refresh_cond, &refresh_lock);
-      if (27 == ch || EOF == ch || (NULL != msg && QUIT == msg->cmd)) {
-        is_running = 0;
-      }
-    } // while
+    }  // while
     pthread_mutex_unlock(&refresh_lock);
     if (NULL != input_buf) free(input_buf);
   }
@@ -88,7 +92,6 @@ int main(void) {
   pthread_mutex_destroy(&refresh_lock);
   pthread_cond_destroy(&refresh_cond);
   destroy_windows(ui);
-
 
   // ==============================================================
   /*

@@ -11,7 +11,7 @@ void handle_input(struct ui ui, int server_mq_id, int ch, char *input_buf,
     case '\n':
       on_key_enter(ui, server_mq_id, input_buf, input_buf_length);
       break;
-    case KEY_RESIZE:  // TODO перейти в input с getchar на wgetch 
+    case KEY_RESIZE:  // TODO перейти в input с getchar на wgetch
                       // чтобы обрабатывать изменение размера терминала.
       handle_resize(ui);
       break;
