@@ -20,12 +20,18 @@ int history_to_string(struct chat_msg *history, int *start_msg_id,
 
     while (msg != history + last_msg_id && 0 == err) {
       char pid_str[MAX_PID_STR_LENGTH] = "";
+      char cmd_str[MAX_CMD_STR_LENGTH] = "";
+      size_t content_length;
+
       snprintf(pid_str, MAX_PID_STR_LENGTH, "%d", msg->sender);
       size_t pid_str_length = strlen(pid_str);
-      char cmd_str[MAX_CMD_STR_LENGTH] = "";
       snprintf(cmd_str, MAX_CMD_STR_LENGTH, "%d", msg->cmd);
       size_t cmd_str_length = strlen(cmd_str);
-      size_t content_length = strlen(msg->content);
+      if (NULL != msg->content)
+        content_length = strlen(msg->content);
+      else
+        content_length = 0;
+
       if (bytes_available >
           (pid_str_length + 1 + cmd_str_length + 1 + content_length + 1)) {
         memcpy(buf_ptr, pid_str, pid_str_length);
@@ -36,8 +42,10 @@ int history_to_string(struct chat_msg *history, int *start_msg_id,
         buf_ptr += cmd_str_length;
         *buf_ptr = 0x1F;
         ++buf_ptr;
-        memcpy(buf_ptr, msg->content, (content_length));
-        buf_ptr = buf_ptr + content_length;
+        if (NULL != msg->content) {
+          memcpy(buf_ptr, msg->content, (content_length));
+          buf_ptr = buf_ptr + content_length;
+        }
         *buf_ptr = 0x1E;  // Record separator = разделитель записей
         ++buf_ptr;
         bytes_available = bytes_available - (pid_str_length + 1) -

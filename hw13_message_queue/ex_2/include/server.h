@@ -4,6 +4,8 @@
 #include "mq_chat.h"
 
 int get_nickname(char *mtext, char *nickname, size_t *nickname_length);
+void handle_disconnected_client(int client_mq_id, pid_t client,
+                                struct user *users, int *n_users);
 int handle_new_client(int client_mq_id, struct chat_msg client_msg, struct user *users, int *n_users, struct chat_msg *history, int last_msg_id);
 int history_send(int client_mq_id, long to_whom,
                   struct chat_msg *history, int last_msg_id);
@@ -12,6 +14,9 @@ void history_update(struct chat_msg msg, struct chat_msg *history, int *last_msg
 int msg_to_all(int client_mq_id, struct chat_msg msg, struct user *users,
                 int n_users);
 int send_user_joined_notification(int client_mq_id, struct user *users, int n_users, const char *client_nickname, size_t client_nickname_length);
+int send_user_left_notification(int client_mq_id, struct user *users,
+                                  int n_users, const char *client_nickname,
+                                  size_t client_nickname_length);
 int send_users_list(int client_mq_id, struct user *users, int n_users);
 int server_cleanup(int server_mq_id, int client_mq_id, struct user *users, int n_users, struct chat_msg *history);
 void *server_queue_handler(void *server_mq_name);

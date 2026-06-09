@@ -46,6 +46,7 @@ struct user {
   char *nickname;
 };
 
+void cleanup_buffer(void *arg);
 int clear_mq(char *mq_name);
 int connect2mq(char *mq_name, int *mq_id);
 int conn_timer(int connection_timeout, int sleep_time, int n_attempts);
@@ -56,7 +57,7 @@ void deserialize_msg(const char *mdata, size_t mdata_size,
 int get_last_sender_pid(int mq_id, pid_t *last_sender_pid);
 long get_max_msg_size(void);
 int is_mq_empty(int mq_id, long unsigned int *mq_num);
-char *pid_to_nick(struct user *users, int n_users, pid_t pid);
+char *pid_to_nick(struct user *users, int n_users, pid_t pid, int *free_nick);
 int read_mq_msg(int mq_id, long msg_type, struct chat_msg **msg);
 int send_mq_msg(int mq_id, long to_whom, struct chat_msg msg);
 void serialize_msg(const struct chat_msg *msg, size_t content_size,

@@ -8,6 +8,8 @@ int main(void) {
   struct chat_msg *msg = NULL;
   int ch = 0;
   struct ui ui = {NULL, NULL, NULL};
+  struct user users[MAX_CHAT_USERS] = {};
+  int n_users = 0;
 
   char *server_mq_name = SERVER_MQ_NAME;
   int server_mq_id = -1;
@@ -37,8 +39,6 @@ int main(void) {
     refresh_windows(ui);
 
     int is_running = 1;
-    struct user users[MAX_CHAT_USERS] = {};
-    int n_users = 0;
     char *input_buf = malloc(get_max_msg_size() - sizeof(struct chat_msg));
     if (NULL == input_buf) {
       perror("malloc");
@@ -49,7 +49,7 @@ int main(void) {
 
     while (is_running) {
       // ждём сигналов от потоков и обрабатываем условия выхода
-       
+
       // Рекомендуется оборачивать pthread_cond_wait в цикл, чтобы
       // защититься от ложных пробуждений, которые может инициировать
       // операционная система, а не наши потоки.
@@ -57,13 +57,11 @@ int main(void) {
         pthread_cond_wait(&refresh_cond, &refresh_lock);
       }
 
-      if (27 == ch || EOF == ch || (NULL != msg && QUIT == msg->cmd)) {
+      if (27 == ch || EOF == ch || (NULL != msg && QUIT == msg->cmd))
         is_running = 0;
-      }
 
-      if (is_running && NULL != msg && NO_COMMAND != msg->cmd) {
+      if (is_running && NULL != msg && NO_COMMAND != msg->cmd)
         handle_msg(msg, ui, users, &n_users);
-      }
 
       if (is_running && 0 != ch)
         handle_input(ui, server_mq_id, ch, input_buf, &input_buf_length);
@@ -80,102 +78,34 @@ int main(void) {
         ch = 0;
       }
     }  // while
-    pthread_mutex_unlock(&refresh_lock);
     if (NULL != input_buf) free(input_buf);
   }
 
-  close_threads(reader_tid, input_tid);
-  pthread_mutex_destroy(&refresh_lock);
-  pthread_cond_destroy(&refresh_cond);
-  destroy_windows(ui);
-  if (NULL != msg && QUIT == msg->cmd) {
+  pthread_mutex_unlock(&refresh_lock);
+
+  if (NULL != msg && QUIT == msg->cmd && getpid() != msg->sender) {
     printf("\nСервер завершил свою работу. Выходим.\n");
-  } else if (27 == ch) {
-    // TODO отправить сообщение серверу, чтобы он убрал нас из списка
-    printf("\nНажали Esc. Выходим.\n");
   } else {
-    printf("\nПриключилась какая-то оказия. Выходим.\n");
+    // пытаемся отправить сообщение серверу, чтобы он убрал нас из списка
+    if (-1 != server_mq_id) {
+      struct chat_msg quit_msg = {getpid(), QUIT, NULL};
+      if (0 != send_mq_msg(server_mq_id, 1, quit_msg)) {
+        fprintf(stderr,
+                "Ошибка: не удалось отправить сообщение о выходе.\n"
+                "Требуется перезагрузка сервера.\n");
+      }
+    }
+    if (NULL != msg && QUIT == msg->cmd && getpid() == msg->sender) {
+      printf("\nВ дочернем потоке возникла ошибка. Выходим.\n");
+    } else if (27 == ch) {
+      printf("\nНажали Esc. Выходим.\n");
+    } else {
+      printf("\nПриключилась какая-то оказия. Выходим.\n");
+    }
   }
 
-  // ==============================================================
-  /*
-    char *server_mq_name = SERVER_MQ_NAME;
-    char *client_mq_name = CLIENT_MQ_NAME;
-    pid_t my_pid = getpid();
+  client_cleanup(reader_tid, input_tid, &refresh_lock, &refresh_cond, ui, users,
+                 n_users);
 
-    int server_mq_id = -1, client_mq_id = -1;
-
-    // подключаемся к очереди сервера
-    err = connect2mq(server_mq_name, &server_mq_id);
-    if (ETIME == err) {
-      printf("Ошибка: время ожидания сервера истекло.\n");
-    } else if (0 != err) {
-      printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
-    }
-    // подключаемся к очереди для клиентов
-    err = connect2mq(client_mq_name, &client_mq_id);
-    if (ETIME == err) {
-      printf("Ошибка: время ожидания сервера истекло.\n");
-    } else if (0 != err) {
-      printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
-    }
-
-    // подключаемся к чату
-    if (0 == err && -1 < server_mq_id) {
-      struct chat_msg join_msg = {my_pid, JOIN,
-                                  "Pablo Diego José Francisco "
-                                  "de Paula Juan Nepomuceno María de los "
-                                  "Remedios Cipriano de la Santísima "
-                                  "Trinidad Ruiz y Picasso"};
-
-                                  */
-  /* // перегруз по длине никнейма.
-   * struct chat_msg join_msg = {
-      my_pid, JOIN,
-      "Забавно, но моё полное имя Пабло Диего Хосе Франциско де Паула Хуан "
-      "Непомучено Мария де лос Ремедиос Чиприано де ла Сантисима Тринидад "
-      "Руиз и Пикассо"};
-  */
-  /*
-      if (0 != (err = send_mq_msg(server_mq_id, 1, join_msg))) {
-        printf("Ошибка send_mq_msg: %d\n", err);
-      }
-    }
-
-    // заполняем историю
-    if (0 == err && -1 < client_mq_id) {
-      struct chat_msg some_msg = {my_pid, MSG, NULL};
-      some_msg.content = malloc(280);
-      for (int i = 0; i < 10; ++i) {
-        sprintf(some_msg.content,
-                "Это очень длинное сообщение номер %d. Сейчас мы попытаемся "
-                "забить буфер так, чтобы серверу приходилось отправлять по два "
-                "сообщения из истории.",
-                i);
-        if (0 != (err = send_mq_msg(server_mq_id, 1, some_msg))) {
-          printf("Ошибка send_mq_msg: %d\n", err);
-        }
-        usleep(100);
-      }
-      if (NULL != some_msg.content) {
-        free(some_msg.content);
-      }
-    }
-
-    // считываем сообщения от сервера и выводим на экран
-    if (0 == err && -1 < client_mq_id) {
-      for (int i = 0; i < 25; ++i) {
-        struct chat_msg *reply_from_server;
-        if (0 != (err = read_mq_msg(client_mq_id, my_pid, &reply_from_server)))
-    { printf("Ошибка read_mq_msg: %d\n", err); } else { const char *commands[] =
-    {"NO_COMMAND", "JOIN",    "QUIT", "LIST",       "HISTORY", "MSG"};
-          printf("\n\nПолучено сообщение типа %s: %s\n",
-                 commands[reply_from_server->cmd], reply_from_server->content);
-          free(reply_from_server->content);
-          free(reply_from_server);
-        }
-      }
-    }
-  */
   return err;
 }

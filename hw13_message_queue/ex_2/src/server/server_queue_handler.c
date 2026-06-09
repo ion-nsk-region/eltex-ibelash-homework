@@ -47,15 +47,14 @@ void *server_queue_handler(void *server_mq_name) {
       case QUIT:
         if (msg->sender == server_pid) {
           clear_mq(CLIENT_MQ_NAME);
-          struct chat_msg msg_quit;
-          msg_quit.sender = getpid();
-          msg_quit.cmd = QUIT;
-          msg_quit.content = NULL;
+          struct chat_msg msg_quit = {server_pid, QUIT, NULL};
           msg_to_all(client_mq_id, msg_quit, users, n_users);
           sleep(1);  // даём клиентам возможность прочитать сообщение о выходе
 
           is_running = 0;
-        } else {  // handle_disconnected_client();
+        } else {
+          handle_disconnected_client(client_mq_id, msg->sender, users,
+                                     &n_users);
         }
         break;
       case JOIN:
@@ -68,13 +67,14 @@ void *server_queue_handler(void *server_mq_name) {
       default:
         printf("Получена неизвестная команда с кодом %d.\n", msg->cmd);
     }
-
+    /*
     // при изменении массива "commands" также необходимо изменить "enum
     // chat_command" в заголовочном файле.
     const char *commands[] = {"NO_COMMAND", "JOIN",    "QUIT",
                               "LIST",       "HISTORY", "MSG"};
     fprintf(stderr, "DEBUG получено сообщение от %d с командой %s: %s\n",
             msg->sender, commands[msg->cmd], msg->content);
+    */
     free(msg);
     msg = NULL;
   };  // while (is_running)

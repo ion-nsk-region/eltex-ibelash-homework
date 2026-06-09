@@ -30,6 +30,11 @@ int send_mq_msg(int mq_id, long to_whom, struct chat_msg msg) {
                      flags)) {
       perror("msgsnd");
       err = errno;
+    } else {
+      fprintf(stderr,
+              "Отправлено от %d к %ld, команда %d,\n"
+              "содержимое %s.\n",
+              msg.sender, to_whom, msg.cmd, msg.content);
     }
   }
 

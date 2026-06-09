@@ -26,11 +26,11 @@ int handle_new_client(int client_mq_id, struct chat_msg client_msg,
   }
 
   // отправить всем новый список участников чата
-  send_users_list(client_mq_id, users, *n_users);
+  err = send_users_list(client_mq_id, users, *n_users);
 
   // отправить историю сообщений (последние MAX_HISTORY_SIZE)
   if (NULL != history && 0 < last_msg_id) {
-    history_send(client_mq_id, client_msg.sender, history, last_msg_id);
+    err = history_send(client_mq_id, client_msg.sender, history, last_msg_id);
   }
 
   return err;

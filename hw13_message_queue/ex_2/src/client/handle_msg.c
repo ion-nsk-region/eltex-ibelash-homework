@@ -2,12 +2,9 @@
 
 int handle_msg(struct chat_msg *msg, struct ui ui, struct user *users,
                int *n_users) {
-  int err = 0;
-  char *nickname = "server";
-  if (1 != msg->sender) {
-    nickname = pid_to_nick(users, *n_users, msg->sender);
-    if (NULL == nickname) nickname = "Not found";
-  }
+  int err = 0, free_nick = 0;
+  char *nickname = pid_to_nick(users, *n_users, msg->sender, &free_nick);
+
   //  fprintf(stderr, "DEBUG: получено от %d, тип %d,\nсодержимое %s.\n",
   //          msg->sender, msg->cmd, msg->content);
 
@@ -33,6 +30,8 @@ int handle_msg(struct chat_msg *msg, struct ui ui, struct user *users,
               "содержимое: %s.\n",
               msg->sender, nickname, msg->cmd, msg->content);
   }
+
+  if (free_nick) free(nickname);
 
   return err;
 }

@@ -18,6 +18,10 @@ struct input_args {
 //   WINDOW *win; // требовался, чтобы обрабатывать изменение размера...но ну его.
 };
 
+void client_cleanup(pthread_t reader_tid, pthread_t input_tid,
+                    pthread_mutex_t *refresh_lock,
+                    pthread_cond_t *refresh_cond, struct ui ui,
+                    struct user *users, int n_users);
 void close_threads(pthread_t reader_tid, pthread_t input_tid);
 void console_handle_msg(struct chat_msg *msg);
 void handle_input(struct ui ui, int server_mq_id, int ch, char *input_buf, size_t *input_buf_length);

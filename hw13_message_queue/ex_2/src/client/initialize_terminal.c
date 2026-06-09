@@ -5,6 +5,15 @@
 int initialize_terminal(void) {
   int err = 0;
   setlocale(LC_ALL, "");
+
+  // пишем ошибки в файл, чтобы не ломать интерфейс
+  char log_name[25] = "";
+  sprintf(log_name, "client%d_error.log", getpid());
+  errno = 0;
+  if (NULL == freopen(log_name, "w", stderr)) {
+    perror("freopen");
+  }
+
   initscr();
 
   // выключаем ожидание нажатия Enter после ввода с клавиатуры
@@ -52,6 +61,9 @@ int initialize_terminal(void) {
   }
 
   init_colors();
+
+  restore_terminal();  // вернуть терминал к нормальной работе после неудачного
+                       // завершения работы.
 
   return err;
 }
