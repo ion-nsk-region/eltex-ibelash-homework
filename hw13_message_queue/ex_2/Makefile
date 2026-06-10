@@ -69,6 +69,7 @@ code_check: $(SERVER_SRCS) $(SRC_DIR)/server/$(MAIN_SERVER).c $(CLIENT_SRCS) $(S
 
 clean:
 	rm -vrf $(BUILD_DIR) $(LIB_DIR)
+	rm -vf $(SERVER_SRCS:.c=.c~) $(CLIENT_SRCS:.c=.c~) $(LIB_SRCS:.c=.c~) 
 
 .PHONY: all clean code_check server client directories
 

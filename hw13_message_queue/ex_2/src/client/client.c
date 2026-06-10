@@ -2,11 +2,11 @@
 
 int main(void) {
   int err = 0;
-  pthread_mutex_t refresh_lock;
-  pthread_cond_t refresh_cond;
+  pthread_mutex_t refresh_lock, msg_processing_lock, ch_processing_lock;
+  pthread_cond_t refresh_cond, msg_processing_cond, ch_processing_cond;
   pthread_t reader_tid = pthread_self(), input_tid = pthread_self();
   struct chat_msg *msg = NULL;
-  int ch = 0;
+  int ch = 0, ch_is_processing = 0, msg_is_processing = 0;
   struct ui ui = {NULL, NULL, NULL};
   struct user users[MAX_CHAT_USERS] = {};
   int n_users = 0;
@@ -21,15 +21,23 @@ int main(void) {
     printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
   }
 
+  if (0 == err) err = nickname_prompt(server_mq_id);
   if (0 == err) {
+    pthread_mutex_init(&msg_processing_lock, NULL);
+    pthread_cond_init(&msg_processing_cond, NULL);
+    pthread_mutex_init(&ch_processing_lock, NULL);
+    pthread_cond_init(&ch_processing_cond, NULL);
     pthread_mutex_init(&refresh_lock, NULL);
     pthread_cond_init(&refresh_cond, NULL);
+
     pthread_mutex_lock(
         &refresh_lock);  // блокируем изменение переменных в потоках
-    err = spawn_threads(&refresh_lock, &refresh_cond, &msg, &ch, &reader_tid,
+    err = spawn_threads(&refresh_lock, &refresh_cond, &msg, &msg_is_processing,
+                        &msg_processing_lock, &msg_processing_cond, &ch,
+                        &ch_is_processing, &ch_processing_lock,
+                        &ch_processing_cond, ui.msg_input, &reader_tid,
                         &input_tid);
   }
-  if (0 == err) err = nickname_prompt(server_mq_id);
   if (0 == err) err = initialize_terminal();
   if (0 == err) err = create_windows(&ui);
   if (0 == err) {
@@ -56,32 +64,55 @@ int main(void) {
       while (0 == ch && NULL == msg) {
         pthread_cond_wait(&refresh_cond, &refresh_lock);
       }
+      /*
+            fprintf(stderr, "DEBUG обрабатываем: ch = %d, ", ch);
+            if (NULL != msg) {
+              const char *commands[] = {"NO_COMMAND", "JOIN",    "QUIT",
+                                        "LIST",       "HISTORY", "MSG"};
+              fprintf(stderr, "msg от %d, тип %s\n", msg->sender,
+         commands[msg->cmd]); if (NULL != msg->content) { fprintf(stderr,
+         "содержимое: %s.\n", msg->content); } else { fprintf(stderr,
+         "содержимое = NULL.\n");
+              }
+            } else {
+              fprintf(stderr, "msg = NULL.\n");
+            }
+      */
 
       if (27 == ch || EOF == ch || (NULL != msg && QUIT == msg->cmd))
         is_running = 0;
 
-      if (is_running && NULL != msg && NO_COMMAND != msg->cmd)
+      if (is_running && NULL != msg && NO_COMMAND != msg->cmd) {
+        pthread_mutex_lock(&msg_processing_lock);
         handle_msg(msg, ui, users, &n_users);
+        if (NULL != msg->content) free(msg->content);
+        free(msg);
+        msg = NULL;
+        msg_is_processing = 0;
+        pthread_cond_signal(&msg_processing_cond);
+        pthread_mutex_unlock(&msg_processing_lock);
+      }
 
-      if (is_running && 0 != ch)
+      if (is_running && 0 != ch) {
+        pthread_mutex_lock(&ch_processing_lock);
         handle_input(ui, server_mq_id, ch, input_buf, &input_buf_length);
+        ch = 0;
+        ch_is_processing = 0;
+        pthread_cond_signal(&ch_processing_cond);
+        pthread_mutex_unlock(&ch_processing_lock);
+      }
 
       refresh_windows(ui);
-
-      // готовимся к следующей итерации
-      if (is_running) {
-        if (NULL != msg) {
-          if (NULL != msg->content) free(msg->content);
-          free(msg);
-          msg = NULL;
-        }
-        ch = 0;
-      }
     }  // while
     if (NULL != input_buf) free(input_buf);
   }
 
   pthread_mutex_unlock(&refresh_lock);
+
+  destroy_windows(ui);
+  client_cleanup(reader_tid, input_tid, &refresh_lock, &refresh_cond,
+                 &msg_processing_lock, &msg_processing_cond,
+                 &ch_processing_lock, &ch_processing_cond, users, n_users);
 
   if (NULL != msg && QUIT == msg->cmd && getpid() != msg->sender) {
     printf("\nСервер завершил свою работу. Выходим.\n");
@@ -104,8 +135,10 @@ int main(void) {
     }
   }
 
-  client_cleanup(reader_tid, input_tid, &refresh_lock, &refresh_cond, ui, users,
-                 n_users);
+  if (NULL != msg) {
+    if (NULL != msg->content) free(msg->content);
+    free(msg);
+  }
 
   return err;
 }

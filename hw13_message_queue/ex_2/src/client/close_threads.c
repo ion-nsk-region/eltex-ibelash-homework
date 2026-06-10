@@ -34,9 +34,9 @@ void close_threads(pthread_t reader_tid, pthread_t sender_tid) {
       errno = err;
       perror("sender pthread_join");
     } else if (PTHREAD_CANCELED == sender_return) {
-      fprintf(stderr,
-              "Инфо: поток для обработки пользовательского ввода и отправки "
-              "сообщений завершился.\n");
+      fprintf(
+          stderr,
+          "Инфо: поток для обработки пользовательского ввода завершился.\n");
     }
   }
 }

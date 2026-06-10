@@ -37,10 +37,15 @@ int read_mq_msg(int mq_id, long msg_type, struct chat_msg **msg) {
       // освобождаем только в случае падения
       pthread_cleanup_pop(0);  // *(msg)->content
       pthread_cleanup_pop(0);  // msg
-      fprintf(stderr,
-              "Получено от %d к %ld, команда %d,\n"
-              "содержимое %s.\n",
-              (*msg)->sender, msg_type, (*msg)->cmd, (*msg)->content);
+                               /*
+                                * const char *commands[] = {"NO_COMMAND", "JOIN",    "QUIT",
+                                                               "LIST",       "HISTORY", "MSG"};
+                                     fprintf(stderr,
+                                             "DEBUG Получено от %d к %ld, команда %s,\n"
+                                             "содержимое %s.\n",
+                                             (*msg)->sender, msg_type, commands[(*msg)->cmd],
+                                (*msg)->content);
+                                 */
     }
   }
 

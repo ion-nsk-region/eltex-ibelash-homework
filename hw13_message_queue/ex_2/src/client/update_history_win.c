@@ -27,7 +27,7 @@ void update_history_win(WINDOW *history, char *content, struct user *users,
       char format[25];
       // делаем следующую строку формата "%d\x1F%d\x1F%n%8???[^\x1E]\x1E%n"
       snprintf(format, sizeof(format), "%%d\x1F%%d\x1F%%n%%%zu[^\x1E]\x1E%%n",
-               buffer_size);
+               buffer_size - 1);
       while ('\0' != *ptr) {
         int items = sscanf(ptr, format, &pid_buf, &cmd, &first_bytes_read,
                            buffer, &total_bytes_read);

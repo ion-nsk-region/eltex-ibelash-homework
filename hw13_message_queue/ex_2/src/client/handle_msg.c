@@ -5,9 +5,6 @@ int handle_msg(struct chat_msg *msg, struct ui ui, struct user *users,
   int err = 0, free_nick = 0;
   char *nickname = pid_to_nick(users, *n_users, msg->sender, &free_nick);
 
-  //  fprintf(stderr, "DEBUG: получено от %d, тип %d,\nсодержимое %s.\n",
-  //          msg->sender, msg->cmd, msg->content);
-
   switch (msg->cmd) {
     case MSG:
       wprintw(ui.history, "%s: %s\n", nickname, msg->content);
