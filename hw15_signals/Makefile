@@ -50,7 +50,7 @@ $(BUILD_DIR)/receiver3.exe: $(EX3_DIR)/signal_receiver.c $(EX3_DIR)/signal_recei
 
 # =============================================================
 
-code_check: $(EX1_DIR)/*.c $(EX2_DIR)/*.c
+code_check: $(EX1_DIR)/*.c $(EX2_DIR)/*.c $(EX3_DIR)/*.c
 	clang-format -i --style=Google $^
 	-cppcheck --enable=all --suppress=missingIncludeSystem $^
 

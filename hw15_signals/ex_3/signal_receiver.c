@@ -8,8 +8,8 @@ int main(void) {
       -1 == sigaddset(&signal_mask, SIGUSR1)) {
     err = errno;
     perror("sigemptyset or sigaddset");
-  } 
-  
+  }
+
   if (0 == err && 0 > (err = sigprocmask(SIG_BLOCK, &signal_mask, NULL))) {
     perror("sigprocmask");
   }
@@ -19,7 +19,7 @@ int main(void) {
   if (0 == err) {
     while (1) {
       sigwait(&signal_mask, &signal_number);
-    printf("Получен сигнал %s\n", strsignal(signal_number));
+      printf("Получен сигнал %s\n", strsignal(signal_number));
     }
   }
 

@@ -22,7 +22,7 @@ void signal_handler(int signal_number, const siginfo_t *info, void *args) {
   } else {
     printf("Получен сигнал %s\n", strsignal(signal_number));
   }
-  if (NULL != context) {
+  if (NULL != context && NULL != context->uc_link) {
     printf("Указатель на следующую структуру контекста %p\n", context->uc_link);
   }
 }
