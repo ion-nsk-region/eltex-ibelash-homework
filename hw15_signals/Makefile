@@ -23,6 +23,8 @@ ex_1: $(BUILD_DIR) receiver1 sender
 
 ex_2: $(BUILD_DIR) receiver2
 
+ex_3: $(BUILD_DIR) receiver3
+
 sender: $(BUILD_DIR)/sender.exe
 
 $(BUILD_DIR)/sender.exe: $(EX1_DIR)/signal_sender.c
@@ -43,7 +45,7 @@ $(BUILD_DIR)/receiver2.exe: $(EX2_DIR)/signal_receiver2.c $(EX2_DIR)/signal_rece
 # Третий ======================================================
 receiver3: $(BUILD_DIR)/receiver3.exe
 
-$(BUILD_DIR)/receiver3.exe: $(EX3_DIR)/signal_receiver.c $(EX3_DIR)/signal_receiver.h $(EX3_DIR)/signal_handler.c
+$(BUILD_DIR)/receiver3.exe: $(EX3_DIR)/signal_receiver.c $(EX3_DIR)/signal_receiver.h
 	$(CC) $(CFLAGS) $^ -o $@
 
 # =============================================================
