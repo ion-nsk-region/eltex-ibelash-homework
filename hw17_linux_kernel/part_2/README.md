@@ -73,4 +73,208 @@ $ git status
 нечего коммитить, нет изменений в рабочем каталоге
 ```
 
+### Создаём конфигурацию
+
+Создаём конфигурацию по умолчанию. Обязательно предваряем команду make переменной ARCH со значением `arm`.
+```
+$ ARCH=arm make defconfig
+  HOSTCC  scripts/basic/fixdep
+  HOSTCC  scripts/kconfig/conf.o
+  HOSTCC  scripts/kconfig/confdata.o
+  HOSTCC  scripts/kconfig/expr.o
+  LEX     scripts/kconfig/lexer.lex.c
+  YACC    scripts/kconfig/parser.tab.[ch]
+  HOSTCC  scripts/kconfig/lexer.lex.o
+  HOSTCC  scripts/kconfig/menu.o
+  HOSTCC  scripts/kconfig/parser.tab.o
+  HOSTCC  scripts/kconfig/preprocess.o
+  HOSTCC  scripts/kconfig/symbol.o
+  HOSTCC  scripts/kconfig/util.o
+  HOSTLD  scripts/kconfig/conf
+*** Default configuration is based on 'multi_v7_defconfig'
+#
+# configuration written to .config
+#
+```
+
+### Запускаем компиляцию
+
+Устанавливаем компилятор gcc gnueabihf для arm:
+```
+$ apt search gcc gnueabi arm
+Сортировка… Готово
+Полнотекстовый поиск… Готово
+cpp-10-arm-linux-gnueabi/noble-updates,noble-security 10.5.0-4ubuntu2.1cross1 amd64
+  препроцессор GNU C
+
+cpp-10-arm-linux-gnueabihf/noble-updates,noble-security 10.5.0-4ubuntu2.1cross1 amd64
+  препроцессор GNU C
+...
+...
+...
+gcc-14-plugin-dev-arm-linux-gnueabihf/noble-updates,noble-security 14.2.0-4ubuntu2~24.04.1cross1 amd64
+  Files for GNU GCC plugin development.
+...
+...
+...
+$ sudo apt install gcc-14-plugin-dev-arm-linux-gnueabihf
+...
+...
+...
+```
+
+Вместе с компилятором установились следующие пакеты: 
+  binutils-arm-linux-gnueabihf cpp-14-arm-linux-gnueabihf
+  gcc-14-arm-linux-gnueabihf gcc-14-arm-linux-gnueabihf-base gcc-14-cross-base
+  gcc-14-plugin-dev-arm-linux-gnueabihf libasan8-armhf-cross libatomic1-armhf-cross
+  libc6-armhf-cross libc6-dev-armhf-cross libgcc-14-dev-armhf-cross
+  libgcc-s1-armhf-cross libgmp-dev libgmpxx4ldbl libgomp1-armhf-cross libmpc-dev
+  libmpfr-dev libstdc++6-armhf-cross libubsan1-armhf-cross
+  linux-libc-dev-armhf-cross
+
+
+Перед запуском компиляции посмотрел как используются переменные в Makefile:
+```
+$ grep -n CROSS ./Makefile 
+396:# CROSS_COMPILE specify the prefix used for all executables used
+398:# are prefixed with $(CROSS_COMPILE).
+399:# CROSS_COMPILE can be set on the command line
+400:# make CROSS_COMPILE=aarch64-linux-gnu-
+401:# Alternatively CROSS_COMPILE can be set in the environment.
+402:# Default value for CROSS_COMPILE is not to prefix executables
+403:# Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
+525:CC		= $(CROSS_COMPILE)gcc
+526:LD		= $(CROSS_COMPILE)ld
+527:AR		= $(CROSS_COMPILE)ar
+528:NM		= $(CROSS_COMPILE)nm
+529:OBJCOPY		= $(CROSS_COMPILE)objcopy
+530:OBJDUMP		= $(CROSS_COMPILE)objdump
+531:READELF		= $(CROSS_COMPILE)readelf
+532:STRIP		= $(CROSS_COMPILE)strip
+631:export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE LD CC HOSTPKG_CONFIG
+714:# Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+```
+
+Обратил внимание, что на 400й строке показано как правильно задавать префикс утилит. 
+А на 714й ещё более интересная заметка... но, к сожалению, arm не задаёт CROSS\_COMPILE в своём Makefile.
+
+Проверил, что утилиты перечисленные в Makefile на строках 525 - 532 присутствуют в моей системе (набрал arm и нажал Tab два раза).
+
+Запускаем компиляцию
+И она падает:
+```
+$ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make -j$(nproc) zImage
+make[1]: arm-linux-gnueabihf-gcc: Нет такого файла или каталога
+  SYNC    include/config/auto.conf.cmd
+make[2]: arm-linux-gnueabihf-gcc: Нет такого файла или каталога
+scripts/Kconfig.include:40: C compiler 'arm-linux-gnueabihf-gcc' not found
+make[3]: *** [scripts/kconfig/Makefile:85: syncconfig] Ошибка 1
+make[2]: *** [Makefile:747: syncconfig] Ошибка 2
+make[1]: *** [/home/user/Documents/programming_practice/linux/Makefile:867: include/config/auto.conf.cmd] Ошибка 2
+make[1]: *** [include/config/auto.conf.cmd] Удаляется файл «include/generated/rustc_cfg»
+make[1]: *** [include/config/auto.conf.cmd] Удаляется файл «include/generated/autoconf.h»
+make: *** [Makefile:248: __sub-make] Ошибка 2
+```
+
+Видимо я не тот пакет поставил. Нашёл в пакетах пакет с нужным компилятором и установил его:
+```
+$ sudo apt install gcc-arm-linux-gnueabihf
+```
+
+Также установились следующие пакеты:
+  cpp-13-arm-linux-gnueabihf cpp-arm-linux-gnueabihf gcc-13-arm-linux-gnueabihf
+  gcc-13-arm-linux-gnueabihf-base gcc-13-cross-base gcc-arm-linux-gnueabihf
+  libgcc-13-dev-armhf-cross
+
+
+Снова запускаю компиляцию, в этот раз успешно. 
+При этом в начале пришлось ответить на пару вопросов (отвечал по умолчанию):
+```
+$ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make -j$(nproc) zImage
+  SYNC    include/config/auto.conf.cmd
+*
+* Restart config...
+*
+*
+* Kernel Features
+*
+Symmetric Multi-Processing (SMP) [Y/n/?] y
+  Allow booting SMP kernel on uniprocessor systems (SMP_ON_UP) [Y/n/?] y
+Support cpu topology definition (ARM_CPU_TOPOLOGY) [Y/n/?] y
+Architected timer support (HAVE_ARM_ARCH_TIMER) [Y/?] y
+Multi-Cluster Power Management (MCPM) [Y/?] y
+big.LITTLE support (Experimental) (BIG_LITTLE) [N/y/?] n
+Memory split
+> 1. 3G/1G user/kernel split (VMSPLIT_3G)
+  2. 3G/1G user/kernel split (for full 1G low memory) (VMSPLIT_3G_OPT)
+  3. 2G/2G user/kernel split (VMSPLIT_2G)
+  4. 1G/3G user/kernel split (VMSPLIT_1G)
+choice[1-4?]: 1
+Maximum number of CPUs (2-32) (NR_CPUS) [16] 16
+Support for hot-pluggable CPUs (HOTPLUG_CPU) [Y/?] y
+Support for the ARM Power State Coordination Interface (PSCI) (ARM_PSCI) [Y/?] y
+Timer frequency
+> 1. 100 Hz (HZ_100)
+  2. 200 Hz (HZ_200)
+  3. 250 Hz (HZ_250)
+  4. 300 Hz (HZ_300)
+  5. 500 Hz (HZ_500)
+  6. 1000 Hz (HZ_1000)
+choice[1-6?]: 1
+Compile the kernel in Thumb-2 mode (THUMB2_KERNEL) [N/y/?] n
+Runtime patch udiv/sdiv instructions into __aeabi_{u}idiv() (ARM_PATCH_IDIV) [Y/n/?] y
+Use the ARM EABI to compile the kernel (AEABI) [Y/?] y
+  Allow old ABI binaries to run with this kernel (EXPERIMENTAL) (OABI_COMPAT) [N/y/?] n
+High Memory Support (HIGHMEM) [Y/?] y
+Enable privileged no-access (ARM_PAN) [Y/n/?] y
+Use PLTs to allow module memory to spill over into vmalloc area (ARM_MODULE_PLTS) [Y/n/?] y
+Order of maximal physically contiguous allocations (ARCH_FORCE_MAX_ORDER) [11] 11
+Use kernel mem{cpy,set}() for {copy_to,clear}_user() (UACCESS_WITH_MEMCPY) [N/y/?] n
+Enable paravirtualization code (PARAVIRT) [N/y/?] n
+Paravirtual steal time accounting (PARAVIRT_TIME_ACCOUNTING) [N/y/?] n
+Xen guest support on ARM (XEN) [N/y/?] n
+Use a unique stack canary value for each task (STACKPROTECTOR_PER_TASK) [Y/n/?] (NEW) 
+  UPD     include/generated/uapi/linux/version.h
+  SYSHDR  arch/arm/include/generated/uapi/asm/unistd-oabi.h
+  SYSHDR  arch/arm/include/generated/uapi/asm/unistd-eabi.h
+  HOSTCC  scripts/dtc/dtc.o
+  HOSTCC  scripts/dtc/flattree.o
+  HOSTCC  scripts/dtc/fstree.o
+  WRAP    arch/arm/include/generated/uapi/asm/kvm_para.h
+...
+...
+...
+```
+По традиции кулер зашумел на полную. 
+_Надо компилировать ядра зимой, когда дома прохладно, а не летом, когда итак уже жарко._
+
+
+Примерно через 10 минут сборка была закончена.
+Скопировал ядро в отдельную директорию:
+```
+$ mkdir ../experiments_eltex/arm_kernel
+$ cp -a ./arch/arm/boot/zImage ../experiments_eltex/arm_kernel/
+```
+
+## Сборка Device tree
+
+Зашёл в ./arch/arm/boot/dts/ как показывали на лекции, но там никаких vexpress не оказалось. 
+Рекурсивным grep обнаружил их в поддиректории arm:
+```
+$ grep -R vexpress ./arch/arm/boot/dts/
+./arch/arm/boot/dts/arm/vexpress-v2p-ca9.dts:#include "vexpress-v2m.dtsi"
+./arch/arm/boot/dts/arm/vexpress-v2p-ca9.dts:	arm,vexpress,site = <0xf>;
+./arch/arm/boot/dts/arm/vexpress-v2p-ca9.dts:	compatible = "arm,vexpress,v2p-ca9", "arm,vexpress";
+./arch/arm/boot/dts/arm/vexpress-v2p-ca9.dts:		compatible = "arm,vexpress,config-bus";
+...
+...
+...
+./arch/arm/boot/dts/arm/vexpress-v2m.dtsi:					arm,vexpress-sysreg,func = <9 0>;
+./arch/arm/boot/dts/arm/vexpress-v2m.dtsi:					compatible = "arm,vexpress-dvimode";
+./arch/arm/boot/dts/arm/vexpress-v2m.dtsi:					arm,vexpress-sysreg,func = <11 0>;
+```
+
+
+
+
 
