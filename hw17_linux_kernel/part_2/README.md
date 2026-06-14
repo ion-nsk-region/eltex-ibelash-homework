@@ -51,7 +51,7 @@ $ make mrproper
   CLEAN   include/config include/generated arch/x86/include/generated debian .config .config.old .version Module.symvers certs/signing_key.pem certs/x509.genkey vmlinux-gdb.py 
 ```
 
-С помощью git diff и git status нашёл другие файлы, состояние которых необходимо восстановить. Такой файл только один - certs/Makefile:
+С помощью `git diff` и `git status` нашёл другие файлы, состояние которых необходимо восстановить. Такой файл только один - **certs/Makefile**:
 ```
 $ git diff
 diff --git a/certs/Makefile b/certs/Makefile
@@ -75,7 +75,7 @@ $ git status
 
 ### Создаём конфигурацию
 
-Создаём конфигурацию по умолчанию. Обязательно предваряем команду make переменной ARCH со значением `arm`.
+Создаём конфигурацию по умолчанию. Обязательно предваряем команду `make` переменной **ARCH** со значением **arm**.
 ```
 $ ARCH=arm make defconfig
   HOSTCC  scripts/basic/fixdep
@@ -99,7 +99,7 @@ $ ARCH=arm make defconfig
 
 ### Запускаем компиляцию
 
-Устанавливаем компилятор gcc gnueabihf для arm:
+Устанавливаем компилятор ***gcc gnueabihf*** для **arm**:
 ```
 $ apt search gcc gnueabi arm
 Сортировка… Готово
@@ -124,16 +124,16 @@ $ sudo apt install gcc-14-plugin-dev-arm-linux-gnueabihf
 ```
 
 Вместе с компилятором установились следующие пакеты: 
-  binutils-arm-linux-gnueabihf cpp-14-arm-linux-gnueabihf
+  **binutils-arm-linux-gnueabihf cpp-14-arm-linux-gnueabihf
   gcc-14-arm-linux-gnueabihf gcc-14-arm-linux-gnueabihf-base gcc-14-cross-base
   gcc-14-plugin-dev-arm-linux-gnueabihf libasan8-armhf-cross libatomic1-armhf-cross
   libc6-armhf-cross libc6-dev-armhf-cross libgcc-14-dev-armhf-cross
   libgcc-s1-armhf-cross libgmp-dev libgmpxx4ldbl libgomp1-armhf-cross libmpc-dev
   libmpfr-dev libstdc++6-armhf-cross libubsan1-armhf-cross
-  linux-libc-dev-armhf-cross
+  linux-libc-dev-armhf-cross**
 
 
-Перед запуском компиляции посмотрел как используются переменные в Makefile:
+Перед запуском компиляции посмотрел как используются переменные в **Makefile**:
 ```
 $ grep -n CROSS ./Makefile 
 396:# CROSS_COMPILE specify the prefix used for all executables used
@@ -155,12 +155,13 @@ $ grep -n CROSS ./Makefile
 714:# Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
 ```
 
-Обратил внимание, что на 400й строке показано как правильно задавать префикс утилит. 
-А на 714й ещё более интересная заметка... но, к сожалению, arm не задаёт CROSS\_COMPILE в своём Makefile.
+Обратил внимание, что на **400й** строке показано как правильно задавать префикс утилит. 
+А на **714й** ещё более интересная заметка... но, к сожалению, **arm** не задаёт **CROSS\_COMPILE** в своём **Makefile**.
 
-Проверил, что утилиты перечисленные в Makefile на строках 525 - 532 присутствуют в моей системе (набрал arm и нажал Tab два раза).
+Проверил, что утилиты перечисленные в **Makefile** на строках **525 - 532** присутствуют в моей системе (набрал `arm` и нажал `Tab` два раза).
 
-Запускаем компиляцию
+Запускаем компиляцию.
+
 И она падает:
 ```
 $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make -j$(nproc) zImage
@@ -176,15 +177,15 @@ make[1]: *** [include/config/auto.conf.cmd] Удаляется файл «includ
 make: *** [Makefile:248: __sub-make] Ошибка 2
 ```
 
-Видимо я не тот пакет поставил. Нашёл в пакетах пакет с нужным компилятором и установил его:
+Видимо я не тот пакет поставил. [Нашёл в пакетах](https://packages.ubuntu.com/search?searchon=contents&keywords=arm-linux-gnueabihf-gcc&mode=exactfilename&suite=resolute&arch=any) пакет с нужным компилятором и установил его:
 ```
 $ sudo apt install gcc-arm-linux-gnueabihf
 ```
 
 Также установились следующие пакеты:
-  cpp-13-arm-linux-gnueabihf cpp-arm-linux-gnueabihf gcc-13-arm-linux-gnueabihf
+  **cpp-13-arm-linux-gnueabihf cpp-arm-linux-gnueabihf gcc-13-arm-linux-gnueabihf
   gcc-13-arm-linux-gnueabihf-base gcc-13-cross-base gcc-arm-linux-gnueabihf
-  libgcc-13-dev-armhf-cross
+  libgcc-13-dev-armhf-cross**
 
 
 Снова запускаю компиляцию, в этот раз успешно. 
@@ -258,8 +259,8 @@ $ cp -a ./arch/arm/boot/zImage ../experiments_eltex/arm_kernel/
 
 ### Сборка Device tree
 
-Зашёл в ./arch/arm/boot/dts/ как показывали на лекции, но там никаких vexpress не оказалось. 
-Рекурсивным grep обнаружил их в поддиректории arm:
+Зашёл в **./arch/arm/boot/dts/** как показывали на лекции, но там никаких _vexpress_ не оказалось. 
+Рекурсивным `grep` обнаружил их в поддиректории **arm**:
 ```
 $ grep -R vexpress ./arch/arm/boot/dts/
 ./arch/arm/boot/dts/arm/vexpress-v2p-ca9.dts:#include "vexpress-v2m.dtsi"
@@ -350,7 +351,7 @@ $ QEMU_AUDIO_DRV=none qemu-system-armhf -M vexpress-a9 -kernel zImage -dtb vexpr
 QEMU: Terminated
 ```
 Заканчивается с Kernel panic как и требовалось.
-В отличие от запуска на лекции я не вижу строчки с kernel\_init и Exception stack`а. В моём случае тут Call trace. Но в целом, та же самая проблема - нет корневой файловой системы.
+В отличие от запуска на лекции я не вижу строчки с **kernel\_init** и **Exception stack`а**. В моём случае тут **Call trace**. Но в целом, та же самая проблема - нет корневой файловой системы.
 
 ![Kernel panic](kernel_panic.png)
 
