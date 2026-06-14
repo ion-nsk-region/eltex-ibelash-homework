@@ -14,12 +14,14 @@ $ arm-linux-gnueabihf-gcc -Wall -Wextra -Werror -static init.c -o init
 $ mv ./init ../../experiments_eltex/arm_kernel/
 ```
 
-_Я работаю в нескольких вкладках терминала:
+
+Я работаю в нескольких вкладках терминала:
 - **programming_practice/eltex-ibelash-homework/hw18_rootfs** <- репозиторий с отчётом и исходным кодом.
 - **programming_practice/experiments_eltex/arm_kernel** <- директория с ядром из предыдущего задания.
 - **programming_practice** <- тут читаются маны или идёт поиск каких-либо файлов.
 Переключения между директориями происходит через вкладки терминала, а не через cd.
-Поэтому в командах появляются различные относительные пути "не связанные" между собой._
+Поэтому в командах появляются различные относительные пути "не связанные" между собой.
+
 
 ```
 $ grep -nR "cpio.*gzip" linux/Documentation/
