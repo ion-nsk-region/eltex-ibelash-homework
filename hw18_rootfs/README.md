@@ -19,6 +19,7 @@ $ mv ./init ../../experiments_eltex/arm_kernel/
 - **programming_practice/eltex-ibelash-homework/hw18_rootfs** <- репозиторий с отчётом и исходным кодом.
 - **programming_practice/experiments_eltex/arm_kernel** <- директория с ядром из предыдущего задания.
 - **programming_practice** <- тут читаются маны или идёт поиск каких-либо файлов.
+
 Переключения между директориями происходит через вкладки терминала, а не через cd.
 Поэтому в командах появляются различные относительные пути "не связанные" между собой.
 
