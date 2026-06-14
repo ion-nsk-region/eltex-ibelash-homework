@@ -256,7 +256,7 @@ $ mkdir ../experiments_eltex/arm_kernel
 $ cp -a ./arch/arm/boot/zImage ../experiments_eltex/arm_kernel/
 ```
 
-## Сборка Device tree
+### Сборка Device tree
 
 Зашёл в ./arch/arm/boot/dts/ как показывали на лекции, но там никаких vexpress не оказалось. 
 Рекурсивным grep обнаружил их в поддиректории arm:
@@ -274,7 +274,83 @@ $ grep -R vexpress ./arch/arm/boot/dts/
 ./arch/arm/boot/dts/arm/vexpress-v2m.dtsi:					arm,vexpress-sysreg,func = <11 0>;
 ```
 
+Запускаем сборку дерева устройств:
+```
+$ ARCH=arm make -j$(nproc) dtbs
+  SYNC    include/config/auto.conf.cmd
+  DTC     arch/arm/boot/dts/airoha/en7523-evb.dtb
+  DTC     arch/arm/boot/dts/actions/owl-s500-cubieboard6.dtb
+...
+...
+...
+  DTC     arch/arm/boot/dts/nxp/imx/imx7ulp-com.dtb
+  DTC     arch/arm/boot/dts/nxp/imx/imx7ulp-evk.dtb
+  OVL     arch/arm/boot/dts/nxp/imx/imx53-qsb-hdmi.dtb
+  OVL     arch/arm/boot/dts/nxp/imx/imx53-qsrb-hdmi.dtb
+```
 
+Успешно!
 
+Проверяем наличие нашего файла:
+```
+$ file ./arch/arm/boot/dts/arm/vexpress-v2p-ca9.dtb
+./arch/arm/boot/dts/arm/vexpress-v2p-ca9.dtb: Device Tree Blob version 17, size=14329, boot CPU=0, string block size=929, DT structure block size=13344
+```
 
+Копируем его к ядру:
+```
+$ cp -a ./arch/arm/boot/dts/arm/vexpress-v2p-ca9.dtb ../experiments_eltex/arm_kernel/
+```
+
+### Запуск в эмуляторе
+
+Установил эмулятор:
+```
+$ sudo apt install qemu-user-static
+$ sudo apt install qemu-system-arm qemu-system-aarch64
+``` 
+
+Так как я собирал ядро с железной поддержкой вычислений с плавающей точкой, 
+то запускаю в соответствующем эмуляторе. На лекции вы почему-то использовали 
+эмулятор без железной поддержки float-point, несмотря на то, что ядро 
+собирали с ней. Не уверен, насколько это важно.
+Проверяю, что эмулятор работает с платами vexpress:
+```
+$ qemu-system-armhf -machine help | grep vexpress
+vexpress-a15         ARM Versatile Express for Cortex-A15
+vexpress-a9          ARM Versatile Express for Cortex-A9
+```
+
+Собственно запуск:
+```
+$ QEMU_AUDIO_DRV=none qemu-system-armhf -M vexpress-a9 -kernel zImage -dtb vexpress-v2p-ca9.dtb  -append "console=ttyAMA0" -nographic
+[    0.000000] Booting Linux on physical CPU 0x0
+[    0.000000] Linux version 7.0.0 (user@oboltus-depo) (arm-linux-gnueabihf-gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP Sun Jun 14 20:24:07 +07 2026
+[    0.000000] CPU: ARMv7 Processor [410fc090] revision 0 (ARMv7), cr=10c5387d
+[    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT nonaliasing instruction cache
+[    0.000000] OF: fdt: Machine model: V2P-CA9
+...
+...
+...
+[    3.312487]  vfat
+[    3.312502]  msdos
+[    3.312506]  ntfs
+[    3.312510]  ntfs3
+[    3.312520] 
+[    3.312816] Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)
+[    3.321263] CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 7.0.0 #1 VOLUNTARY 
+[    3.321861] Hardware name: ARM-Versatile Express
+[    3.322306] Call trace: 
+[    3.323308]  unwind_backtrace from show_stack+0x10/0x14
+[    3.324993]  show_stack from dump_stack_lvl+0x54/0x68
+[    3.325299]  dump_stack_lvl from vpanic+0x234/0x454
+[    3.325535]  vpanic from do_panic_on_target_cpu+0x0/0x14
+[    3.326644] ---[ end Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0) ]---
+
+QEMU: Terminated
+```
+Заканчивается с Kernel panic как и требовалось.
+В отличие от запуска на лекции я не вижу строчки с kernel\_init и Exception stack`а. В моём случае тут Call trace. Но в целом, та же самая проблема - нет корневой файловой системы.
+
+![Kernel panic](kernel_panic.png)
 
