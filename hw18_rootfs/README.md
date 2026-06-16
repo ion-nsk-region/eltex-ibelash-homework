@@ -606,3 +606,7 @@ ptys7            tty29            ttyr0
 
 Это успех!
 
+Машину даже выключить можно:
+
+![Выключение](busybox_rootfs_poweroff.png)
+
