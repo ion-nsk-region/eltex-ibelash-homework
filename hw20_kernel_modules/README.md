@@ -124,7 +124,12 @@ $ journalctl -k | tail -n2
 
 ## Модуль с обменом информацией через файл устройства
 
-Собрал:
+За основу был взят предыдущий модуль, к которому добавил функции и структуру как в лекции. Также я решил создавать устройство программно - код подсмотрел в [The Linux Kernel Module Programming Guide](https://sysprog21.github.io/lkmpg/#chardevc).
+[Получившийся исходный код модуля](module_dev.c) (см. историю коммитов, чтобы увидеть предыдущие версии этого модуля).
+
+### Компиляция 
+
+Собрал модуль:
 ```
 $ make
 make -C /lib/modules/7.0.0-dirty/build M=/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules modules
@@ -146,12 +151,15 @@ make[2]: выход из каталога «/home/user/Documents/programming_pra
 make[1]: выход из каталога «/usr/src/linux-headers-7.0.0-dirty»
 ```
 
-Присоединил:
+### Загрузка модуля - попытка №1
+
+Загрузил модуль:
 ```
 $ sudo insmod ./module_dev.ko
 ```
 
 В `dmesg` появились следующие сообщения:
+
 ```
 ...
 ...
@@ -163,6 +171,8 @@ $ sudo insmod ./module_dev.ko
 [51643.228057] module_dev: Модуль загружен
 ```
 
+Устройство действительно было создано, но без прав для других пользователей:
+
 ```
 $ ls -l /dev/module_dev 
 crw------- 1 root root 234, 0 июн 23 01:02 /dev/module_dev
@@ -170,14 +180,18 @@ crw------- 1 root root 234, 0 июн 23 01:02 /dev/module_dev
 
 Разбирался как программно назначить права.
 
-Разобрался. Перекомпилировал, выгрузил старую версию модуля, загрузил новую:
+### Загрузка модуля - попытка №2
+
+Разобрался - подсмотрел код в **./fs/pstore/pmsg.c**. Перекомпилировал, выгрузил старую версию модуля, загрузил новую:
 ```
 $ ls -l /dev/module_dev 
 crw-rw-rw- 1 root root 234, 0 июн 23 01:30 /dev/module_dev
 ```
 
+### Чтение из файла устройства
 
 Попытался прочитать:
+
 ```
 $ cat /dev/module_dev 
 cat: /dev/module_dev: Неправильный адрес
@@ -189,20 +203,59 @@ $ less -f /dev/module_dev | cat
 Привет!
 ```
 
+### Запись в файл устройства
+
 Запись в файл:
 ```
 $ echo "Ну привет!" > /dev/module_dev 
 bash: echo: ошибка записи: Недопустимый аргумент
-```
-
-```
 $ echo "Hello!" > /dev/module_dev
-```
-
-```
 $ less -f /dev/module_dev | cat
 Hello!
 �ет!
 ```
 
-Так как устройство у нас с побайтовой записью, то с кириллицей видимо беда.
+Выводит мусор. 
+
+### Борьба с выводимым мусором
+
+Для борьбы с выводимым мусором добавил следующее:
+
+- вычисление длины строки в функцию чтения 
+- вставку конца строки в функцию записи. 
+
+*С удивлением узнал, что в ядре **strlen** вычисляется на этапе компиляции. Вместо неё необходимо использовать **strnlen**.*
+
+Пересобрал модуль
+```
+$ make
+make -C /lib/modules/7.0.0-dirty/build M=/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules modules
+make[1]: вход в каталог «/usr/src/linux-headers-7.0.0-dirty»
+make[2]: вход в каталог «/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules»
+  CC [M]  module_dev.o
+  MODPOST Module.symvers
+  CC [M]  module_dev.mod.o
+  LD [M]  module_dev.ko
+  BTF [M] module_dev.ko
+Skipping BTF generation for module_dev.ko due to unavailability of vmlinux
+make[2]: выход из каталога «/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules»
+make[1]: выход из каталога «/usr/src/linux-headers-7.0.0-dirty»
+```
+
+Загрузил.
+Попробовал почитать и позаписывать (попутно выяснил, что без проблем читается через `tac`, `head`, `tail`):
+```
+$ tac /dev/module_dev 
+Привет!
+
+$ echo "12345678901234" > /dev/module_dev
+$ tac /dev/module_dev 
+12345678901234
+
+$ echo "123456789012345" > /dev/module_dev
+bash: echo: ошибка записи: Недопустимый аргумент
+```
+
+![Чтение и запись работают](module_dev.png)
+
+
