@@ -629,4 +629,96 @@ Linux oboltus-depo 7.0.0-dirty #12 SMP PREEMPT_DYNAMIC Sat Jun 13 20:44:26 +07 2
 
 ![photo of grub - manually compiled kernel](grub2.jpg)
 
+### Удаление ядра
+
+Удаляю это ядро спустя 39 дней использования. Причина: нет модуля для работы с USB накопителями (usb_storage). В остальном, всё работало без проблем.
+
+Загружаюсь с ядром от Ubuntu.
+
+Запускаю удаление:
+
+```
+$ sudo apt purge linux-image-7.0.0-dirty linux-image-7.0.0-dirty-dbg linux-headers-7.0.0-dirty
+[sudo] пароль для user: 
+Чтение списков пакетов… Готово
+Построение дерева зависимостей… Готово
+Чтение информации о состоянии… Готово         
+Следующие пакеты устанавливались автоматически и больше не требуются:
+  libetonyek-0.1-1 libfwupd2 liborcus-0.18-0 liborcus-parser-0.18-0 libwoff1
+  lp-solve
+Для их удаления используйте «sudo apt autoremove».
+Следующие пакеты будут УДАЛЕНЫ:
+  linux-headers-7.0.0-dirty* linux-image-7.0.0-dirty* linux-image-7.0.0-dirty-dbg*
+Обновлено 0 пакетов, установлено 0 новых пакетов, для удаления отмечено 3 пакетов, и 6 пакетов не обновлено.
+После данной операции объём занятого дискового пространства уменьшится на 1 144 MB.
+Хотите продолжить? [Д/н] y
+(Чтение базы данных … на данный момент установлено 350187 файлов и каталогов.)
+Удаляется linux-headers-7.0.0-dirty (7.0.0-12) …
+Удаляется linux-image-7.0.0-dirty (7.0.0-12) …
+update-initramfs: Deleting /boot/initrd.img-7.0.0-dirty
+Sourcing file `/etc/default/grub'
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-7.0.0-28-generic
+Found initrd image: /boot/initrd.img-7.0.0-28-generic
+Found linux image: /boot/vmlinuz-6.17.0-40-generic
+Found initrd image: /boot/initrd.img-6.17.0-40-generic
+Found linux image: /boot/vmlinuz-6.17.0-14-generic
+Found initrd image: /boot/initrd.img-6.17.0-14-generic
+Found linux image: /boot/vmlinuz-6.14.0-37-generic
+Found initrd image: /boot/initrd.img-6.14.0-37-generic
+Found memtest86+x64 image: /boot/memtest86+x64.bin
+Warning: os-prober will not be executed to detect other bootable partitions.
+Systems on them will not be added to the GRUB boot configuration.
+Check GRUB_DISABLE_OS_PROBER documentation entry.
+Adding boot menu entry for UEFI Firmware Settings ...
+done
+Удаляется linux-image-7.0.0-dirty-dbg (7.0.0-12) …
+(Чтение базы данных … на данный момент установлено 341828 файлов и каталогов.)
+Вычищаются файлы настройки пакета linux-image-7.0.0-dirty (7.0.0-12) …
+```
+
+Я не стал удалять пакет *linux-libc-dev* так как он тянет за собой огромную кучу зависимостей включая *libc6-dev*:
+
+```
+$ sudo apt remove linux-libc-dev
+....
+Следующие пакеты будут УДАЛЕНЫ:
+  build-essential debhelper dh-autoreconf g++ g++-13 g++-13-x86-64-linux-gnu
+  g++-x86-64-linux-gnu libc6-dev libdw-dev libelf-dev libncurses-dev
+  libstdc++-13-dev libtool linux-libc-dev zlib1g-dev
+....
+```
+
+Вместо этого, я установил старую версию:
+
+```
+$ apt list linux-libc-dev
+Вывод списка… Готово
+linux-libc-dev/now 7.0.0-12 amd64 [установлен, локальный]
+linux-libc-dev/noble-updates,noble-security 6.8.0-136.136 i386
+
+$ sudo apt install linux-libc-dev=6.8.0-136.136 --allow-downgrades
+Чтение списков пакетов… Готово
+Построение дерева зависимостей… Готово
+Чтение информации о состоянии… Готово         
+Следующие пакеты устанавливались автоматически и больше не требуются:
+  libetonyek-0.1-1 libfwupd2 liborcus-0.18-0 liborcus-parser-0.18-0 libwoff1
+  lp-solve
+Для их удаления используйте «sudo apt autoremove».
+Следующие пакеты будут заменены на СТАРЫЕ версии:
+  linux-libc-dev
+Обновлено 0 пакетов, установлено 0 новых пакетов, 1 пакетов заменено на старые версии, для удаления отмечено 0 пакетов, и 0 пакетов не обновлено.
+Необходимо скачать 1 575 kB архивов.
+После данной операции объём занятого дискового пространства уменьшится на 106 kB.
+Хотите продолжить? [Д/н] y
+Пол:1 http://ru.archive.ubuntu.com/ubuntu noble-updates/main amd64 linux-libc-dev amd64 6.8.0-136.136 [1 575 kB]
+Получено 1 575 kB за 0с (3 362 kB/s)       
+dpkg: предупреждение: снижение версии linux-libc-dev:amd64 с 7.0.0-12 до 6.8.0-136.13
+6
+(Чтение базы данных … на данный момент установлено 341828 файлов и каталогов.)
+Подготовка к распаковке …/linux-libc-dev_6.8.0-136.136_amd64.deb …
+Распаковывается linux-libc-dev:amd64 (6.8.0-136.136) на замену (7.0.0-12) …
+Настраивается пакет linux-libc-dev:amd64 (6.8.0-136.136) …
+```
+
 
