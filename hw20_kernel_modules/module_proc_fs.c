@@ -1,20 +1,21 @@
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
-#include <linux/fs.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/rwlock.h>
-#include <linux/version.h>
+#include "proc_compat.h"
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Модуль, обменивающийся информацией через proc_fs.");
 MODULE_VERSION("1.0");
 
 #define MAX_STR_SIZE 30
-#define DIRECTORY "module_proc_fs"
+#define FILENAME "module_proc_fs"
+#define FILE_PTR module_proc_fs
 
 static rwlock_t lock;
 static char a_string[MAX_STR_SIZE] = "Здравствуйте!";
+static struct proc_dir_entry *FILE_PTR = NULL;
 
 static ssize_t read_from_proc_fs(struct file *fd, char __user *buf, size_t size, loff_t *offset) {
     ssize_t bytes_read, a_string_length = strnlen(a_string, MAX_STR_SIZE - 1);
@@ -45,4 +46,30 @@ static ssize_t write_to_proc_fs(struct file *fd, const char __user *buf, size_t 
     write_unlock(&lock);
 
     return bytes_written;
+}
+
+// макрос разворачивается в зависимости от наличия поддержки структуры proc_ops 
+// см. подробности в proc_compat.h 
+DEFINE_COMPAT_PROC_OPS(fops, read_from_proc_fs, write_to_proc_fs);
+
+int init_module(void) {
+    int err = 0;
+
+    rwlock_init(&lock);
+
+    FILE_PTR = compat_proc_create(FILENAME, 0666, NULL, &fops);
+    
+    if (NULL == FILE_PTR) {
+        err = -ENOMEM;
+        pr_err("Ошибка: не удалось создать файл /proc/%s, код ошибки: %d\n", FILENAME, err);
+    } else {
+        pr_info("Модуль загружен\n");
+    }
+
+    return err;
+}
+
+void cleanup_module(void) {
+    proc_remove(FILE_PTR);
+    pr_info("Модуль выгружен\n");
 }
