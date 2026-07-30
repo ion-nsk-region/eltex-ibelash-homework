@@ -129,6 +129,7 @@ $ journalctl -k | tail -n2
 ## Модуль с обменом информацией через файл устройства
 
 За основу был взят предыдущий модуль, к которому добавил функции и структуру как в лекции. Также я решил создавать устройство программно - код подсмотрел в [The Linux Kernel Module Programming Guide](https://sysprog21.github.io/lkmpg/#chardevc).
+
 [Получившийся исходный код модуля](module_dev.c) (см. историю коммитов, чтобы увидеть предыдущие версии этого модуля).
 
 ### Компиляция 
@@ -261,4 +262,96 @@ bash: echo: ошибка записи: Недопустимый аргумент
 
 ![Чтение и запись работают](module_dev.png)
 
+&nbsp;
+
+&nbsp;
+
+## Модуль с обменом информацией через proc\_fs
+
+[Исходный код модуля](module_proc_fs.c).
+
+Опять же, за основу был взят предыдущий модуль. Функции чтения и записи совпадают с предыдущим модулем - их наверное надо в отдельную библиотеку выделить.
+
+Я заметил, что в лекции было две различных связки функций чтения и записи в зависимости от версии ядра. Я добавил заголовочный файл, в котором разместил условия и макросы с объявлением структур обёрток для условной компиляции в зависимости от наличия поддержки структуры proc\_ops. Идею про дополнительный заголовочный файл подчерпнул на [сайте U-Boot](https://docs.u-boot-project.org/en/latest/develop/codingstyle.html#conditional-compilation).
+
+### Компиляция
+
+Чтобы задействовать дополнительный заголовочный файл, в *Makefile* была добавлена следующая директива:
+
+```
+ccflags-y += -I$(PWD)
+```
+
+Собственно компиляция:
+
+```
+$ make
+make -C /lib/modules/7.0.0-28-generic/build M=/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules modules
+make[1]: вход в каталог «/usr/src/linux-headers-7.0.0-28-generic»
+make[2]: вход в каталог «/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules»
+warning: the compiler differs from the one used to build the kernel
+  The kernel was built by: x86_64-linux-gnu-gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  You are using:           gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  CC [M]  module_proc_fs.o
+  MODPOST Module.symvers
+  LD [M]  module_proc_fs.ko
+  BTF [M] module_proc_fs.ko
+Skipping BTF generation for module_proc_fs.ko due to unavailability of vmlinux
+make[2]: выход из каталога «/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules»
+make[1]: выход из каталога «/usr/src/linux-headers-7.0.0-28-generic»
+```
+
+### Загрузка модуля
+
+```
+$ sudo insmod module_proc_fs.ko
+```
+
+Проверяем, что загрузилось:
+
+```
+$ ls -l /proc/module_proc_fs 
+-rw-rw-rw- 1 root root 0 июл 31 02:05 /proc/module_proc_fs
+
+$ sudo dmesg -T -k
+....
+....
+....
+[Пт июл 31 02:05:31 2026] module_proc_fs: loading out-of-tree module taints kernel.
+[Пт июл 31 02:05:31 2026] module_proc_fs: module verification failed: signature and/or required key missing - tainting kernel
+[Пт июл 31 02:05:31 2026] module_proc_fs: Модуль загружен
+```
+
+### Чтение из файла
+
+```
+$ tac /proc/module_proc_fs 
+Здравствуйте!
+```
+
+
+### Запись в файл
+
+```
+$ sudo echo "Здарова" > /proc/module_proc_fs
+$ tac /proc/module_proc_fs 
+Здарова
+```
+
+### Выгружаем модуль
+
+```
+$ sudo rmmod module_proc_fs
+
+$ sudo dmesg -T -k | tail -n3
+[Пт июл 31 02:16:04 2026] module_proc_fs: Модуль выгружен
+....
+```
+
+![Модуль работает](module_proc_fs.png)
+
+
+&nbsp;
+
+&nbsp;
 
