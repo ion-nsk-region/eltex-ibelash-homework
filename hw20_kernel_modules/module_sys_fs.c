@@ -20,10 +20,11 @@ static struct kobject *DIR_PTR = NULL;
 static ssize_t read_from_sys_fs(struct kobject *kobj,
                                 struct kobj_attribute *attr, char __user *buf) {
   ssize_t bytes_read, a_string_length = strnlen(a_string, MAX_STR_SIZE - 1);
+  loff_t pos = 0;  // всегда читаем с начала строки
 
   read_lock(&lock);
-  bytes_read =
-      simple_read_from_buffer(buf, MAX_STR_SIZE, 0, a_string, a_string_length);
+  bytes_read = simple_read_from_buffer(buf, MAX_STR_SIZE, &pos, a_string,
+                                       a_string_length);
   read_unlock(&lock);
 
   return bytes_read;
@@ -33,11 +34,13 @@ static ssize_t write_to_sys_fs(struct kobject *kobj,
                                struct kobj_attribute *attr,
                                const char __user *buf, size_t size) {
   ssize_t bytes_written;
+  loff_t pos = 0;
 
   if (MAX_STR_SIZE < size) return -EINVAL;
 
   write_lock(&lock);
-  bytes_written = simple_write_to_buffer(a_string, MAX_STR_SIZE, 0, buf, size);
+  bytes_written =
+      simple_write_to_buffer(a_string, MAX_STR_SIZE, &pos, buf, size);
   if ('\n' == *(a_string + size - 1)) {
     *(a_string + size - 1) = '\0';
   } else {
