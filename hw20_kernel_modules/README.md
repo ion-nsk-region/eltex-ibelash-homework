@@ -355,3 +355,151 @@ $ sudo dmesg -T -k | tail -n3
 
 &nbsp;
 
+## Модуль с обменом информацией через sys\_fs
+
+[Получившийся исходный код модуля](module_sys_fs.c)
+
+### Компиляция
+
+Добавил в *Makefile* проверку `cppcheck` и получил следующие предупреждения:
+
+```
+....
+Checking module_sys_fs.c ...
+4/4 files checked 100% done
+module_proc_fs.c:59:0: style: The function 'init_module' is never used. [unusedFunction]
+int init_module(void) {
+^
+module_proc_fs.c:77:0: style: The function 'cleanup_module' is never used. [unusedFunction]
+void cleanup_module(void) {
+^
+....
+```
+
+Аналогичные предупреждения были и для всех предыдущих модулей. 
+Так как функции `init_module` и `cleanup_module` не рекомендуются к
+использованию начиная с версии ядра 2.3.13, а с версии 6.15.3 вообще
+объявлены устаревшими и прерывают компиляцию на x86 с IBT, то я решил
+заменить их на рекомендованные макросы `module_init` и `module_exit`
+во всех модулях.
+Источники информации:
+https://sysprog21.github.io/lkmpg/#hello-and-goodbye
+https://github.com/torvalds/linux/commit/4fab2d76
+
+После изменений компиляция прошла успешно:
+
+```
+$ make
+clang-format -i --style=Google module_dev.c module_pr_info.c module_proc_fs.c module_sys_fs.c
+cppcheck --enable=all --suppress=missingIncludeSystem module_dev.c module_pr_info.c module_proc_fs.c module_sys_fs.c
+Checking module_dev.c ...
+1/4 files checked 45% done
+Checking module_pr_info.c ...
+2/4 files checked 52% done
+Checking module_proc_fs.c ...
+3/4 files checked 74% done
+Checking module_sys_fs.c ...
+4/4 files checked 100% done
+nofile:0:0: information: Active checkers: 106/592 (use --checkers-report=<filename> to see details) [checkersReport]
+
+make -C /lib/modules/7.0.0-28-generic/build M=/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules C=2 modules
+make[1]: вход в каталог «/usr/src/linux-headers-7.0.0-28-generic»
+make[2]: вход в каталог «/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules»
+/usr/src/linux-headers-7.0.0-28-generic/Makefile:1216: C=2 specified, but sparse is not available or not up to date
+warning: the compiler differs from the one used to build the kernel
+  The kernel was built by: x86_64-linux-gnu-gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  You are using:           gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  CC [M]  module_sys_fs.o
+  MODPOST Module.symvers
+  CC [M]  module_sys_fs.mod.o
+  LD [M]  module_sys_fs.ko
+  BTF [M] module_sys_fs.ko
+Skipping BTF generation for module_sys_fs.ko due to unavailability of vmlinux
+make[2]: выход из каталога «/home/user/Documents/programming_practice/eltex-ibelash-homework/hw20_kernel_modules»
+make[1]: выход из каталога «/usr/src/linux-headers-7.0.0-28-generic»
+```
+
+
+### Загрузка модуля
+
+Загрузка модуля прошла успешно:
+
+```
+$ sudo insmod module_sys_fs.ko 
+[sudo] пароль для user: 
+
+$ lsmod
+Module                  Size  Used by
+module_sys_fs          12288  0
+....
+
+$ ls -l /sys/kernel/module_sys_fs/a_string 
+-rw-r--r-- 1 root root 4096 авг  6 20:55 /sys/kernel/module_sys_fs/a_string
+
+$ sudo dmesg -T -k
+[sudo] пароль для user:
+....
+....
+....
+[Чт авг  6 20:54:54 2026] module_sys_fs: loading out-of-tree module taints kernel.
+[Чт авг  6 20:54:54 2026] module_sys_fs: module verification failed: signature and/or required key missing - tainting kernel
+[Чт авг  6 20:54:54 2026] module_sys_fs: Модуль загружен
+....
+```
+
+### Чтение из файла - Попытка №1
+
+А вот чтение не удалось:
+
+```
+$ cat /sys/kernel/module_sys_fs/a_string 
+Убито
+
+$ head /sys/kernel/module_sys_fs/a_string 
+Убито
+
+$ sudo dmesg -T -k | tail -n20
+[Чт авг  6 20:55:41 2026]  </TASK>
+[Чт авг  6 20:55:41 2026] Modules linked in: module_sys_fs(OE) snd_seq_dummy snd_hrtimer qrtr snd_hda_codec_intelhdmi snd_hda_codec_hdmi intel_rapl_msr intel_rapl_common x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel cmdlinepart spi_nor kvm mtd at24 irqbypass ghash_clmulni_intel i2c_i801 snd_hda_codec_alc882 snd_hda_codec_realtek_lib aesni_intel rapl spi_intel_platform snd_hda_codec_generic i2c_smbus snd_hda_intel sunrpc binfmt_misc mei_hdcp mei_pxp spi_intel intel_cstate i2c_mux snd_usb_audio snd_hda_codec snd_hda_core snd_usbmidi_lib gspca_zc3xx snd_intel_dspcfg snd_ump snd_intel_sdw_acpi gspca_main videobuf2_vmalloc snd_hwdep videobuf2_memops snd_seq_midi i915 snd_seq_midi_event snd_pcm videobuf2_v4l2 lpc_ich snd_rawmidi videobuf2_common mei_me videodev snd_seq mei drm_buddy snd_seq_device ttm snd_timer drm_display_helper cec rc_core i2c_algo_bit tpm_infineon snd soundcore mc input_leds mac_hid serio_raw sch_fq_codel msr parport_pc ppdev lp parport efi_pstore nfnetlink dmi_sysfs ip_tables x_tables autofs4 btrfs
+[Чт авг  6 20:55:41 2026]  libblake2b xor raid6_pq hid_plantronics hid_generic usbhid hid e1000e ahci video libahci wmi
+[Чт авг  6 20:55:41 2026] CR2: 0000000000000000
+[Чт авг  6 20:55:41 2026] ---[ end trace 0000000000000000 ]---
+[Чт авг  6 20:55:41 2026] RIP: 0010:simple_read_from_buffer+0x12/0xd0
+[Чт авг  6 20:55:41 2026] Code: 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 55 48 89 e5 41 57 41 56 41 55 41 54 53 <4c> 8b 22 4d 85 e4 0f 88 9d 00 00 00 4d 39 c4 73 71 48 85 f6 74 6c
+[Чт авг  6 20:55:41 2026] RSP: 0018:ffffd1f6e5373b90 EFLAGS: 00010246
+[Чт авг  6 20:55:41 2026] RAX: 0000000000000000 RBX: 0000000000000019 RCX: ffffffffc11650a0
+[Чт авг  6 20:55:41 2026] RDX: 0000000000000000 RSI: 000000000000001e RDI: ffff8c40499e0000
+[Чт авг  6 20:55:41 2026] RBP: ffffd1f6e5373bb8 R08: 0000000000000019 R09: 0000000000000000
+[Чт авг  6 20:55:41 2026] R10: 0000000000000000 R11: 0000000000000000 R12: ffff8c40499e0000
+[Чт авг  6 20:55:41 2026] R13: ffff8c404aaa5480 R14: ffff8c41ce76bfc0 R15: ffff8c404b2c8960
+[Чт авг  6 20:55:41 2026] FS:  000075f33524a740(0000) GS:ffff8c43d1fe3000(0000) knlGS:0000000000000000
+[Чт авг  6 20:55:41 2026] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[Чт авг  6 20:55:41 2026] CR2: 0000000000000000 CR3: 0000000280e1c006 CR4: 00000000001726f0
+[Чт авг  6 20:55:41 2026] note: head[41808] exited with irqs disabled
+[Чт авг  6 20:55:41 2026] note: head[41808] exited with preempt_count 1
+```
+
+### Почему "Убито"?
+
+В `dmesg` обнаружил следующие сообщения:
+
+```
+[Чт авг  6 20:55:41 2026] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[Чт авг  6 20:55:41 2026] #PF: supervisor read access in kernel mode
+[Чт авг  6 20:55:41 2026] #PF: error_code(0x0000) - not-present page
+[Чт авг  6 20:55:41 2026] PGD 0 P4D 0 
+[Чт авг  6 20:55:41 2026] Oops: Oops: 0000 [#2] SMP PTI
+[Чт авг  6 20:55:41 2026] CPU: 0 UID: 1000 PID: 41808 Comm: head Tainted: G      D    OE       7.0.0-28-generic #28~24.04.1-Ubuntu PREEMPT(lazy) 
+[Чт авг  6 20:55:41 2026] Tainted: [D]=DIE, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[Чт авг  6 20:55:41 2026] Hardware name: DEPO Computers To be filled by O.E.M./Q87M-D2H, BIOS F7 01/17/2014
+[Чт авг  6 20:55:41 2026] RIP: 0010:simple_read_from_buffer+0x12/0xd0
+```
+
+
+
+### Чтение из файла - Попытка №2
+
+### Запись в файл
+
+### Выгружаем модуль
+

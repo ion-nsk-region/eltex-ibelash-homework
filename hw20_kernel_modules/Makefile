@@ -1,6 +1,7 @@
 obj-m +=module_pr_info.o
 obj-m +=module_dev.o
 obj-m +=module_proc_fs.o
+obj-m +=module_sys_fs.o
 
 # Добавляем заголовочные файлы из текущей директории
 ccflags-y += -I$(PWD)
