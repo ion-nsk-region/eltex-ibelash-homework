@@ -10,7 +10,7 @@ SRCS := $(filter-out %.mod.c, $(wildcard *.c))
 all: code_check build_modules
 
 code_check: $(SRCS)
-	clang-format -n --style=Google $^
+	clang-format -i --style=Google $^
 	-cppcheck --enable=all --suppress=missingIncludeSystem $^
 
 build_modules:

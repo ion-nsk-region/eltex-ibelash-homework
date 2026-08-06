@@ -66,10 +66,7 @@ static ssize_t write_to_dev(struct file *fd, const char __user *buff,
 }
 
 static struct file_operations fops = {
-    .owner = THIS_MODULE, 
-    .read = read_from_dev, 
-    .write = write_to_dev
-};
+    .owner = THIS_MODULE, .read = read_from_dev, .write = write_to_dev};
 
 // подсмотрено в ./fs/pstore/pmsg.c
 static char *device_class_devnode(const struct device *dev, umode_t *mode) {
@@ -79,8 +76,8 @@ static char *device_class_devnode(const struct device *dev, umode_t *mode) {
   return NULL;
 }
 
-int init_module(void) {
-  int err = 0;
+static int __init module_dev_init(void) {
+  int err;
   rwlock_init(&lock);
 
   major_number = register_chrdev(major_number, DEVICE_NAME, &fops);
@@ -134,10 +131,13 @@ err_chrdev:
   return err;
 }
 
-void cleanup_module(void) {
+static void __exit module_dev_exit(void) {
   device_destroy(device_class, MKDEV(major_number, 0));
   class_destroy(device_class);
   unregister_chrdev(major_number, DEVICE_NAME);
 
   pr_info("Модуль выгружен\n");
 }
+
+module_init(module_dev_init);
+module_exit(module_dev_exit);
