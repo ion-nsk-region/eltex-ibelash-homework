@@ -506,11 +506,64 @@ $ sudo dmesg -T -k | tail -n20
   loff_t pos = 0;  // всегда читаем с начала строки
 ```
 
-указатель на которую передаётся параметром в `simple_read_from_buffer`.
 
 ### Чтение из файла - Попытка №2
 
+Скомпилировал, подключил модуль, и ошибка изменилась:
+
+```
+$ head /sys/kernel/module_sys_fs/a_string
+head: ошибка чтения '/sys/kernel/module_sys_fs/a_string': Неправильный адрес
+```
+
+То есть errno = 14 или EFAULT (Bad address).
+
+`dmesg` в этот раз молчит - отображается только сообщение, которое я добавил для отладки:
+
+```
+$ sudo dmesg -T -k -w
+[sudo] пароль для user:
+....
+....
+[Пт авг  7 19:25:29 2026] module_sys_fs: Модуль загружен
+
+[Пт авг  7 19:25:41 2026] module_sys_fs: DEBUG: buf 000000000237d4d5, a_string 000000009add9db2
+
+```
+
+В логах тоже ничего не отображается кроме отладочного сообщения:
+
+```
+$ tail -fn0 /var/log/*
+....
+....
+
+==> /var/log/kern.log <==
+2026-08-07T19:43:42.689353+07:00 oboltus-depo kernel: module_sys_fs: DEBUG: buf 0000000006ee9dc0, a_string 000000009add9db2
+
+==> /var/log/syslog <==
+2026-08-07T19:43:42.689353+07:00 oboltus-depo kernel: module_sys_fs: DEBUG: buf 0000000006ee9dc0, a_string 000000009add9db2
+^C
+```
+
+Я поэкспериментировал ещё немного и ... 
+
+### Чтение из файла - Попытка №3
+
+и махнул на это рукой - заменил `simple_read_from_buffer` на `sysfs_emit` по образцу из примеров в исходниках ядра (_samples/kobject/kobject-example.c_). 
+
+В этот раз успешно прочиталось:
+
+```
+$ sudo insmod module_sys_fs.ko
+
+$ head /sys/kernel/module_sys_fs/a_string 
+Здравствуйте!
+```
+
 ### Запись в файл
+
+
 
 ### Выгружаем модуль
 
