@@ -29,16 +29,21 @@ static ssize_t read_from_sys_fs(struct kobject *kobj,
 }
 
 static ssize_t write_to_sys_fs(struct kobject *kobj,
-                               struct kobj_attribute *attr,
-                               const char __user *buf, size_t size) {
+                               struct kobj_attribute *attr, const char *buf,
+                               size_t size) {
   ssize_t bytes_written;
   loff_t pos = 0;
 
   if (MAX_STR_SIZE < size) return -EINVAL;
 
+  pr_info("a_string %px, buf %px\n", a_string, buf);
+
   write_lock(&lock);
   bytes_written =
       simple_write_to_buffer(a_string, MAX_STR_SIZE, &pos, buf, size);
+  if (0 > bytes_written) {
+    pr_err("Ошибка записи: %pe\n", ERR_PTR(bytes_written));
+  }
   if ('\n' == *(a_string + size - 1)) {
     *(a_string + size - 1) = '\0';
   } else {
