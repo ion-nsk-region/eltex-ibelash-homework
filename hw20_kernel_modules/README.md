@@ -630,4 +630,4 @@ $ sudo dmesg -T -k | tail -n1
 
 Успешно!
 
-[!Модуль sys\_fs работает](module_sys_fs.png)
+![Модуль sys\_fs работает](module_sys_fs.png)
