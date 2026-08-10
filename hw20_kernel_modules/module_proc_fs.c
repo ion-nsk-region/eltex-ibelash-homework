@@ -39,8 +39,6 @@ static ssize_t write_to_proc_fs(struct file *fd, const char __user *buf,
 
   if (MAX_STR_SIZE < size) return -EINVAL;
 
-  pr_info("a_string %px, buf %px\n", a_string, buf);
-
   write_lock(&lock);
   bytes_written =
       simple_write_to_buffer(a_string, MAX_STR_SIZE, offset, buf, size);

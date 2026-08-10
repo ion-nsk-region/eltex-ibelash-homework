@@ -550,7 +550,7 @@ $ tail -fn0 /var/log/*
 
 ### Чтение из файла - Попытка №3
 
-и махнул на это рукой - заменил `simple_read_from_buffer` на `sysfs_emit` по образцу из примеров в исходниках ядра (_samples/kobject/kobject-example.c_). 
+... и махнул на это рукой - заменил `simple_read_from_buffer` на `sysfs_emit` по образцу из примеров в исходниках ядра (_samples/kobject/kobject-example.c_). 
 
 В этот раз успешно прочиталось:
 
@@ -578,6 +578,56 @@ echo: ошибка записи: Неправильный адрес
 
 Я предполагаю, что `simple_write_to_buffer` (и `simple_read_from_buffer`) под буфером подразумевают кусок памяти в юзерспейсе, тогда как sysfs работает только с кусками памяти в пространстве ядра.   
 
+Для подтверждения гипотезы добавил вывод адресов буфера и строки в этот и предыдущий модули. Предыдущий модуль, где `simple_{read_from|write_to}_buffer` работают, показал адрес буфера начинающийся с нулей, тогда как в модуле sys\_fs и буфер и "файл" находятся ближе - оба адреса начинаются с ffff:
+
+```
+[Сб авг  8 17:23:31 2026] module_sys_fs: a_string ffffffffc13180a0, buf ffff8b07ccc466e0
+[Сб авг  8 17:23:31 2026] module_sys_fs: Ошибка записи: -EFAULT
+[Сб авг  8 17:24:16 2026] module_proc_fs: a_string ffffffffc1320030, buf 0000567dc0c052c0
+```
+
+В общем, как и с чтением...
+
+### Запись в файл - Попытка №2
+
+... я снова махнул на это рукой и заменил `simple_write_to_buffer` на `strscpy`.
+
+Выбор пал на `strscpy` потому что эта функция [рекомендуется аж три раза](https://www.kernel.org/doc/html/v7.0/process/deprecated.html#strcpy) для замены `strcpy`, `strncpy`, и `strlcpy`.
+
+Скомпилировал, подключил модуль, переключился на root\`а, записал успешно:
+
+```
+$ sudo su root
+[sudo] пароль для user:
+
+# cat /sys/kernel/module_sys_fs/a_string
+Здравствуйте!
+
+# echo "Hello!" > /sys/kernel/module_sys_fs/a_string
+
+# cat /sys/kernel/module_sys_fs/a_string
+Hello!
+```
+
+Проверил обработку переполнения строки:
+
+```
+# echo "привет приветушки!" > /sys/kernel/module_sys_fs/a_string
+bash: echo: ошибка записи: Слишком длинный список аргументов
+
+# cat /sys/kernel/module_sys_fs/a_string
+привет привету�
+```
 
 ### Выгружаем модуль
 
+```
+$ sudo rmmod module_sys_fs
+
+$ sudo dmesg -T -k | tail -n1
+[Пн авг 10 21:36:20 2026] module_sys_fs: Модуль выгружен
+```
+
+Успешно!
+
+[!Модуль sys\_fs работает](module_sys_fs.png)

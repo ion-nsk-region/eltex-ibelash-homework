@@ -32,15 +32,11 @@ static ssize_t write_to_sys_fs(struct kobject *kobj,
                                struct kobj_attribute *attr, const char *buf,
                                size_t size) {
   ssize_t bytes_written;
-  loff_t pos = 0;
-
-  if (MAX_STR_SIZE < size) return -EINVAL;
-
-  pr_info("a_string %px, buf %px\n", a_string, buf);
 
   write_lock(&lock);
-  bytes_written =
-      simple_write_to_buffer(a_string, MAX_STR_SIZE, &pos, buf, size);
+
+  bytes_written = strscpy(a_string, buf, (MAX_STR_SIZE - 1));
+
   if (0 > bytes_written) {
     pr_err("Ошибка записи: %pe\n", ERR_PTR(bytes_written));
   }
