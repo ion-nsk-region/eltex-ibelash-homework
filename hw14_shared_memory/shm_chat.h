@@ -1,6 +1,7 @@
 #ifndef SHM_CHAT_H
 #define SHM_CHAT_H
 
+#include <errno.h>
 #include <stdio.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
