@@ -7,9 +7,9 @@ int main(void) {
     char *msg = "Hi!";
     char *reply = NULL;
 
-    err = init_chat(&shm_addr);
-    if (0 != err) {
-        fprintf(stderr, "Ошибка: не удалось инициализировать чат. Код ошибки: %d\n", err);
+    shm_addr = init_chat();
+    if (NULL == shm_addr) {
+        fprintf(stderr, "Ошибка: не удалось инициализировать чат. См. подробности в stderr.\n");
     } else {
         send_msg(msg);
 
