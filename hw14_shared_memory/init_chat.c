@@ -1,12 +1,15 @@
+#include <unistd.h>
+
 #include "shm_chat.h"
 
 void *init_chat(void) {
   key_t key = ftok(SERVER_FILENAME, PROJ_ID);
   int perms = 0600;
   int flags = IPC_CREAT | perms;
+  long page_size = sysconf(_SC_PAGESIZE);
 
   errno = 0;
-  int shm_id = shmget(key, PAGE_SIZE, flags);
+  int shm_id = shmget(key, page_size, flags);
   if (-1 == shm_id) {
     perror("shmget");
     goto err_exit;
