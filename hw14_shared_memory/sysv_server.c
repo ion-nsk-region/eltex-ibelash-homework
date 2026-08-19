@@ -11,12 +11,14 @@ int main(void) {
     if (NULL == shm_addr) {
         fprintf(stderr, "Ошибка: не удалось инициализировать чат. См. подробности в stderr.\n");
     } else {
+            /*
         send_msg(msg);
 
         receive_msg(&reply);
         printf("%s\n", reply);
 
         cleanup(shm_addr);
+        */
     }
 
     return err;
