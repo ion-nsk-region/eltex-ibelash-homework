@@ -4,8 +4,10 @@ int main(void) {
     int err = 0;
     void *shm_addr = NULL;
 
+/*
     char *msg = "Hi!";
     char *reply = NULL;
+*/
 
     shm_addr = init_chat();
     if (NULL == shm_addr) {
@@ -16,9 +18,8 @@ int main(void) {
 
         receive_msg(&reply);
         printf("%s\n", reply);
-
-        cleanup(shm_addr);
         */
+        cleanup(shm_addr);
     }
 
     return err;

@@ -1,4 +1,4 @@
-#include <unistd.h>
+#include <unistd.h> // нам нужна sysconf для получения размера страницы памяти
 
 #include "shm_chat.h"
 
