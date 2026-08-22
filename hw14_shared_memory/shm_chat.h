@@ -19,11 +19,11 @@ union semun {
 };
 
 void *attach_shm_segment(int shm_id);
-void cleanup(void *shm_addr);
+void cleanup(int shm_id, void *shm_addr, int sem4_id);
 void destroy_semaphore(int sem4_id);
 void destroy_shm_segment(int shm_id);
 void detach_shm_segment(void *shm_addr);
-void *init_chat(void);
+int init_chat(int *shm_id, void **shm_addr, int *sem4_id);
 void receive_msg(char **reply);
 void send_msg(char *msg);
 
