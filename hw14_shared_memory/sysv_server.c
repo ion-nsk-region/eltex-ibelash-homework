@@ -7,9 +7,7 @@ int main(void) {
   void *shm_addr = NULL;
 
   char *msg = "Hi!";
-  /*
-      char *reply = NULL;
-  */
+  char *reply = NULL;
 
   err = init_chat(&shm_id, &shm_addr, &sem4_id);
   if (-1 == err || NULL == shm_addr) {
@@ -18,13 +16,13 @@ int main(void) {
         "Ошибка: не удалось инициализировать чат. См. подробности в stderr.\n");
   } else {
     send_msg(shm_addr, msg);
-    /*
+    set_state(sem4_id, SRV_MSG_SENT);
+    set_state(sem4_id, SRV_WAITING);
 
-receive_msg(shm_addr, &reply);
-printf("%s\n", reply);
-*/
-    sleep(10);
-    cleanup(shm_id, shm_addr, sem4_id);
+    receive_msg(shm_addr, &reply);
+    printf("%s\n", reply);
+    //    sleep(10);
+    cleanup(shm_id, shm_addr, sem4_id, reply);
   }
 
   return err;
