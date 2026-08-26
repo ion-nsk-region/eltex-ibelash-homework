@@ -37,7 +37,7 @@ void destroy_shm_segment(int shm_id);
 void detach_shm_segment(void *shm_addr);
 int init_chat(int *shm_id, void **shm_addr, int *sem4_id);
 int receive_msg(void *shm_addr, char **msg);
-int send_msg(void *shm_addr, char *msg);
+int send_msg(void *shm_addr, const char *msg);
 void set_state(int sem4_id, int value);
 
 #endif  // SHM_CHAT_H

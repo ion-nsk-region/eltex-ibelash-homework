@@ -1,6 +1,6 @@
 #include "shm_chat.h"
 
-int send_msg(void *shm_addr, char *msg) {
+int send_msg(void *shm_addr, const char *msg) {
   int err = 0;
 
   if (NULL == shm_addr || NULL == msg) {

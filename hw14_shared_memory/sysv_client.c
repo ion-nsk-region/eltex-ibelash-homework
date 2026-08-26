@@ -6,9 +6,6 @@ int main(void) {
   int err = 0, shm_id, sem4_id;
   void *shm_addr = NULL;
 
-  char *msg = NULL;
-  char *reply = "Hello!";
-
   key_t key = ftok(SERVER_FILENAME, PROJ_ID);
   errno = 0;
   shm_id = shmget(key, 1, 0);
@@ -35,13 +32,15 @@ int main(void) {
     goto exit;
   }
 
+  char *msg = NULL;
   set_state(sem4_id, CL_WAITING);
   receive_msg(shm_addr, &msg);
   printf("%s\n", msg);
+  free(msg);
+
+  const char *reply = "Hello!";
   send_msg(shm_addr, reply);
   set_state(sem4_id, CL_MSG_SENT);
-
-  free(msg);
 
 exit:
 

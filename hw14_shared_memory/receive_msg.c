@@ -10,7 +10,7 @@ int receive_msg(void *shm_addr, char **msg) {
   }
 
   if (0 == err) {
-    struct shm_msg *buf = shm_addr;
+    const struct shm_msg *buf = shm_addr;
     *msg = (char *)malloc(sizeof(char) * buf->msize);
     if (NULL == *msg) {
       err = errno;
