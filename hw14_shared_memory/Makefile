@@ -1,47 +1,24 @@
-ifndef BUILD_MODE
-    BUILD_MODE = Release
-endif
+BUILD_DIR = $(CURDIR)/build
+EX1_SYSV_DIR = ex1_sysv
+EX1_POSIX_DIR = ex1_posix
+EX2_DIR = ex2
 
-ifeq ($(BUILD_MODE), Release)
-        CFLAGS = -Wall -Wextra -Werror
-else ifeq ($(BUILD_MODE), Debug)
-        CFLAGS = -g -Wall -Wextra -Werror
-else ifeq ($(BUILD_MODE), Asan)
-        CFLAGS = -g -fsanitize=address -Wall -Wextra -Werror
-endif
+all: ex1_sysv ex1_posix ex2
 
-MAIN_SERVER = sysv_server
-MAIN_CLIENT = sysv_client
-LIB = libshm_chat.a
-SRCS = $(filter-out $(MAIN_SERVER).c $(MAIN_CLIENT).c, $(wildcard *.c))
-OBJ := $(SRCS:.c=.o)
+$(BUILD_DIR):
+	mkdir -p $@
 
-all: code_check $(MAIN_SERVER).exe $(MAIN_CLIENT).exe
+ex1_sysv: $(BUILD_DIR)
+	-$(MAKE) -C $(EX1_SYSV_DIR)
 
-server: $(MAIN_SERVER).exe
+ex1_posix: $(BUILD_DIR)
+	-$(MAKE) -C $(EX1_POSIX_DIR)
 
-client: $(MAIN_CLIENT).exe
-
-$(MAIN_SERVER).exe: $(MAIN_SERVER).c $(LIB)
-	@echo "\nСобираем исполняемый файл сервера. Флаги компиляции: $(CFLAGS)"
-	$(CC) $(CFLAGS) -o $@ $< -L. -l:$(LIB)
-
-$(MAIN_CLIENT).exe: $(MAIN_CLIENT).c $(LIB)
-	@echo "\nСобираем исполняемый файл клиента. Флаги компиляции: $(CFLAGS)"
-	$(CC) $(CFLAGS) -o $@ $< -L. -l:$(LIB)
-
-$(LIB): msg_lib $(LIB)($(OBJ))
-
-msg_lib:
-	@echo "\nСоздаём объектные файлы для статической библиотеки и собираем её."
-
-code_check: $(SRCS) $(MAIN_SERVER).c $(MAIN_CLIENT).c
-	-cppcheck --enable=all --suppress=missingIncludeSystem $^
-	#-clang-format -n --style=Google $^
-	clang-format -i --style=Google $^
+ex2: $(BUILD_DIR)
+	-$(MAKE) -C $(EX2_DIR)
 
 clean:
-	rm -vf *.exe *.c~ *.a *.o
+	find -name "*~" -delete
+	rm -rvf build
 
-.PHONY: all clean code_check msg_lib server client
-
+.PHONY: all ex1_sysv ex1_posix ex2 clean
