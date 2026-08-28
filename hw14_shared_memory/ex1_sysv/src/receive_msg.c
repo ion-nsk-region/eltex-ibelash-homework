@@ -11,12 +11,13 @@ int receive_msg(void *shm_addr, char **msg) {
 
   if (0 == err) {
     const struct shm_msg *buf = shm_addr;
-    *msg = (char *)malloc(sizeof(char) * buf->msize);
+    *msg = (char *)malloc(sizeof(char) * (buf->msize + 1));
     if (NULL == *msg) {
       err = errno;
       perror("malloc");
     } else {
-      strncpy(*msg, buf->mdata, buf->msize);
+      char *end = stpncpy(*msg, buf->mdata, buf->msize);
+      *end = '\0';
     }
   }
 

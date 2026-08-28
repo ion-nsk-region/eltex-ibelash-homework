@@ -50,6 +50,7 @@ code_check: $(SRCS) src/$(MAIN_SERVER).c src/$(MAIN_CLIENT).c
 
 clean:
 	rm -vf *.exe *.c~ *.a *.o
+	rm -vf $(BUILD_DIR)/$(MAIN_SERVER).exe $(BUILD_DIR)/$(MAIN_CLIENT).exe $(BUILD_DIR)/$(LIB)
 
 .PHONY: all clean code_check msg_lib server client
 
