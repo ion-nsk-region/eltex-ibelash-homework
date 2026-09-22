@@ -2,10 +2,13 @@
 #define SHM_CHAT_H
 
 #include <errno.h>
+#include <unistd.h>  // нам нужна sysconf для получения размера страницы памяти
+#include <fcntl.h> // определение констант флагов в shm_open
 #include <stdio.h>
 #include <string.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <sys/stat.h>
 
 #define SHM_FILENAME "/chat_shm_segment"
 
