@@ -4,7 +4,7 @@
 int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_id) {
   int perms = 0600;
   int flags = O_CREAT | O_RDWR;
-  long page_size = sysconf(_SC_PAGESIZE);
+  unsigned long page_size = sysconf(_SC_PAGESIZE);
 
   errno = 0;
   *shm_fd = shm_open(SHM_FILENAME, flags, perms);
@@ -13,13 +13,13 @@ int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_id) {
     goto err_exit;
   }
 
-  if (-1 == ftruncate(*shm_fd, page_size)) {
+  if (-1 == ftruncate(*shm_fd, (off_t)page_size)) {
     perror("ftruncate");
     goto destroy_shm_segment;
   }
 
-  *shm_addr = attach_shm_segment(*shm_fd, page_size);
-  if ((void *)-1 == *shm_addr) {
+  *shm_addr = attach_shm_segment(*shm_fd, (size_t)page_size);
+  if (MAP_FAILED == *shm_addr) {
     goto destroy_shm_segment;
   }
 

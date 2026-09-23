@@ -6,8 +6,8 @@
 #include <fcntl.h> // определение констант флагов в shm_open
 #include <stdio.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <sys/sem.h>
-#include <sys/shm.h>
 #include <sys/stat.h>
 
 #define SHM_FILENAME "/chat_shm_segment"
@@ -32,12 +32,12 @@ struct shm_msg {
     char mdata[];
 };
 
-void *attach_shm_segment(int shm_id);
-void cleanup(int shm_id, void *shm_addr, int sem4_id, char *reply);
+void *attach_shm_segment(int shm_fd, size_t shm_size);
+void cleanup(int shm_fd, void *shm_addr, int sem4_id, char *reply);
 void destroy_semaphore(int sem4_id);
-void destroy_shm_segment(int shm_id);
+void destroy_shm_segment(int shm_fd);
 void detach_shm_segment(void *shm_addr);
-int init_chat(int *shm_id, void **shm_addr, int *sem4_id);
+int init_chat(int *shm_fd, void **shm_addr, int *sem4_id);
 int receive_msg(void *shm_addr, char **msg);
 int send_msg(void *shm_addr, const char *msg);
 void set_state(int sem4_id, int value);
