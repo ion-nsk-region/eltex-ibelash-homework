@@ -24,27 +24,13 @@ int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_id) {
   }
 
   errno = 0;
-  *sem4_id = sem_open(SHM_FILENAME, flags);
+  *sem4_id = sem_open(SHM_FILENAME, O_CREAT, perms, 0);
   if (-1 == *sem4_id) {
-    perror("semget");
+    perror("sem_open");
     goto detach_shm_segment;
   }
 
-  // по идее, следующий код не нужен на Linux, так как семафоры там сразу
-  // инициализируются нулём. Но может понадобиться на других ОСях.
-  union semun arg;
-  arg.val = 0;
-  errno = 0;
-  int err = semctl(*sem4_id, 0, SETVAL, arg);
-  if (-1 == err) {
-    perror("init_chat > semctl");
-    goto destroy_semaphore;
-  }
-
   return 0;
-
-destroy_semaphore:
-  destroy_semaphore(*sem4_id);
 
 detach_shm_segment:
   detach_shm_segment(*shm_addr);
