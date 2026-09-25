@@ -33,10 +33,10 @@ int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_id) {
   return 0;
 
 detach_shm_segment:
-  detach_shm_segment(*shm_addr);
+  detach_shm_segment(*shm_addr, (size_t)page_size);
 
 destroy_shm_segment:
-  destroy_shm_segment(*shm_fd);
+  destroy_shm_segment(SHM_FILENAME);
 
 err_exit:
   return -1;

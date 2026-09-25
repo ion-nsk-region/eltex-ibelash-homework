@@ -1,8 +1,8 @@
 #include "shm_chat.h"
 
-void destroy_shm_segment(int shm_id) {
+void destroy_shm_segment(const char *shm_name) {
   errno = 0;
-  if (-1 == shmctl(shm_id, IPC_RMID, NULL)) {
-    perror("shmctl");
+  if (-1 == shm_unlink(shm_name)) {
+    perror("shm_unlink");
   }
 }
