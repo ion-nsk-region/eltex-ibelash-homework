@@ -3,10 +3,11 @@
 #include "shm_chat.h"
 
 int main(void) {
-  int err = 0, shm_fd, sem4_id;
+  int err = 0, shm_fd;
+  sem_t sem4_server, sem4_client;
   void *shm_addr = NULL;
 
-  err = init_chat(&shm_fd, &shm_addr, &sem4_id);
+  err = init_chat(&shm_fd, &shm_addr, &sem4_server, &sem4_client);
   if (-1 == err || NULL == shm_addr) {
     fprintf(
         stderr,
@@ -16,13 +17,13 @@ int main(void) {
     char *reply = NULL;
 
     send_msg(shm_addr, msg);
-    set_state(sem4_id, SRV_MSG_SENT);
-    set_state(sem4_id, SRV_WAITING);
+    notify_msg_sent(&sem4_client);
+    wait_for_msg(&sem4_server);
 
     receive_msg(shm_addr, &reply);
     printf("%s\n", reply);
     //    sleep(10);
-    cleanup(shm_fd, shm_addr, sem4_id, reply);
+    cleanup(shm_addr, &sem4_server, &sem4_client, reply);
   }
 
   return err;

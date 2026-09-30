@@ -4,13 +4,15 @@
 #include <errno.h>
 #include <unistd.h>  // нам нужна sysconf для получения размера страницы памяти
 #include <fcntl.h> // определение констант флагов в shm_open
+#include <semaphore.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
-#include <sys/sem.h>
 #include <sys/stat.h>
 
 #define SHM_FILENAME "/chat_shm_segment"
+#define SEM4_SERVER "/chat_sem4_server"
+#define SEM4_CLIENT "/chat_sem4_client"
 
 // константы для состояний синхронизации через семафор
 #define SRV_MSG_SENT 1
@@ -33,13 +35,14 @@ struct shm_msg {
 };
 
 void *attach_shm_segment(int shm_fd, size_t shm_size);
-void cleanup(int shm_fd, void *shm_addr, int sem4_id, char *reply);
-void destroy_semaphore(int sem4_id);
+void cleanup(void *shm_addr, sem_t *sem4_server, sem_t *sem4_client, char *reply);
+void destroy_semaphore(sem_t *sem4_id, const char *sem4_name);
 void destroy_shm_segment(const char *shm_name);
 void detach_shm_segment(void *shm_addr, size_t page_size);
-int init_chat(int *shm_fd, void **shm_addr, int *sem4_id);
+int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_server, sem_t *sem4_client);
+int notify_msg_sent(sem_t *sem4_id);
 int receive_msg(void *shm_addr, char **msg);
 int send_msg(void *shm_addr, const char *msg);
-void set_state(int sem4_id, int value);
+int wait_for_msg(sem_t *sem4_id);
 
 #endif  // SHM_CHAT_H

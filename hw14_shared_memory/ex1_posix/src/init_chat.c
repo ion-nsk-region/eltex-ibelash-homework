@@ -1,7 +1,7 @@
 
 #include "shm_chat.h"
 
-int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_id) {
+int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_server, sem_t *sem4_client) {
   int perms = 0600;
   int flags = O_CREAT | O_RDWR;
   unsigned long page_size = sysconf(_SC_PAGESIZE);
@@ -24,10 +24,17 @@ int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_id) {
   }
 
   errno = 0;
-  *sem4_id = sem_open(SHM_FILENAME, O_CREAT, perms, 0);
-  if (-1 == *sem4_id) {
+  sem4_server = sem_open(SEM4_SERVER, O_CREAT, perms, 0);
+  if (SEM_FAILED == sem4_server) {
     perror("sem_open");
     goto detach_shm_segment;
+  }
+
+  errno = 0;
+  sem4_client = sem_open(SEM4_CLIENT, O_CREAT, perms, 0);
+  if (SEM_FAILED == sem4_client) {
+    perror("sem_open");
+    goto destroy_sem4_server;
   }
 
   return 0;
@@ -37,6 +44,9 @@ detach_shm_segment:
 
 destroy_shm_segment:
   destroy_shm_segment(SHM_FILENAME);
+
+destroy_sem4_server:
+  destroy_semaphore(sem4_server, SEM4_SERVER);
 
 err_exit:
   return -1;

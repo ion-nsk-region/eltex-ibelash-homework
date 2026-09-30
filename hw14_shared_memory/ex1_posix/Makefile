@@ -12,8 +12,8 @@ else ifeq ($(BUILD_MODE), Asan)
         CFLAGS = $(COMMON_FLAGS) -g -fsanitize=address
 endif
 
-MAIN_SERVER = sysv_server
-MAIN_CLIENT = sysv_client
+MAIN_SERVER = posix_server
+MAIN_CLIENT = posix_client
 LIB = libshm_chat.a
 SRCS = $(filter-out src/$(MAIN_SERVER).c src/$(MAIN_CLIENT).c, $(wildcard src/*.c))
 OBJ := $(SRCS:.c=.o)

@@ -1,10 +1,15 @@
 #include "shm_chat.h"
 
-void destroy_semaphore(int sem4_id) {
-  union semun dummy;
+void destroy_semaphore(sem_t *sem4_id, const char *sem4_name) {
   errno = 0;
-  int err = semctl(sem4_id, 0, IPC_RMID, dummy);
+  int err = sem_close(sem4_id);
   if (-1 == err) {
-    perror("destroy_semaphore > semctl");
+    perror("destroy_semaphore > sem_close");
+  }
+
+  errno = 0;
+  err = sem_unlink(sem4_name);
+  if (-1 == err) {
+    perror("destroy_semaphore > sem_unlink");
   }
 }
