@@ -36,10 +36,12 @@ struct shm_msg {
 
 void *attach_shm_segment(int shm_fd, size_t shm_size);
 void cleanup(void *shm_addr, sem_t *sem4_server, sem_t *sem4_client, char *reply);
+int close_semaphore(sem_t *sem4_id);
 void destroy_semaphore(sem_t *sem4_id, const char *sem4_name);
 void destroy_shm_segment(const char *shm_name);
 void detach_shm_segment(void *shm_addr, size_t page_size);
-int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_server, sem_t *sem4_client);
+int init_chat(void **shm_addr, sem_t *sem4_server, sem_t *sem4_client);
+int init_client(void **shm_addr, sem_t *sem4_server, sem_t *sem4_client);
 int notify_msg_sent(sem_t *sem4_id);
 int receive_msg(void *shm_addr, char **msg);
 int send_msg(void *shm_addr, const char *msg);

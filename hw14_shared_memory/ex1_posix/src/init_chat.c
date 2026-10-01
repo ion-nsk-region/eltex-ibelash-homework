@@ -1,24 +1,24 @@
 
 #include "shm_chat.h"
 
-int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_server, sem_t *sem4_client) {
+int init_chat(void **shm_addr, sem_t *sem4_server, sem_t *sem4_client) {
   int perms = 0600;
   int flags = O_CREAT | O_RDWR;
   unsigned long page_size = sysconf(_SC_PAGESIZE);
 
   errno = 0;
-  *shm_fd = shm_open(SHM_FILENAME, flags, perms);
-  if (-1 == *shm_fd) {
+  int shm_fd = shm_open(SHM_FILENAME, flags, perms);
+  if (-1 == shm_fd) {
     perror("shm_open");
     goto err_exit;
   }
 
-  if (-1 == ftruncate(*shm_fd, (off_t)page_size)) {
+  if (-1 == ftruncate(shm_fd, (off_t)page_size)) {
     perror("ftruncate");
     goto destroy_shm_segment;
   }
 
-  *shm_addr = attach_shm_segment(*shm_fd, (size_t)page_size);
+  *shm_addr = attach_shm_segment(shm_fd, (size_t)page_size);
   if (MAP_FAILED == *shm_addr) {
     goto destroy_shm_segment;
   }
