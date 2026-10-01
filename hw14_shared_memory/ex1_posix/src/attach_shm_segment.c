@@ -11,5 +11,11 @@ void *attach_shm_segment(int shm_fd, size_t shm_size) {
     perror("mmap");
   }
 
+  errno = 0;
+  int err = close(shm_fd);
+  if (-1 == err) {
+    perror("attach_shm_segment > close");
+  }
+
   return shm_addr;
 }
