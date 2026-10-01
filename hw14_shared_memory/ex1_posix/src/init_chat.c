@@ -39,14 +39,14 @@ int init_chat(int *shm_fd, void **shm_addr, sem_t *sem4_server, sem_t *sem4_clie
 
   return 0;
 
+destroy_sem4_server:
+  destroy_semaphore(sem4_server, SEM4_SERVER);
+
 detach_shm_segment:
   detach_shm_segment(*shm_addr, (size_t)page_size);
 
 destroy_shm_segment:
   destroy_shm_segment(SHM_FILENAME);
-
-destroy_sem4_server:
-  destroy_semaphore(sem4_server, SEM4_SERVER);
 
 err_exit:
   return -1;
