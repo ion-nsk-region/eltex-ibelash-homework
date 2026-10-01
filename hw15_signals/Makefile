@@ -17,7 +17,7 @@ EX1_DIR = ex_1
 EX2_DIR = ex_2
 EX3_DIR = ex_3
 
-all: code_check ex_1
+all: code_check ex_1 ex_2 ex_3
 
 ex_1: $(BUILD_DIR) receiver1 sender
 
