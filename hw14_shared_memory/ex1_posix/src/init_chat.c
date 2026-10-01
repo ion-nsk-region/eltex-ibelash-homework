@@ -1,7 +1,7 @@
 
 #include "shm_chat.h"
 
-int init_chat(void **shm_addr, sem_t *sem4_server, sem_t *sem4_client) {
+int init_chat(void **shm_addr, sem_t **sem4_server, sem_t **sem4_client) {
   int perms = 0600;
   int flags = O_CREAT | O_RDWR;
   unsigned long page_size = sysconf(_SC_PAGESIZE);
@@ -24,15 +24,15 @@ int init_chat(void **shm_addr, sem_t *sem4_server, sem_t *sem4_client) {
   }
 
   errno = 0;
-  sem4_server = sem_open(SEM4_SERVER, O_CREAT, perms, 0);
-  if (SEM_FAILED == sem4_server) {
+  *sem4_server = sem_open(SEM4_SERVER, O_CREAT, perms, 0);
+  if (SEM_FAILED == *sem4_server) {
     perror("sem_open");
     goto detach_shm_segment;
   }
 
   errno = 0;
-  sem4_client = sem_open(SEM4_CLIENT, O_CREAT, perms, 0);
-  if (SEM_FAILED == sem4_client) {
+  *sem4_client = sem_open(SEM4_CLIENT, O_CREAT, perms, 0);
+  if (SEM_FAILED == *sem4_client) {
     perror("sem_open");
     goto destroy_sem4_server;
   }
@@ -40,7 +40,7 @@ int init_chat(void **shm_addr, sem_t *sem4_server, sem_t *sem4_client) {
   return 0;
 
 destroy_sem4_server:
-  destroy_semaphore(sem4_server, SEM4_SERVER);
+  destroy_semaphore(*sem4_server, SEM4_SERVER);
 
 detach_shm_segment:
   detach_shm_segment(*shm_addr, (size_t)page_size);
