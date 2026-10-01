@@ -22,6 +22,8 @@ int main(void) {
     const char *reply = "Hello!";
     send_msg(shm_addr, reply);
     notify_msg_sent(sem4_server);
+
+    cleanup_client(sem4_server, sem4_client);
   }
 
   return err;

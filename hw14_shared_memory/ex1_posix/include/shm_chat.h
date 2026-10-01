@@ -36,6 +36,7 @@ struct shm_msg {
 
 void *attach_shm_segment(int shm_fd, size_t shm_size);
 void cleanup(void *shm_addr, sem_t *sem4_server, sem_t *sem4_client, char *reply);
+void cleanup_client(sem_t *sem4_server, sem_t *sem4_client);
 int close_semaphore(sem_t *sem4_id);
 void destroy_semaphore(sem_t *sem4_id, const char *sem4_name);
 void destroy_shm_segment(const char *shm_name);

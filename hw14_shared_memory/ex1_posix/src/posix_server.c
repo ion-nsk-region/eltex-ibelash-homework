@@ -22,7 +22,6 @@ int main(void) {
 
     receive_msg(shm_addr, &reply);
     printf("%s\n", reply);
-    //    sleep(10);
     cleanup(shm_addr, sem4_server, sem4_client, reply);
   }
 
