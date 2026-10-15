@@ -2,22 +2,9 @@
 
 int main(void) {
   int err = 0;
-  char *server_mq_name = SERVER_MQ_NAME;
-  int server_mq_id = -1, client_mq_id = -1;
   pthread_t server_queue_handler_tid;
 
-  // очередь для чтения входящих сообщений от клиентов и общения с самим собой
-  if (0 != (err = create_mq(server_mq_name, &server_mq_id))) {
-    fprintf(stderr,
-            "Ошибка: не удалось создать очередь для обработки "
-            "сообщений от клиентов. См. подробности в stderr.\n");
-  }
-  // очередь для исходящих сообщений для клиентов
-  if (0 != (err = create_mq(CLIENT_MQ_NAME, &client_mq_id))) {
-    fprintf(stderr,
-            "Ошибка: не удалось создать очередь для исходящих "
-            "сообщений для клиентов. См. подробности в stderr.\n");
-  }
+  err = init_chat();
 
   // создаём поток для обработки сообщений от клиентов
   if (0 == err &&
