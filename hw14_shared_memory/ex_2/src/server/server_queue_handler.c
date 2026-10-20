@@ -1,42 +1,19 @@
 #include "server.h"
 
-void *server_queue_handler(void **shm_msg_addr) {
+void *server_queue_handler(void *input_shm_addr) {
   int err = 0, is_running = 1, n_users = 0;
-  int server_mq_id = -1, client_mq_id = -1;
-  struct chat_msg *msg = NULL;
-  struct chat_msg history[MAX_HISTORY_SIZE] = {};
+  struct chat_msg *history = NULL;
   int last_msg_id = MAX_HISTORY_SIZE - 1;
   struct user *users = NULL;
   pid_t server_pid = getpid();
+  sem_t *data_updated, *count_reads;
 
-  err = connect2mq((char *)server_mq_name, &server_mq_id);
-  if (0 != err || 0 > server_mq_id) {
-    printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
-    is_running = 0;
-  }
-
-  err = connect2mq(CLIENT_MQ_NAME, &client_mq_id);
-  if (0 != err || 0 > client_mq_id) {
-    printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
-    is_running = 0;
-  }
-
-  // создаём список пользователей
-  if (0 == err) {
-    errno = 0;
-    users = malloc(MAX_CHAT_USERS * sizeof(struct user));
-    if (NULL == users) {
-      err = errno;
-      perror("malloc");
-      is_running = 0;
-    } else {
-      err = user_add(server_pid, "server", 6, users, &n_users);
-    }
-  }
+  err = init_chat(&input_shm_addr, &data_updated, &count_reads, &users, &history);
 
   if (0 != err) is_running = 0;
 
   while (is_running) {
+	  err = receive_msg(&input_shm_addr, )
     if (0 != (err = read_mq_msg(server_mq_id, 0, &msg))) {
       printf("Ошибка read_mq_msg: %d\n", err);
     } else {
@@ -49,7 +26,6 @@ void *server_queue_handler(void **shm_msg_addr) {
           clear_mq(CLIENT_MQ_NAME);
           struct chat_msg msg_quit = {server_pid, QUIT, NULL};
           msg_to_all(client_mq_id, msg_quit, users, n_users);
-          sleep(1);  // даём клиентам возможность прочитать сообщение о выходе
 
           is_running = 0;
         } else {

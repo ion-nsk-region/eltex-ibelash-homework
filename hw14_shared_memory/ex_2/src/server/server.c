@@ -3,11 +3,11 @@
 int main(void) {
   int err = 0;
   pthread_t server_queue_handler_tid;
-  void *shm_msg_addr = NULL;
+  void *input_shm_addr = NULL;
 
   // создаём поток для обработки сообщений от клиентов
   err = pthread_create(&server_queue_handler_tid, NULL, server_queue_handler,
-                       &shm_msg_addr);
+                       &input_shm_addr);
   if (0 != err) {
     fprintf(stderr,
             "Ошибка: не удалось создать поток для обработки входящих сообщений "
@@ -20,7 +20,7 @@ int main(void) {
     wait_for_quit();
 
     // отправляем сообщение потоку о выходе
-    server_queue_handler_exit(shm_msg_addr);
+    server_queue_handler_exit(input_shm_addr);
 
     void *status;
     err = pthread_join(server_queue_handler_tid, &status);
