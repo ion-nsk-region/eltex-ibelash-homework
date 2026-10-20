@@ -9,12 +9,13 @@ void *server_queue_handler(void **input_shm_addr) {
   pid_t server_pid = getpid();
   sem_t *data_updated, *count_reads;
 
-  err = init_chat(input_shm_addr, &data_updated, &count_reads, &users, &history);
+  err =
+      init_chat(input_shm_addr, &data_updated, &count_reads, &users, &history);
 
   if (0 != err) is_running = 0;
 
   while (is_running) {
-	err = receive_msg(input_shm_addr, &msg)
+    err = receive_msg(input_shm_addr, &msg);
     if (0 != err) {
       printf("Ошибка receive_msg: %d\n", err);
     } else {
@@ -24,13 +25,9 @@ void *server_queue_handler(void **input_shm_addr) {
     switch (msg->cmd) {
       case QUIT:
         if (msg->sender == server_pid) {
-          struct chat_msg msg_quit = {server_pid, QUIT, NULL};
-          history_update(msg_quit, history, &last_msg_id);
-
           is_running = 0;
         } else {
-          handle_disconnected_client(msg->sender, users,
-                                     &n_users);
+          handle_disconnected_client(msg->sender, users, &n_users);
         }
         break;
       case JOIN:
@@ -44,6 +41,7 @@ void *server_queue_handler(void **input_shm_addr) {
         printf("Получена неизвестная команда с кодом %d.\n", msg->cmd);
     }
 
+    history_update(msg, history, &last_msg_id);
     notify_about_update(&data_updated, n_users, &count_reads);
     /*
     // при изменении массива "commands" также необходимо изменить "enum
