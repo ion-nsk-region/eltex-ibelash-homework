@@ -1,6 +1,6 @@
 #include "server.h"
 
-void *server_queue_handler(void *server_mq_name) {
+void *server_queue_handler(void **shm_msg_addr) {
   int err = 0, is_running = 1, n_users = 0;
   int server_mq_id = -1, client_mq_id = -1;
   struct chat_msg *msg = NULL;

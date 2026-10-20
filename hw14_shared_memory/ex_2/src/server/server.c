@@ -3,13 +3,12 @@
 int main(void) {
   int err = 0;
   pthread_t server_queue_handler_tid;
-
-  err = init_chat();
+  void *shm_msg_addr = NULL;
 
   // создаём поток для обработки сообщений от клиентов
-  if (0 == err &&
-      0 != (err = pthread_create(&server_queue_handler_tid, NULL,
-                                 server_queue_handler, server_mq_name))) {
+  err = pthread_create(&server_queue_handler_tid, NULL, server_queue_handler,
+                       &shm_msg_addr);
+  if (0 != err) {
     fprintf(stderr,
             "Ошибка: не удалось создать поток для обработки входящих сообщений "
             "от клиентов:\n%s\n",
@@ -21,10 +20,11 @@ int main(void) {
     wait_for_quit();
 
     // отправляем сообщение потоку о выходе
-    server_queue_handler_exit(server_mq_id);
+    server_queue_handler_exit(shm_msg_addr);
 
     void *status;
-    if (0 == (err = pthread_join(server_queue_handler_tid, &status))) {
+    err = pthread_join(server_queue_handler_tid, &status);
+    if (0 == err) {
       int exit_code = (int)(intptr_t)status;
       if (0 != exit_code) {
         printf(
