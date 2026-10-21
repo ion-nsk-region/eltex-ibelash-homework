@@ -14,7 +14,8 @@ void *server_queue_handler(void **input_shm_addr) {
   if (0 != err) is_running = 0;
 
   while (is_running) {
-    err = receive_msg(*input_shm_addr, &msg) if (0 != err) {
+    err = receive_msg(input_shm_addr, &msg);
+    if (0 != err) {
       printf("Ошибка receive_msg: %d\n", err);
     }
 
