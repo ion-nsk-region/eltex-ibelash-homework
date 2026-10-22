@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "shm_chat.h"
 
 // очистка буферов, которые были выделены в прерываемых потоках.
 // Регистрировать с помощью pthread_cleanup_push

@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "shm_chat.h"
 
 char *pid_to_nick(struct user *users, int n_users, pid_t pid, int *free_nick) {
   char *nickname = NULL;

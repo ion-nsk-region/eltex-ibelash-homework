@@ -1,7 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "mq_chat.h"
+#include "shm_chat.h"
 
 int get_nickname(char *mtext, char *nickname, size_t *nickname_length);
 void handle_disconnected_client(int client_mq_id, pid_t client,

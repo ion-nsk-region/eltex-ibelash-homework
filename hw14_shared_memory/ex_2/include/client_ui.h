@@ -3,7 +3,7 @@
 
 #include <curses.h>
 
-#include "mq_chat.h"
+#include "shm_chat.h"
 
 #define MIN_MSG_INPUT_HEIGHT \
   3  // Минимальная высота поля (в строках) для ввода текста с учётом рамки

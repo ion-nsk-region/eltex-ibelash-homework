@@ -1,7 +1,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "mq_chat.h"
+#include "shm_chat.h"
 #include "client_ui.h"
 
 struct reader_args {

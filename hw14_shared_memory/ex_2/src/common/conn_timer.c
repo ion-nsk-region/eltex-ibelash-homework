@@ -1,4 +1,4 @@
-#include "mq_chat.h"
+#include "shm_chat.h"
 
 int conn_timer(int connection_timeout, int sleep_time, int n_attempts) {
   int err = 0;
