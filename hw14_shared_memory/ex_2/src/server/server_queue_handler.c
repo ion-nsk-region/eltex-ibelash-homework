@@ -6,7 +6,7 @@ void *server_queue_handler(void **input_shm_addr) {
   struct chat_msg *history = NULL;
   struct user *users = NULL;
   pid_t server_pid = getpid();
-  sem_t *data_updated, *count_reads;
+  sem_t *data_updated, *count_reads, *input_shm_updated;
 
   err =
       init_chat(input_shm_addr, &data_updated, &count_reads, &users, &history);
@@ -14,6 +14,7 @@ void *server_queue_handler(void **input_shm_addr) {
   if (0 != err) is_running = 0;
 
   while (is_running) {
+    wait_for_msg(input_shm_updated);
     err = receive_msg(input_shm_addr, &msg);
     if (0 != err) {
       printf("Ошибка receive_msg: %d\n", err);
