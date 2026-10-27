@@ -1,6 +1,20 @@
 #ifndef SHM_CHAT_H
 #define SHM_CHAT_H
 
+#define MAX_NICKNAME_LENGTH 256
+#define MAX_PID_STR_LENGTH 12 // размер строки для текстового представления pid
+#define MAX_CMD_STR_LENGTH 3 // размер строки для текстового представления номера комманды чата
+#define MAX_CHAT_USERS 20
+#define MAX_HISTORY_SIZE 100
+
+#define SHM_INPUT "/shm_input"
+#define SHM_HISTORY "/shm_history"
+#define SHM_USERS "/shm_users"
+#define SEM4_INPUT_UPDATED "/sem4_input_updated"
+#define SEM4_INPUT_READ "/sem4_input_read"
+#define SEM4_DATA_UPDATED "/sem4_data_updated"
+#define SEM4_COUNT_READS "/sem4_count_reads"
+
 enum chat_command { NO_COMMAND, //! пустые ячейки истории
                                 JOIN, QUIT, LIST, HISTORY, MSG };
 
@@ -13,7 +27,7 @@ struct chat_msg {
 
 struct user {
     pid_t pid;
-    char *nickname;
+    char nickname[MAX_NICKNAME_LENGTH]; // в отличие от предыдущей реализации, память уже выделена.
 }
 
 #endif // SHM_CHAT_H

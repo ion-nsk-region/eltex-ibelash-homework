@@ -1,65 +1,92 @@
-
 #include "shm_chat.h"
 
-int init_chat(void **shm_addr, sem_t **sem4_server, sem_t **sem4_client) {
-  int perms = 0600;
-  int flags = O_CREAT | O_RDWR;
-  unsigned long page_size = sysconf(_SC_PAGESIZE);
+int init_chat(void **shm_addr, sem_t **sem4_input_updated,
+              sem_t **sem4_input_read, struct user **users,
+              struct chat_msg **history, sem_t **sem4_data_updated,
+              sem_t **sem4_count_reads) {
+  size_t page_size = (size_t)sysconf(_SC_PAGESIZE);
 
-  errno = 0;
-  int shm_fd = shm_open(SHM_FILENAME, flags, perms);
-  if (-1 == shm_fd) {
-    perror("shm_open");
+  // input
+  *shm_addr = create_and_attach_shm_segment(SHM_INPUT, page_size);
+  if ((void *)-1 == *shm_addr) {
     goto err_exit;
+  } else if ((void *)-2 == *shm_addr) {
+    goto destroy_shm_input;
   }
 
-  if (-1 == ftruncate(shm_fd, (off_t)page_size)) {
-    perror("ftruncate");
-    goto destroy_shm_segment;
+  // users
+  *users = create_and_attach_shm_segment(SHM_USERS, page_size);
+  if ((void *)-1 == *users) {
+    goto detach_shm_input;
+  } else if ((void *)-2 == *users) {
+    goto destroy_shm_users;
+  }
+  
+  // history
+  *history = create_and_attach_shm_segment(SHM_HISTORY, page_size);
+  if ((void *)-1 == *history) {
+    goto detach_shm_users;
+  } else if ((void *)-2 == *history) {
+    goto destroy_shm_history;
   }
 
-  *shm_addr = attach_shm_segment(shm_fd, (size_t)page_size);
-  if (MAP_FAILED == *shm_addr) {
-    goto destroy_shm_segment;
+  // Семафоры
+  errno = 0;
+  *sem4_input_updated = sem_open(SEM4_INPUT_UPDATED, O_CREAT, perms, 0);
+  if (SEM_FAILED == *sem4_input_updated) {
+    perror("sem_open");
+    goto detach_shm_history;
   }
 
   errno = 0;
-  *sem4_server = sem_open(SEM4_SERVER, O_CREAT, perms, 0);
-  if (SEM_FAILED == *sem4_server) {
+  *sem4_input_read = sem_open(SEM4_INPUT_READ, O_CREAT, perms, 0);
+  if (SEM_FAILED == *sem4_input_read) {
     perror("sem_open");
-    goto detach_shm_segment;
+    goto destroy_sem4_input_updated;
   }
 
   errno = 0;
-  *sem4_client = sem_open(SEM4_CLIENT, O_CREAT, perms, 0);
-  if (SEM_FAILED == *sem4_client) {
+  *sem4_data_updated = sem_open(SEM4_DATA_UPDATED, O_CREAT, perms, 0);
+  if (SEM_FAILED == *sem4_data_updated) {
     perror("sem_open");
-    goto destroy_sem4_server;
+    goto destroy_sem4_input_read;
   }
 
-  // создаём список пользователей
-  if (0 == err) {
-    errno = 0;
-    users = malloc(MAX_CHAT_USERS * sizeof(struct user));
-    if (NULL == users) {
-      err = errno;
-      perror("malloc");
-      is_running = 0;
-    } else {
-      err = user_add(server_pid, "server", 6, users, &n_users);
-    }
+  errno = 0;
+  *sem4_count_reads = sem_open(SEM4_COUNT_READS, O_CREAT, perms, 0);
+  if (SEM_FAILED == *sem4_count_reads) {
+    perror("sem_open");
+    goto destroy_sem4_data_updated;
   }
+
 
   return 0;
 
-destroy_sem4_server:
-  destroy_semaphore(*sem4_server, SEM4_SERVER);
+// очистка ресурсов в случае ошибки
 
-detach_shm_segment:
-  detach_shm_segment(*shm_addr, (size_t)page_size);
+destroy_sem4_data_updated:
+  destroy_semaphore(*sem4_data_updated, SEM4_DATA_UPDATED);
 
-destroy_shm_segment:
-  destroy_shm_segment(SHM_FILENAME);
+destroy_sem4_input_read:
+  destroy_semaphore(*sem4_input_read, SEM4_INPUT_READ);
+
+destroy_sem4_input_updated:
+  destroy_semaphore(*sem4_input_updated, SEM4_INPUT_UPDATED);
+
+detach_shm_history:
+  detach_shm_segment(*history, page_size);
+destroy_shm_history:
+  destroy_shm_segment(SHM_HISTORY);
+
+detach_shm_users:
+  detach_shm_segment(*users, page_size);
+destroy_shm_users:
+  destroy_shm_segment(SHM_USERS);
+
+detach_shm_input:
+  detach_shm_segment(*shm_addr, page_size);
+destroy_shm_input:
+  destroy_shm_segment(SHM_INPUT);
 
 err_exit:
   return -1;
