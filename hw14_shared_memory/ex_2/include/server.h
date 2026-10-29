@@ -2,29 +2,26 @@
 #define SERVER_H
 
 #include "shm_chat.h"
+#include "common.h"
 
+void *create_and_attach_shm_segment(const char *shm_name, size_t shm_size);
 int get_nickname(char *mtext, char *nickname, size_t *nickname_length);
-void handle_disconnected_client(int client_mq_id, pid_t client,
-                                struct user *users, int *n_users);
-int handle_new_client(int client_mq_id, struct chat_msg client_msg, struct user *users, int *n_users, struct chat_msg *history, int last_msg_id);
-int history_send(int client_mq_id, long to_whom,
-                  struct chat_msg *history, int last_msg_id);
-int history_to_string(struct chat_msg *history, int *start_msg_id, int last_msg_id, char *buffer, size_t buffer_size);
-void history_update(struct chat_msg msg, struct chat_msg *history, int *last_msg_id);
-int msg_to_all(int client_mq_id, struct chat_msg msg, struct user *users,
-                int n_users);
-int send_user_joined_notification(int client_mq_id, struct user *users, int n_users, const char *client_nickname, size_t client_nickname_length);
-int send_user_left_notification(int client_mq_id, struct user *users,
-                                  int n_users, const char *client_nickname,
-                                  size_t client_nickname_length);
-int send_users_list(int client_mq_id, struct user *users, int n_users);
-int server_cleanup(int server_mq_id, int client_mq_id, struct user *users, int n_users, struct chat_msg *history);
-void *server_queue_handler(void *server_mq_name);
-int server_queue_handler_exit(int server_mq_id);
+void handle_disconnected_client(pid_t client, struct user *users,
+                                int *n_users);
+int handle_new_client(struct chat_msg *client_msg, struct user *users, int *n_users);
+void history_update(struct chat_msg *msg, struct chat_msg *history,
+                    sem_t *input_read);
+int init_chat(void **shm_addr, sem_t **sem4_input_updated,
+              sem_t **sem4_input_read, struct user **users,
+              struct chat_msg **history, sem_t **sem4_data_updated,
+              sem_t **sem4_count_reads, sem_t **sem4_next_turn);
+void notify_about_update(int n_users, sem_t *data_updated, sem_t *count_reads,
+                         sem_t *next_turn);
+int server_cleanup(void *input_shm_addr, sem_t *input_updated, sem_t *input_read, struct user *users, struct chat_msg *history, sem_t *data_updated, sem_t *count_reads, sem_t *next_turn);
+void *server_queue_handler(void *input_shm_addr);
+int server_queue_handler_exit(void *input_shm_addr);
 int user_add(pid_t pid, const char *nickname, size_t nickname_length,
              struct user *users, int *n_users);
-int users_list_to_string(struct user *users, int n_users, char *buffer,
-                         size_t buffer_size);
 void wait_for_quit(void);
 
 #endif // SERVER_H

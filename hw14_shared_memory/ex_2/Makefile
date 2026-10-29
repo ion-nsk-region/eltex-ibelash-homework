@@ -43,9 +43,9 @@ $(BUILD_DIR):
 $(LIB_DIR):
 	mkdir -p $@
 
-server: $(BUILD_DIR)/$(MAIN_SERVER).exe
+server: directories $(BUILD_DIR)/$(MAIN_SERVER).exe
 
-client: $(BUILD_DIR)/$(MAIN_CLIENT).exe
+client: directories $(BUILD_DIR)/$(MAIN_CLIENT).exe
 
 $(BUILD_DIR)/$(MAIN_SERVER).exe: $(SERVER_SRCS) $(STATIC_LIB)
 	@echo "\nСобираем исполняемый файл сервера. Флаги компиляции: $(CFLAGS)"

@@ -1,10 +1,11 @@
-#include "shm_chat.h"
+#include "server.h"
 
 int init_chat(void **shm_addr, sem_t **sem4_input_updated,
               sem_t **sem4_input_read, struct user **users,
               struct chat_msg **history, sem_t **sem4_data_updated,
-              sem_t **sem4_count_reads) {
+              sem_t **sem4_count_reads, sem_t **sem4_next_turn) {
   size_t page_size = (size_t)sysconf(_SC_PAGESIZE);
+  mode_t perms = 0600;
 
   // input
   *shm_addr = create_and_attach_shm_segment(SHM_INPUT, page_size);
@@ -59,10 +60,20 @@ int init_chat(void **shm_addr, sem_t **sem4_input_updated,
     goto destroy_sem4_data_updated;
   }
 
+  errno = 0;
+  *sem4_next_turn = sem_open(SEM4_NEXT_TURN, O_CREAT, perms, 0);
+  if (SEM_FAILED == *sem4_next_turn) {
+    perror("sem_open");
+    goto destroy_sem4_count_reads;
+  }
+
 
   return 0;
 
 // очистка ресурсов в случае ошибки
+
+destroy_sem4_count_reads:
+  destroy_semaphore(*sem4_count_reads, SEM4_COUNT_READS);
 
 destroy_sem4_data_updated:
   destroy_semaphore(*sem4_data_updated, SEM4_DATA_UPDATED);

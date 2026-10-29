@@ -1,4 +1,4 @@
-#include "shm_chat.h"
+#include "common.h"
 
 void destroy_semaphore(sem_t *sem4_id, const char *sem4_name) {
   int err = close_semaphore(sem4_id);
