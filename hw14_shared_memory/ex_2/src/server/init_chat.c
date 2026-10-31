@@ -2,7 +2,7 @@
 
 int init_chat(void **shm_addr, sem_t **sem4_input_updated,
               sem_t **sem4_input_read, struct user **users,
-              struct chat_msg **history, sem_t **sem4_data_updated,
+              struct chat_history **history, sem_t **sem4_data_updated,
               sem_t **sem4_count_reads, sem_t **sem4_next_turn) {
   size_t page_size = (size_t)sysconf(_SC_PAGESIZE);
   mode_t perms = 0600;
@@ -30,6 +30,10 @@ int init_chat(void **shm_addr, sem_t **sem4_input_updated,
   } else if ((void *)-2 == *history) {
     goto destroy_shm_history;
   }
+
+    (*history)->first_msg = (*history)->messages;
+    (*history)->last_msg = (*history)->messages;
+    (*history)->edge_msg = NULL;
 
   // Семафоры
   errno = 0;

@@ -1,8 +1,8 @@
 #include "server.h"
 
-void history_update(struct chat_msg *msg, struct chat_msg *history,
-                    sem_t *input_read) {
-  // рассчитываем новый индекс последнего сообщения
+void history_update(struct chat_msg *msg, struct chat_history *history) {
+  // рассчитываем новый адрес последнего сообщения
+  if (history->last_msg + msg->msg_size)
 
   // удаляем предыдущее содержимое
   struct chat_msg *last_msg = history + *last_msg_id;
@@ -15,5 +15,4 @@ void history_update(struct chat_msg *msg, struct chat_msg *history,
   strncpy(last_msg->content, msg->content, content_length);
 
 
-  sem_post(input_read);
 }

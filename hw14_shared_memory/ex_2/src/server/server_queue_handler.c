@@ -3,16 +3,19 @@
 void *server_queue_handler(void *input_shm_addr) {
   int err = 0, is_running = 1, n_users = 0;
   struct chat_msg *msg = NULL;
-  struct chat_msg *history = NULL;
+  struct chat_history *history = NULL;
   struct user *users = NULL;
   pid_t server_pid = getpid();
   sem_t *data_updated, *count_reads, *next_turn, *input_updated, *input_read;
 
-  err = init_chat(&input_shm_addr, &input_updated, &input_read, &users, &history,
-                  &data_updated, &count_reads, &next_turn);
+  err = init_chat(&input_shm_addr, &input_updated, &input_read, &users,
+                  &history, &data_updated, &count_reads, &next_turn);
 
-  if (0 != err) is_running = 0;
-  msg = input_shm_addr;
+  if (0 != err) {
+    is_running = 0;
+  } else {
+    msg = input_shm_addr;
+  }
 
   while (is_running) {
     wait_for(input_updated);
@@ -34,7 +37,8 @@ void *server_queue_handler(void *input_shm_addr) {
         printf("Получена неизвестная команда с кодом %d.\n", msg->cmd);
     }
 
-    history_update(msg, history, input_read);
+    history_update(msg, history);
+    sem_post(input_read);
     notify_about_update(n_users, data_updated, count_reads, next_turn);
     /*
     // при изменении массива "commands" также необходимо изменить "enum
