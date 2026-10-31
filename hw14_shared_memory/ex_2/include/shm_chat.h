@@ -43,11 +43,11 @@ struct user {
 };
 
 struct chat_history {
-	void *first_msg;
-	void *last_msg;
-	void *edge_msg; // крайнее сообщение на границе выделенной памяти, 
-			// после которого прыгаем в начало сегмента памяти
+	struct chat_msg *first_msg;
+	struct chat_msg *last_msg;
+	struct chat_msg *edge_msg; 	// крайнее сообщение на границе выделенной памяти, 
+					// после которого прыгаем в начало сегмента памяти
 	struct chat_msg *messages;
-}
+};
 
 #endif // SHM_CHAT_H

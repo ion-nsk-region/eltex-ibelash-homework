@@ -21,6 +21,7 @@ int main(void) {
 
     // отправляем сообщение потоку о выходе
     server_queue_handler_exit(input_shm_addr);
+    fprintf(stderr, "Поток уведомлен о выходе.\n");
 
     void *status;
     err = pthread_join(server_queue_handler_tid, &status);

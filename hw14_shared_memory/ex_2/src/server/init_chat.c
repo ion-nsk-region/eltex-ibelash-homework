@@ -49,6 +49,7 @@ int init_chat(void **shm_addr, sem_t **sem4_input_updated,
     perror("sem_open");
     goto destroy_sem4_input_updated;
   }
+  sem_post(*sem4_input_read); // взводим семафор чтобы прочитать самое первое сообщение
 
   errno = 0;
   *sem4_data_updated = sem_open(SEM4_DATA_UPDATED, O_CREAT, perms, 0);

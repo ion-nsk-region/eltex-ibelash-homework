@@ -22,6 +22,7 @@ int server_queue_handler_exit(void *input_shm_addr) {
     err = -1;
   }
 
+  fprintf(stderr, "Приготовиться к выходу!\n");
   if (0 == err) {
     err = send_msg(input_shm_addr, msg, sem4_input_updated, sem4_input_read);
     if (0 != err) {

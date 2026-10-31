@@ -2,7 +2,7 @@
 
 int server_cleanup(void *input_shm_addr, sem_t *input_updated,
                    sem_t *input_read, struct user *users,
-                   struct chat_msg *history, sem_t *data_updated,
+                   struct chat_history *history, sem_t *data_updated,
                    sem_t *count_reads, sem_t *next_turn) {
   size_t page_size = (size_t)sysconf(_SC_PAGESIZE);
 
