@@ -6,7 +6,7 @@ int server_cleanup(void *input_shm_addr, sem_t *input_updated,
                    sem_t *count_reads, sem_t *next_turn) {
   size_t page_size = (size_t)sysconf(_SC_PAGESIZE);
 
-  destroy_semaphore(next_turn, SEM4_COUNT_READS);
+  destroy_semaphore(next_turn, SEM4_NEXT_TURN);
   destroy_semaphore(count_reads, SEM4_COUNT_READS);
   destroy_semaphore(data_updated, SEM4_DATA_UPDATED);
   destroy_semaphore(input_read, SEM4_INPUT_READ);

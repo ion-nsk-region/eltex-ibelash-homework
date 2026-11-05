@@ -13,5 +13,6 @@ void destroy_semaphore(sem_t *sem4_id, const char *sem4_name) {
   err = sem_unlink(sem4_name);
   if (-1 == err) {
     perror("destroy_semaphore > sem_unlink");
+    fprintf(stderr, "%s\n", sem4_name);
   }
 }

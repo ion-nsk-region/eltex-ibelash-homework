@@ -8,13 +8,13 @@ void *server_queue_handler(void *input_shm_addr) {
   pid_t server_pid = getpid();
   sem_t *data_updated, *count_reads, *next_turn, *input_updated, *input_read;
 
-  err = init_chat(&input_shm_addr, &input_updated, &input_read, &users,
+  err = init_chat(input_shm_addr, &input_updated, &input_read, &users,
                   &history, &data_updated, &count_reads, &next_turn);
 
   if (0 != err) {
     is_running = 0;
   } else {
-    msg = input_shm_addr;
+    msg = *((struct chat_msg **)input_shm_addr);
   }
 
   while (is_running) {
@@ -37,7 +37,7 @@ void *server_queue_handler(void *input_shm_addr) {
         printf("Получена неизвестная команда с кодом %d.\n", msg->cmd);
     }
 
-    history_update(msg, history);
+    // history_update(msg, history);
     sem_post(input_read);
     notify_about_update(n_users, data_updated, count_reads, next_turn);
     /*
@@ -51,8 +51,7 @@ void *server_queue_handler(void *input_shm_addr) {
   };  // while (is_running)
 
   // очищаем выделенные ресурсы
-  msg = NULL;
-  err = server_cleanup(input_shm_addr, input_updated, input_read, users,
+  err = server_cleanup(msg, input_updated, input_read, users,
                        history, data_updated, count_reads, next_turn);
 
   return (void *)(intptr_t)err;

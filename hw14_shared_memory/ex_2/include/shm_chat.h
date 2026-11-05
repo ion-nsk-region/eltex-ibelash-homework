@@ -34,7 +34,7 @@ struct chat_msg {
     size_t msg_size;
     pid_t sender;
     enum chat_command cmd;
-    char *content;
+    char content[];
 };
 
 struct user {
@@ -47,7 +47,7 @@ struct chat_history {
 	struct chat_msg *last_msg;
 	struct chat_msg *edge_msg; 	// крайнее сообщение на границе выделенной памяти, 
 					// после которого прыгаем в начало сегмента памяти
-	struct chat_msg *messages;
+	struct chat_msg messages[];
 };
 
 #endif // SHM_CHAT_H

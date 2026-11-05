@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include "server.h"
 
 void history_update(struct chat_msg *msg, struct chat_history *history) {
@@ -32,6 +34,6 @@ void history_update(struct chat_msg *msg, struct chat_history *history) {
   new_msg->msg_size = msg->msg_size;
   new_msg->sender = msg->sender;
   new_msg->cmd = msg->cmd;
-  size_t content_length = strlen(msg->content);
+  size_t content_length = msg->msg_size - offsetof(struct chat_msg, content);
   strncpy(new_msg->content, msg->content, content_length);
 }
