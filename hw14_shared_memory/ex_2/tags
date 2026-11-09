@@ -1,0 +1,192 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/user/Documents/programming_practice/eltex-ibelash-homework/hw14_shared_memory/ex_2/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	//
+$(BUILD_DIR)	Makefile	/^$(BUILD_DIR):$/;"	t
+$(BUILD_DIR)/$(MAIN_CLIENT).exe	Makefile	/^$(BUILD_DIR)\/$(MAIN_CLIENT).exe: $(CLIENT_SRCS) $(STATIC_LIB)$/;"	t
+$(BUILD_DIR)/$(MAIN_SERVER).exe	Makefile	/^$(BUILD_DIR)\/$(MAIN_SERVER).exe: $(SERVER_SRCS) $(STATIC_LIB)$/;"	t
+$(BUILD_DIR)/%.o	Makefile	/^$(BUILD_DIR)\/%.o: $(SRC_DIR)\/common\/%.c$/;"	t
+$(LIB_DIR)	Makefile	/^$(LIB_DIR):$/;"	t
+$(STATIC_LIB)	Makefile	/^$(STATIC_LIB): $(LIB_OBJ) $/;"	t
++	Session.vim	/^nnoremap <expr> + $'<Cmd>{v:count1}Up$/;"	m
+-	Session.vim	/^nnoremap <expr> - $'<Cmd>{v:count1}Down$/;"	m
+<C-U>	Session.vim	/^inoremap <C-U> u$/;"	m
+<C-U>	src/server/Session.vim	/^inoremap <C-U> u$/;"	m
+<Plug>NetrwBrowseX	Session.vim	/^nnoremap <silent> <Plug>NetrwBrowseX :call netrw#BrowseX(netrw#GX(),netrw#CheckIfRemote(netrw#GX/;"	m
+<Plug>NetrwBrowseX	src/server/Session.vim	/^nnoremap <silent> <Plug>NetrwBrowseX :call netrw#BrowseX(netrw#GX(),netrw#CheckIfRemote(netrw#GX/;"	m
+<Plug>NetrwBrowseXVis	Session.vim	/^xnoremap <silent> <Plug>NetrwBrowseXVis :call netrw#BrowseXVis()$/;"	m
+<Plug>NetrwBrowseXVis	src/server/Session.vim	/^xnoremap <silent> <Plug>NetrwBrowseXVis :call netrw#BrowseXVis()$/;"	m
+BUILD_DIR	Makefile	/^BUILD_DIR = build$/;"	m
+BUILD_MODE	Makefile	/^    BUILD_MODE = Release$/;"	m
+CFLAGS	Makefile	/^        CFLAGS = $(COMMON_FLAGS) -g $/;"	m
+CFLAGS	Makefile	/^        CFLAGS = $(COMMON_FLAGS) -g -fsanitize=address$/;"	m
+CFLAGS	Makefile	/^        CFLAGS = $(COMMON_FLAGS)$/;"	m
+CLIENT_H	include/client.h	/^#define CLIENT_H$/;"	d
+CLIENT_LIBS	Makefile	/^CLIENT_LIBS = -lncursesw -pthread$/;"	m
+CLIENT_OBJ	Makefile	/^CLIENT_OBJ := $(patsubst $(SRC_DIR)\/client\/%.c, $(BUILD_DIR)\/%.o, $(CLIENT_SRCS))$/;"	m
+CLIENT_SRCS	Makefile	/^CLIENT_SRCS = $(wildcard $(SRC_DIR)\/client\/*.c)$/;"	m
+CLIENT_UI_H	include/client_ui.h	/^#define CLIENT_UI_H$/;"	d
+COMMON_FLAGS	Makefile	/^COMMON_FLAGS = -Wall -Wextra -Werror -Iinclude$/;"	m
+COMMON_H	include/common.h	/^#define COMMON_H$/;"	d
+HISTORY	include/shm_chat.h	/^                                JOIN, QUIT, LIST, HISTORY, MSG };$/;"	e	enum:chat_command
+JOIN	include/shm_chat.h	/^                                JOIN, QUIT, LIST, HISTORY, MSG };$/;"	e	enum:chat_command
+K	Session.vim	/^nnoremap K :Evaluate$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS = -L$(LIB_DIR) -l$(LIB_NAME)$/;"	m
+LIB_DIR	Makefile	/^LIB_DIR = lib$/;"	m
+LIB_NAME	Makefile	/^LIB_NAME = shm_chat$/;"	m
+LIB_OBJ	Makefile	/^LIB_OBJ := $(patsubst $(SRC_DIR)\/common\/%.c, $(BUILD_DIR)\/%.o, $(LIB_SRCS))$/;"	m
+LIB_SRCS	Makefile	/^LIB_SRCS = $(wildcard $(SRC_DIR)\/common\/*.c)$/;"	m
+LIST	include/shm_chat.h	/^                                JOIN, QUIT, LIST, HISTORY, MSG };$/;"	e	enum:chat_command
+MAIN_CLIENT	Makefile	/^MAIN_CLIENT = client$/;"	m
+MAIN_SERVER	Makefile	/^MAIN_SERVER = server$/;"	m
+MAX_CHAT_USERS	include/shm_chat.h	/^#define MAX_CHAT_USERS /;"	d
+MAX_CMD_STR_LENGTH	include/shm_chat.h	/^#define MAX_CMD_STR_LENGTH /;"	d
+MAX_HISTORY_SIZE	include/shm_chat.h	/^#define MAX_HISTORY_SIZE /;"	d
+MAX_NICKNAME_LENGTH	include/shm_chat.h	/^#define MAX_NICKNAME_LENGTH /;"	d
+MAX_PID_STR_LENGTH	include/shm_chat.h	/^#define MAX_PID_STR_LENGTH /;"	d
+MIN_MSG_INPUT_HEIGHT	include/client_ui.h	/^#define MIN_MSG_INPUT_HEIGHT /;"	d
+MSG	include/shm_chat.h	/^                                JOIN, QUIT, LIST, HISTORY, MSG };$/;"	e	enum:chat_command
+NO_COMMAND	include/shm_chat.h	/^enum chat_command { NO_COMMAND, \/\/! пустые ячейки истории$/;"	e	enum:chat_command
+Q	Session.vim	/^nmap Q gq$/;"	m
+Q	Session.vim	/^omap Q gq$/;"	m
+Q	Session.vim	/^xmap Q gq$/;"	m
+Q	src/server/Session.vim	/^nmap Q gq$/;"	m
+Q	src/server/Session.vim	/^omap Q gq$/;"	m
+Q	src/server/Session.vim	/^xmap Q gq$/;"	m
+QUIT	include/shm_chat.h	/^                                JOIN, QUIT, LIST, HISTORY, MSG };$/;"	e	enum:chat_command
+REL_HISTORY_WIDTH	include/client_ui.h	/^#define REL_HISTORY_WIDTH /;"	d
+REL_MSG_INPUT_HEIGHT	include/client_ui.h	/^#define REL_MSG_INPUT_HEIGHT /;"	d
+SEM4_COUNT_READS	include/shm_chat.h	/^#define SEM4_COUNT_READS /;"	d
+SEM4_DATA_UPDATED	include/shm_chat.h	/^#define SEM4_DATA_UPDATED /;"	d
+SEM4_INPUT_READ	include/shm_chat.h	/^#define SEM4_INPUT_READ /;"	d
+SEM4_INPUT_UPDATED	include/shm_chat.h	/^#define SEM4_INPUT_UPDATED /;"	d
+SEM4_NEXT_TURN	include/shm_chat.h	/^#define SEM4_NEXT_TURN /;"	d
+SERVER_H	include/server.h	/^#define SERVER_H$/;"	d
+SERVER_LIBS	Makefile	/^SERVER_LIBS = -pthread$/;"	m
+SERVER_OBJ	Makefile	/^SERVER_OBJ := $(patsubst $(SRC_DIR)\/server\/%.c, $(BUILD_DIR)\/%.o, $(SERVER_SRCS))$/;"	m
+SERVER_SRCS	Makefile	/^SERVER_SRCS = $(wildcard $(SRC_DIR)\/server\/*.c)$/;"	m
+SHM_CHAT_H	include/shm_chat.h	/^#define SHM_CHAT_H$/;"	d
+SHM_HISTORY	include/shm_chat.h	/^#define SHM_HISTORY /;"	d
+SHM_INPUT	include/shm_chat.h	/^#define SHM_INPUT /;"	d
+SHM_USERS	include/shm_chat.h	/^#define SHM_USERS /;"	d
+SRC_DIR	Makefile	/^SRC_DIR = src$/;"	m
+STATIC_LIB	Makefile	/^STATIC_LIB = $(LIB_DIR)\/lib$(LIB_NAME).a$/;"	m
+SessionLoad	Session.vim	/^let SessionLoad = 1$/;"	v
+SessionLoad	src/server/Session.vim	/^let SessionLoad = 1$/;"	v
+\x16\x15	Session.vim	/^inoremap  u$/;"	m
+\x16\x15	src/server/Session.vim	/^inoremap  u$/;"	m
+all	Makefile	/^all: code_check directories server client $/;"	t
+attach_shm_segment	src/common/attach_shm_segment.c	/^void *attach_shm_segment(int shm_fd, size_t shm_size) {$/;"	f	typeref:typename:void *
+ch	include/client.h	/^   int *ch; \/\/ введённый символ, который будет обрабатыва/;"	m	struct:input_args	typeref:typename:int *
+chat_command	include/shm_chat.h	/^enum chat_command { NO_COMMAND, \/\/! пустые ячейки истории$/;"	g
+chat_history	include/shm_chat.h	/^struct chat_history {$/;"	s
+chat_msg	include/shm_chat.h	/^struct chat_msg {$/;"	s
+clean	Makefile	/^clean:$/;"	t
+cleanup_buffer	src/common/cleandup_buffer.c	/^void cleanup_buffer(void *arg) {$/;"	f	typeref:typename:void
+cleanup_window	src/client/cleanup_window.c	/^int cleanup_window(WINDOW *win) {$/;"	f	typeref:typename:int
+client	Makefile	/^client: directories $(BUILD_DIR)\/$(MAIN_CLIENT).exe$/;"	t
+client_cleanup	src/client/client_cleanup.c	/^void client_cleanup(pthread_t reader_tid, pthread_t input_tid,$/;"	f	typeref:typename:void
+close_semaphore	src/common/close_semaphore.c	/^int close_semaphore(sem_t *sem4_id) {$/;"	f	typeref:typename:int
+close_threads	src/client/close_threads.c	/^void close_threads(pthread_t reader_tid, pthread_t sender_tid) {$/;"	f	typeref:typename:void
+cmd	include/shm_chat.h	/^    enum chat_command cmd;$/;"	m	struct:chat_msg	typeref:enum:chat_command
+code_check	Makefile	/^code_check: $(SERVER_SRCS) $(SRC_DIR)\/server\/$(MAIN_SERVER).c $(CLIENT_SRCS) $(SRC_DIR)\/clien/;"	t
+conn_timer	src/common/conn_timer.c	/^int conn_timer(int connection_timeout, int sleep_time, int n_attempts) {$/;"	f	typeref:typename:int
+content	include/shm_chat.h	/^    char content[];$/;"	m	struct:chat_msg	typeref:typename:char[]
+create_and_attach_shm_segment	src/server/create_and_attach_shm_segment.c	/^void *create_and_attach_shm_segment(const char *shm_name, size_t shm_size) {$/;"	f	typeref:typename:void *
+create_windows	src/client/create_windows.c	/^int create_windows(struct ui *ui) {$/;"	f	typeref:typename:int
+destroy_semaphore	src/common/destroy_semaphore.c	/^void destroy_semaphore(sem_t *sem4_id, const char *sem4_name) {$/;"	f	typeref:typename:void
+destroy_shm_segment	src/common/destroy_shm_segment.c	/^void destroy_shm_segment(const char *shm_name) {$/;"	f	typeref:typename:void
+destroy_windows	src/client/destroy_windows.c	/^void destroy_windows(struct ui ui) {$/;"	f	typeref:typename:void
+detach_shm_segment	src/common/detach_shm_segment.c	/^void detach_shm_segment(void *shm_addr, size_t page_size) {$/;"	f	typeref:typename:void
+directories	Makefile	/^directories: $(BUILD_DIR) $(LIB_DIR)$/;"	t
+edge_msg	include/shm_chat.h	/^	struct chat_msg *edge_msg; 	\/\/ крайнее сообщение на границе выде/;"	m	struct:chat_history	typeref:struct:chat_msg *
+first_msg	include/shm_chat.h	/^	struct chat_msg *first_msg;$/;"	m	struct:chat_history	typeref:struct:chat_msg *
+get_nickname	src/server/get_nickname.c	/^int get_nickname(char *mtext, char *nickname, size_t *nickname_length) {$/;"	f	typeref:typename:int
+gx	Session.vim	/^nmap gx <Plug>NetrwBrowseX$/;"	m
+gx	Session.vim	/^xmap gx <Plug>NetrwBrowseXVis$/;"	m
+gx	src/server/Session.vim	/^nmap gx <Plug>NetrwBrowseX$/;"	m
+gx	src/server/Session.vim	/^xmap gx <Plug>NetrwBrowseXVis$/;"	m
+handle_disconnected_client	src/server/handle_disconnected_client.c	/^void handle_disconnected_client(pid_t client, struct user *users,$/;"	f	typeref:typename:void
+handle_input	src/client/handle_input.c	/^void handle_input(struct ui ui, int server_mq_id, int ch, char *input_buf,$/;"	f	typeref:typename:void
+handle_msg	src/client/handle_msg.c	/^int handle_msg(struct chat_msg *msg, struct ui ui, struct user *users,$/;"	f	typeref:typename:int
+handle_new_client	src/server/handle_new_client.c	/^int handle_new_client(struct chat_msg *client_msg, struct user *users,$/;"	f	typeref:typename:int
+handle_resize	src/client/handle_resize.c	/^void handle_resize(struct ui ui) {$/;"	f	typeref:typename:void
+handle_signal	src/client/restore_teminal.c	/^void handle_signal(int sig) {$/;"	f	typeref:typename:void
+history	include/client_ui.h	/^  WINDOW *history;$/;"	m	struct:ui	typeref:typename:WINDOW *
+history_update	src/server/history_update.c	/^void history_update(struct chat_msg *msg, struct chat_history *history) {$/;"	f	typeref:typename:void
+init_chat	src/server/init_chat.c	/^int init_chat(void **shm_addr, sem_t **sem4_input_updated,$/;"	f	typeref:typename:int
+init_colors	src/client/init_colors.c	/^int init_colors(void) {$/;"	f	typeref:typename:int
+initialize_terminal	src/client/initialize_terminal.c	/^int initialize_terminal(void) {$/;"	f	typeref:typename:int
+input	src/client/input.c	/^void *input(void *arg) {$/;"	f	typeref:typename:void *
+input_args	include/client.h	/^struct input_args {$/;"	s
+input_window	include/client.h	/^   WINDOW *input_window; $/;"	m	struct:input_args	typeref:typename:WINDOW *
+is_message	src/common/is_message.c	/^int is_message(struct chat_msg *msg) {$/;"	f	typeref:typename:int
+is_processing	include/client.h	/^   int *is_processing;   \/\/ флаг, сообщающий что main обрабатывает/;"	m	struct:input_args	typeref:typename:int *
+is_processing	include/client.h	/^   int *is_processing;   \/\/ флаг, сообщающий что main обрабатывает/;"	m	struct:reader_args	typeref:typename:int *
+last_msg	include/shm_chat.h	/^	struct chat_msg *last_msg;$/;"	m	struct:chat_history	typeref:struct:chat_msg *
+main	src/client/client.c	/^int main(void) {$/;"	f	typeref:typename:int
+main	src/server/server.c	/^int main(void) {$/;"	f	typeref:typename:int
+messages	include/shm_chat.h	/^	struct chat_msg messages[];$/;"	m	struct:chat_history	typeref:struct:chat_msg[]
+msg	include/client.h	/^   struct chat_msg **msg; \/\/ сообщение, которое будет обрабатыва/;"	m	struct:reader_args	typeref:struct:chat_msg **
+msg_input	include/client_ui.h	/^  WINDOW *msg_input;$/;"	m	struct:ui	typeref:typename:WINDOW *
+msg_size	include/shm_chat.h	/^    size_t msg_size;$/;"	m	struct:chat_msg	typeref:typename:size_t
+nickname	include/shm_chat.h	/^    char nickname[MAX_NICKNAME_LENGTH]; \/\/ в отличие от предыдущей реал/;"	m	struct:user	typeref:typename:char[]
+nickname_prompt	src/client/nickname_prompt.c	/^int nickname_prompt(int server_mq_id) {$/;"	f	typeref:typename:int
+notify_about_update	src/server/notify_about_update.c	/^void notify_about_update(int n_users, sem_t *data_updated, sem_t *count_reads,$/;"	f	typeref:typename:void
+on_key_backspace	src/client/on_key_backspace.c	/^void on_key_backspace(struct ui ui, char *input_buf, size_t *input_buf_length) {$/;"	f	typeref:typename:void
+on_key_enter	src/client/on_key_enter.c	/^void on_key_enter(struct ui ui, int server_mq_id, char *input_buf,$/;"	f	typeref:typename:void
+pid	include/shm_chat.h	/^    pid_t pid;$/;"	m	struct:user	typeref:typename:pid_t
+pid_to_nick	src/common/pid_to_nick.c	/^char *pid_to_nick(struct user *users, int n_users, pid_t pid, int *free_nick) {$/;"	f	typeref:typename:char *
+print_help	src/client/print_help.c	/^void print_help(struct ui ui) {$/;"	f	typeref:typename:void
+processing_cond	include/client.h	/^   pthread_cond_t *processing_cond;  \/\/ на время обработки введённого/;"	m	struct:input_args	typeref:typename:pthread_cond_t *
+processing_cond	include/client.h	/^   pthread_cond_t *processing_cond;  \/\/ на время обработки сообщения$/;"	m	struct:reader_args	typeref:typename:pthread_cond_t *
+processing_lock	include/client.h	/^   pthread_mutex_t *processing_lock; \/\/ затем блокируем поток $/;"	m	struct:input_args	typeref:typename:pthread_mutex_t *
+processing_lock	include/client.h	/^   pthread_mutex_t *processing_lock; \/\/ затем блокируем поток $/;"	m	struct:reader_args	typeref:typename:pthread_mutex_t *
+reader	src/client/reader.c	/^void *reader(void *arg) {$/;"	f	typeref:typename:void *
+reader_args	include/client.h	/^struct reader_args {$/;"	s
+refresh_cond	include/client.h	/^   pthread_cond_t *refresh_cond;  \/\/ пока не прочитаем сообщение от /;"	m	struct:reader_args	typeref:typename:pthread_cond_t *
+refresh_cond	include/client.h	/^   pthread_cond_t *refresh_cond;  \/\/ пока пользователь не введёт что/;"	m	struct:input_args	typeref:typename:pthread_cond_t *
+refresh_lock	include/client.h	/^   pthread_mutex_t *refresh_lock; \/\/ --\/\/--$/;"	m	struct:input_args	typeref:typename:pthread_mutex_t *
+refresh_lock	include/client.h	/^   pthread_mutex_t *refresh_lock; \/\/ блокируем цикл main$/;"	m	struct:reader_args	typeref:typename:pthread_mutex_t *
+refresh_windows	src/client/refresh_windows.c	/^void refresh_windows(struct ui ui) {$/;"	f	typeref:typename:void
+restore_terminal	src/client/restore_teminal.c	/^void restore_terminal(void) {$/;"	f	typeref:typename:void
+s:cpo_save	Session.vim	/^let s:cpo_save=&cpo$/;"	v
+s:cpo_save	src/server/Session.vim	/^let s:cpo_save=&cpo$/;"	v
+s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 20) \/ 41)$/;"	v
+s:l	Session.vim	/^let s:l = 11 - ((10 * winheight(0) + 20) \/ 41)$/;"	v
+s:l	Session.vim	/^let s:l = 24 - ((23 * winheight(0) + 20) \/ 41)$/;"	v
+s:l	Session.vim	/^let s:l = 37 - ((36 * winheight(0) + 20) \/ 41)$/;"	v
+s:l	Session.vim	/^let s:l = 40 - ((5 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	Session.vim	/^let s:l = 50 - ((37 * winheight(0) + 20) \/ 41)$/;"	v
+s:l	Session.vim	/^let s:l = 58 - ((32 * winheight(0) + 20) \/ 41)$/;"	v
+s:l	src/server/Session.vim	/^let s:l = 5 - ((4 * winheight(0) + 21) \/ 42)$/;"	v
+s:l	src/server/Session.vim	/^let s:l = 8 - ((7 * winheight(0) + 20) \/ 41)$/;"	v
+s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
+s:so_save	src/server/Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
+s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
+s:sx	src/server/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
+s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
+s:wipebuf	src/server/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
+safe_exit	src/client/restore_teminal.c	/^void safe_exit() { endwin(); }$/;"	f	typeref:typename:void
+send_msg	src/common/send_msg.c	/^int send_msg(struct chat_msg *shm_addr, struct chat_msg *msg,$/;"	f	typeref:typename:int
+sender	include/shm_chat.h	/^    pid_t sender;$/;"	m	struct:chat_msg	typeref:typename:pid_t
+server	Makefile	/^server: directories $(BUILD_DIR)\/$(MAIN_SERVER).exe$/;"	t
+server_cleanup	src/server/server_cleanup.c	/^int server_cleanup(void *input_shm_addr, sem_t *input_updated,$/;"	f	typeref:typename:int
+server_queue_handler	src/server/server_queue_handler.c	/^void *server_queue_handler(void *input_shm_addr) {$/;"	f	typeref:typename:void *
+server_queue_handler_exit	src/server/server_queue_handler_exit.c	/^int server_queue_handler_exit(void *input_shm_addr) {$/;"	f	typeref:typename:int
+spawn_threads	src/client/spawn_threads.c	/^int spawn_threads(pthread_mutex_t *refresh_lock, pthread_cond_t *refresh_cond,$/;"	f	typeref:typename:int
+ui	include/client_ui.h	/^struct ui {$/;"	s
+update_history_win	src/client/update_history_win.c	/^void update_history_win(WINDOW *history, char *content, struct user *users,$/;"	f	typeref:typename:void
+update_users_list	src/client/update_users_list.c	/^void update_users_list(WINDOW *users_list, char *content, struct user *users,$/;"	f	typeref:typename:void
+user	include/shm_chat.h	/^struct user {$/;"	s
+user_add	src/server/user_add.c	/^int user_add(pid_t pid, const char *nickname, size_t nickname_length,$/;"	f	typeref:typename:int
+users_list	include/client_ui.h	/^  WINDOW *users_list;$/;"	m	struct:ui	typeref:typename:WINDOW *
+wait_for	src/common/wait_for.c	/^int wait_for(sem_t *sem4_id) {$/;"	f	typeref:typename:int
+wait_for_quit	src/server/wait_for_quit.c	/^void wait_for_quit(void) {$/;"	f	typeref:typename:void
