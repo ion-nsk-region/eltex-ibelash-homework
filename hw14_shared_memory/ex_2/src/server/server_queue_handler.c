@@ -37,7 +37,7 @@ void *server_queue_handler(void *input_shm_addr) {
         printf("Получена неизвестная команда с кодом %d.\n", msg->cmd);
     }
 
-    // history_update(msg, history);
+    history_update(msg, history);
     sem_post(input_read);
     notify_about_update(n_users, data_updated, count_reads, next_turn);
     /*

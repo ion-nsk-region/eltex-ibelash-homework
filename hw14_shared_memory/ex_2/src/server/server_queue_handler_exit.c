@@ -8,7 +8,8 @@ int server_queue_handler_exit(void *input_shm_addr) {
   msg.sender = getpid();
   msg.cmd = QUIT;
   msg.content[0] = '\0';
-  msg.msg_size = offsetof(struct chat_msg, content) + 1;
+  // TODO округлять размер до кратного 8, чтобы не снижало производительность
+  msg.msg_size = offsetof(struct chat_msg, content) + 1; 
 
   errno = 0;
   sem_t *sem4_input_updated = sem_open(SEM4_INPUT_UPDATED, 0);
