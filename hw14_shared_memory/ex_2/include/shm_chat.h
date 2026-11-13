@@ -12,11 +12,11 @@
 #include <sys/stat.h> // для констант режима доступа
 #include <unistd.h> // close
 
-#define MAX_NICKNAME_LENGTH 256
-#define MAX_PID_STR_LENGTH 12 // размер строки для текстового представления pid
-#define MAX_CMD_STR_LENGTH 3 // размер строки для текстового представления номера комманды чата
-#define MAX_CHAT_USERS 20
-#define MAX_HISTORY_SIZE 100
+#define MAX_NICKNAME_LENGTH 256 ///< размер строки (в байтах) для никнейма пользователя
+#define MAX_PID_STR_LENGTH 12 ///< размер строки (в байтах) для текстового представления pid
+#define MAX_CMD_STR_LENGTH 3 ///< размер строки (в байтах) для текстового представления номера комманды чата
+#define MAX_CHAT_USERS 20 ///< максимальное число участников чата
+#define MAX_HISTORY_SIZE 100 ///< (Не реализовано) максимальное количество сообщений хранимых в истории
 
 #define SHM_INPUT "/shm_input"
 #define SHM_HISTORY "/shm_history"
@@ -27,7 +27,7 @@
 #define SEM4_COUNT_READS "/sem4_count_reads"
 #define SEM4_NEXT_TURN "/sem4_next_turn"
 
-enum chat_command { NO_COMMAND, //! пустые ячейки истории
+enum chat_command { NO_COMMAND, ///< пустые ячейки истории
                                 JOIN, QUIT, LIST, HISTORY, MSG };
 
 struct chat_msg {

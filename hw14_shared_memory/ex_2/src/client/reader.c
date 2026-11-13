@@ -7,15 +7,7 @@ void *reader(void *arg) {
 
   pthread_mutex_lock(args.processing_lock);
 
-  int client_mq_id = -1;
   pid_t my_pid = getpid();
-
-  err = connect2mq(CLIENT_MQ_NAME, &client_mq_id);
-  if (ETIME == err) {
-    fprintf(stderr, "Ошибка: время ожидания сервера истекло.\n");
-  } else if (0 != err) {
-    fprintf(stderr, "Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
-  }
 
   if (0 == err && -1 < client_mq_id) {
     //    while (*(args.is_running)) { // не подходит так как поток блокируется

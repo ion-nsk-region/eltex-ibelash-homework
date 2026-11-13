@@ -5,21 +5,21 @@
 #include "client_ui.h"
 
 struct reader_args {
-   pthread_mutex_t *refresh_lock; // блокируем цикл main
-   pthread_cond_t *refresh_cond;  // пока не прочитаем сообщение от сервера
-   pthread_mutex_t *processing_lock; // затем блокируем поток 
-   pthread_cond_t *processing_cond;  // на время обработки сообщения
-   struct chat_msg **msg; // сообщение, которое будет обрабатывать main
-   int *is_processing;   // флаг, сообщающий что main обрабатывает сообщение
+   pthread_mutex_t *refresh_lock; //< блокируем цикл main
+   pthread_cond_t *refresh_cond;  //< пока не прочитаем сообщение от сервера
+   pthread_mutex_t *processing_lock; //< затем блокируем поток 
+   pthread_cond_t *processing_cond;  //< на время обработки сообщения
+   struct chat_msg **msg; //< сообщение, которое будет обрабатывать main
+   int *is_processing;   //< флаг, сообщающий что main обрабатывает сообщение
 };
 
 struct input_args {
    pthread_mutex_t *refresh_lock; // --//--
-   pthread_cond_t *refresh_cond;  // пока пользователь не введёт что-либо
-   pthread_mutex_t *processing_lock; // затем блокируем поток 
-   pthread_cond_t *processing_cond;  // на время обработки введённого символа
-   int *ch; // введённый символ, который будет обрабатывать main
-   int *is_processing;   // флаг, сообщающий что main обрабатывает символ
+   pthread_cond_t *refresh_cond;  //< пока пользователь не введёт что-либо
+   pthread_mutex_t *processing_lock; //< затем блокируем поток 
+   pthread_cond_t *processing_cond;  //< на время обработки введённого символа
+   int *ch; //< введённый символ, который будет обрабатывать main
+   int *is_processing;   //< флаг, сообщающий что main обрабатывает символ
    WINDOW *input_window; 
    // wint_t *ch; // введённый символ, который будет обрабатывать main
 //   WINDOW *win; // требовался, чтобы обрабатывать изменение размера...но ну его.

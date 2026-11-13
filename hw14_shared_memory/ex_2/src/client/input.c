@@ -9,8 +9,8 @@ void *input(void *arg) {
 
   while (EOF != (buf_char = getchar())) {
     // while (EOF != (buf_char = wgetch(args.input_window))) {  // TODO перейти
-    // на
-    //  wgetch, чтобы забирать управляющие клавиши, включая KEY_RESIZE.
+    // на wgetch, чтобы забирать управляющие клавиши, включая KEY_RESIZE.
+    // Однако, с wgetch была какая-то проблема, которую я нигде не описал.
     pthread_mutex_lock(args.refresh_lock);
     *(args.ch) = buf_char;
     *(args.is_processing) = 1;

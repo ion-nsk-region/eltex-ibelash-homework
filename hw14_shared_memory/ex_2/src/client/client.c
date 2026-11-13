@@ -1,43 +1,23 @@
 #include "client.h"
 
 int main(void) {
-  int err = 0;
-  pthread_mutex_t refresh_lock, msg_processing_lock, ch_processing_lock;
-  pthread_cond_t refresh_cond, msg_processing_cond, ch_processing_cond;
-  pthread_t reader_tid = pthread_self(), input_tid = pthread_self();
+  int err = 0, is_running = 1;
+  struct user *users = NULL;
+  struct chat_history *history = NULL;
   struct chat_msg *msg = NULL;
-  int ch = 0, ch_is_processing = 0, msg_is_processing = 0;
+  sem_t *data_updated, *count_reads, *next_turn, *input_updated, *input_read;
   struct ui ui = {NULL, NULL, NULL};
-  struct user users[MAX_CHAT_USERS] = {};
-  int n_users = 0;
+  pthread_t input_tid = pthread_self();
 
-  char *server_mq_name = SERVER_MQ_NAME;
-  int server_mq_id = -1;
-  // подключаемся к очереди сервера
-  err = connect2mq(server_mq_name, &server_mq_id);
-  if (ETIME == err) {
-    printf("Ошибка: время ожидания сервера истекло.\n");
-  } else if (0 != err) {
-    printf("Ошибка connect2mq: %d\nСм. подробности в stderr.\n", err);
+  err = init_client(&msg, &input_updated, &input_read, &users, &history, &data_updated, &count_reads, &next_turn, &ui);
+  if (0 == err) {
+	  err = spawn_input_thread(&msg, &input_updated, &input_read, &ui, &is_running, &input_tid);
   }
+  if (0 == err) err = run(users, history, data_updated, count_reads, next_turn, &ui);
+
+  // ======================
 
   if (0 == err) err = nickname_prompt(server_mq_id);
-  if (0 == err) {
-    pthread_mutex_init(&msg_processing_lock, NULL);
-    pthread_cond_init(&msg_processing_cond, NULL);
-    pthread_mutex_init(&ch_processing_lock, NULL);
-    pthread_cond_init(&ch_processing_cond, NULL);
-    pthread_mutex_init(&refresh_lock, NULL);
-    pthread_cond_init(&refresh_cond, NULL);
-
-    pthread_mutex_lock(
-        &refresh_lock);  // блокируем изменение переменных в потоках
-    err = spawn_threads(&refresh_lock, &refresh_cond, &msg, &msg_is_processing,
-                        &msg_processing_lock, &msg_processing_cond, &ch,
-                        &ch_is_processing, &ch_processing_lock,
-                        &ch_processing_cond, ui.msg_input, &reader_tid,
-                        &input_tid);
-  }
   if (0 == err) err = initialize_terminal();
   if (0 == err) err = create_windows(&ui);
   if (0 == err) {
@@ -107,8 +87,8 @@ int main(void) {
     if (NULL != input_buf) free(input_buf);
   }
 
-  pthread_mutex_unlock(&refresh_lock);
 
+  // ======================
   destroy_windows(ui);
   client_cleanup(reader_tid, input_tid, &refresh_lock, &refresh_cond,
                  &msg_processing_lock, &msg_processing_cond,
@@ -118,14 +98,12 @@ int main(void) {
     printf("\nСервер завершил свою работу. Выходим.\n");
   } else {
     // пытаемся отправить сообщение серверу, чтобы он убрал нас из списка
-    if (-1 != server_mq_id) {
       struct chat_msg quit_msg = {getpid(), QUIT, NULL};
       if (0 != send_mq_msg(server_mq_id, 1, quit_msg)) {
         fprintf(stderr,
                 "Ошибка: не удалось отправить сообщение о выходе.\n"
                 "Требуется перезагрузка сервера.\n");
       }
-    }
     if (NULL != msg && QUIT == msg->cmd && getpid() == msg->sender) {
       printf("\nВ дочернем потоке возникла ошибка. Выходим.\n");
     } else if (27 == ch) {
