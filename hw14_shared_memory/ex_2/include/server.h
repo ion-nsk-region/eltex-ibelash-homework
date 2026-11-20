@@ -4,7 +4,6 @@
 #include "common.h"
 #include "shm_chat.h"
 
-void *create_and_attach_shm_segment(const char *shm_name, size_t shm_size);
 int get_nickname(char *mtext, char *nickname, size_t *nickname_length);
 void handle_disconnected_client(pid_t client, struct user *users, int *n_users);
 int handle_new_client(struct chat_msg *client_msg, struct user *users,
