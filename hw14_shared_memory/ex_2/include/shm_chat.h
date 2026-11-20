@@ -27,6 +27,8 @@
 #define SEM4_COUNT_READS "/sem4_count_reads"
 #define SEM4_NEXT_TURN "/sem4_next_turn"
 
+#define SHM_FD_PERMS 0600 ///< предполагаем, что и сервер и клиенты работают из-под одного и того же системного пользователя.
+
 enum chat_command { NO_COMMAND, ///< пустые ячейки истории
                                 JOIN, QUIT, LIST, HISTORY, MSG };
 
@@ -43,6 +45,7 @@ struct user {
 };
 
 struct chat_history {
+        // TODO заменить на смещения, так как указатели привязаны к виртуальным адресам. А виртуальные адреса у каждого процесса свои.
 	struct chat_msg *first_msg;
 	struct chat_msg *last_msg;
 	struct chat_msg *edge_msg; 	// крайнее сообщение на границе выделенной памяти, 
