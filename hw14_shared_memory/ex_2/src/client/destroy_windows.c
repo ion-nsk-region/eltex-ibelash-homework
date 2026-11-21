@@ -1,8 +1,9 @@
 #include "client_ui.h"
 
 void destroy_windows(struct ui ui) {
-  if (ERR == cleanup_window(ui.history) || cleanup_window(ui.users_list) ||
-      cleanup_window(ui.msg_input)) {
+  if (ERR == cleanup_window(ui.history) ||
+      ERR == cleanup_window(ui.users_list) ||
+      ERR == cleanup_window(ui.msg_input)) {
     fprintf(stderr,
             "Ошибка: не удалось освободить память "
             "выделенную для окон.\n"
