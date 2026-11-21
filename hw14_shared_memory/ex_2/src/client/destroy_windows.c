@@ -10,7 +10,7 @@ void destroy_windows(struct ui ui) {
             "Рекомендуется перезапустить терминал.\n");
   }
 
-  if (ERR == endwin()) {
+  if (NULL != stdscr && ERR == endwin()) {
     fprintf(stderr,
             "Ошибка: не удалось вернуть настройки терминала "
             "в исходное состояние.\n"

@@ -1,31 +1,25 @@
 #include "client.h"
 
 int main(void) {
-  int err = 0, is_running = 1;
+  int err = 0;// , is_running = 1;
   struct user *users = NULL;
   struct chat_history *history = NULL;
   struct chat_msg *msg = NULL;
-  sem_t *data_updated, *count_reads, *next_turn, *input_updated, *input_read;
+  sem_t *data_updated = NULL, *count_reads = NULL, *next_turn = NULL, *input_updated = NULL, *input_read = NULL;
   struct ui ui = {NULL, NULL, NULL};
-  pthread_t input_tid = pthread_self();
+  // pthread_t input_tid = pthread_self();
 
   err = init_client(&msg, &input_updated, &input_read, &users, &history, &data_updated, &count_reads, &next_turn, &ui);
+  //if (0 != err) goto exit;
+  /*
   if (0 == err) {
 	  err = spawn_input_thread(&msg, &input_updated, &input_read, &ui, &is_running, &input_tid);
   }
   if (0 == err) err = run(users, history, data_updated, count_reads, next_turn, &ui);
-
+*/
   // ======================
 
-  if (0 == err) err = nickname_prompt(server_mq_id);
-  if (0 == err) err = initialize_terminal();
-  if (0 == err) err = create_windows(&ui);
-  if (0 == err) {
-    handle_resize(ui);
-    print_help(ui);
-    wmove(ui.msg_input, 1, 0);  // устанавливаем курсор в начало поля
-    refresh_windows(ui);
-
+  /*
     int is_running = 1;
     char *input_buf = malloc(get_max_msg_size() - sizeof(struct chat_msg));
     if (NULL == input_buf) {
@@ -44,6 +38,8 @@ int main(void) {
       while (0 == ch && NULL == msg) {
         pthread_cond_wait(&refresh_cond, &refresh_lock);
       }
+      */
+
       /*
             fprintf(stderr, "DEBUG обрабатываем: ch = %d, ", ch);
             if (NULL != msg) {
@@ -58,7 +54,7 @@ int main(void) {
               fprintf(stderr, "msg = NULL.\n");
             }
       */
-
+/*
       if (27 == ch || EOF == ch || (NULL != msg && QUIT == msg->cmd))
         is_running = 0;
 
@@ -87,36 +83,17 @@ int main(void) {
     if (NULL != input_buf) free(input_buf);
   }
 
+*/
+sleep(3);
 
   // ======================
-  destroy_windows(ui);
-  client_cleanup(reader_tid, input_tid, &refresh_lock, &refresh_cond,
-                 &msg_processing_lock, &msg_processing_cond,
-                 &ch_processing_lock, &ch_processing_cond, users, n_users);
 
-  if (NULL != msg && QUIT == msg->cmd && getpid() != msg->sender) {
-    printf("\nСервер завершил свою работу. Выходим.\n");
-  } else {
-    // пытаемся отправить сообщение серверу, чтобы он убрал нас из списка
-      struct chat_msg quit_msg = {getpid(), QUIT, NULL};
-      if (0 != send_mq_msg(server_mq_id, 1, quit_msg)) {
-        fprintf(stderr,
-                "Ошибка: не удалось отправить сообщение о выходе.\n"
-                "Требуется перезагрузка сервера.\n");
-      }
-    if (NULL != msg && QUIT == msg->cmd && getpid() == msg->sender) {
-      printf("\nВ дочернем потоке возникла ошибка. Выходим.\n");
-    } else if (27 == ch) {
-      printf("\nНажали Esc. Выходим.\n");
-    } else {
-      printf("\nПриключилась какая-то оказия. Выходим.\n");
-    }
-  }
+  // handle_exit();
 
-  if (NULL != msg) {
-    if (NULL != msg->content) free(msg->content);
-    free(msg);
-  }
+  // err = close_input_thread(input_tid);
 
+  client_cleanup(&msg, &input_updated, &input_read, &users, &history, &data_updated, &count_reads, &next_turn, &ui);
+
+// exit:
   return err;
 }

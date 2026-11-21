@@ -12,8 +12,12 @@ void *attach_shm_segment(const char *shm_name, size_t shm_size, int shm_flags) {
   errno = 0;
   int shm_fd = shm_open(shm_name, shm_flags, perms);
   if (-1 == shm_fd) {
-    perror("shm_open");
-    shm_addr = (void *)-1;  // ошибка, когда ничего подчищать не надо
+    if (ENOENT == errno) { // сервер не создал разделяемую память или не запущен
+      shm_addr = NULL;
+    } else {
+      perror("shm_open");
+      shm_addr = (void *)-1;  // ошибка, когда ничего подчищать не надо
+    }
     goto return_shm_addr;
   }
 
@@ -35,7 +39,7 @@ void *attach_shm_segment(const char *shm_name, size_t shm_size, int shm_flags) {
   shm_addr = mmap(NULL, shm_size, protection_flags, memory_flags, shm_fd, 0);
   if (MAP_FAILED == shm_addr) {
     perror("mmap");
-    shm_addr = (void *)-2; // разорвать связь с сегментом памяти
+    shm_addr = (void *)-2;  // разорвать связь с сегментом памяти
     goto close_shm_fd;
   }
 
