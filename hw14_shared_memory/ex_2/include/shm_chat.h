@@ -45,10 +45,9 @@ struct user {
 };
 
 struct chat_history {
-        // TODO заменить на смещения, так как указатели привязаны к виртуальным адресам. А виртуальные адреса у каждого процесса свои.
-	struct chat_msg *first_msg;
-	struct chat_msg *last_msg;
-	struct chat_msg *edge_msg; 	// крайнее сообщение на границе выделенной памяти, 
+	size_t first_msg;
+	size_t last_msg;
+	size_t edge_msg; 	// крайнее сообщение на границе выделенной памяти, 
 					// после которого прыгаем в начало сегмента памяти
 	struct chat_msg messages[];
 };

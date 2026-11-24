@@ -31,10 +31,9 @@ int init_chat(void **shm_addr, sem_t **sem4_input_updated,
     goto destroy_shm_history;
   }
 
-  // TODO здесь должны быть не указатели, а смещения, так как разделяемая память будет отображена с различными адресами в различных процессах, и указатели будут невалидны.
-    (*history)->first_msg = (*history)->messages;
-    (*history)->last_msg = (*history)->messages;
-    (*history)->edge_msg = NULL;
+    (*history)->first_msg = 0;
+    (*history)->last_msg = 0;
+    (*history)->edge_msg = 0;
 
   // Семафоры
   mode_t perms = 0600;
