@@ -7,14 +7,13 @@ int main(void) {
   struct chat_msg *msg = NULL;
   sem_t *data_updated = NULL, *count_reads = NULL, *next_turn = NULL, *input_updated = NULL, *input_read = NULL;
   struct ui ui = {NULL, NULL, NULL};
-  // pthread_t input_tid = pthread_self();
+  pthread_t input_tid = pthread_self();
 
   err = init_client(&msg, &input_updated, &input_read, &users, &history, &data_updated, &count_reads, &next_turn, &ui);
-  //if (0 != err) goto exit;
+  if (0 != err) goto exit;
+
+  err = spawn_input_thread(&msg, &input_updated, &input_read, &ui.msg_input, &input_tid);
   /*
-  if (0 == err) {
-	  err = spawn_input_thread(&msg, &input_updated, &input_read, &ui, &is_running, &input_tid);
-  }
   if (0 == err) err = run(users, history, data_updated, count_reads, next_turn, &ui);
 */
   // ======================
@@ -90,10 +89,10 @@ sleep(3);
 
   // handle_exit();
 
-  // err = close_input_thread(input_tid);
+  err = close_input_thread(input_tid);
 
   client_cleanup(&msg, &input_updated, &input_read, &users, &history, &data_updated, &count_reads, &next_turn, &ui);
 
-// exit:
+exit:
   return err;
 }
