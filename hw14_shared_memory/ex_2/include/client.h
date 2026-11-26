@@ -16,6 +16,7 @@ void client_cleanup(struct chat_msg **msg, sem_t **input_updated,
                    sem_t **input_read, struct user **users,
                    struct chat_history **history, sem_t **data_updated,
                    sem_t **count_reads, sem_t **next_turn, struct ui *ui);
+int close_input_thread(pthread_t input_tid);
 void console_handle_msg(struct chat_msg *msg);
 void handle_input(struct ui ui, int server_mq_id, int ch, char *input_buf, size_t *input_buf_length);
 int handle_msg(struct chat_msg *msg, struct ui ui, struct user *users, int *n_users);
@@ -26,8 +27,7 @@ int init_client(struct chat_msg **msg, sem_t **input_updated,
 void *input(void *arg);
 int nickname_prompt(int server_mq_id);
 void on_key_backspace(struct ui ui, char *input_buf, size_t *input_buf_length);
-void on_key_enter(struct ui ui, int server_mq_id, char *input_buf,
-                  size_t *input_buf_length);
+void on_key_enter(struct chat_msg *input, sem_t *input_updated, sem_t *input_read, WINDOW *input_window, char *input_buf, size_t *input_buf_length);
 int spawn_input_thread(struct chat_msg *msg, sem_t *input_updated, sem_t *input_read, WINDOW *input_window, pthread_t *input_tid);
 
 #endif // CLIENT_H

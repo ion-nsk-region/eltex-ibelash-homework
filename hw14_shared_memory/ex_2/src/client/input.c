@@ -1,3 +1,4 @@
+#include <wctype.h>
 #include "client.h"
 
 void *input(void *arg) {
@@ -30,15 +31,15 @@ void *input(void *arg) {
         on_key_enter(args.msg, args.input_updated, args.input_read, args.input_window, input_buf, &input_buf_length);
         break;
       case KEY_RESIZE: // не работает без wgetch
-        handle_resize(ui);
+        // handle_resize(ui);
         break;
       case '\x7F':  // DEL более известный как Backspace на современных
                     // клавиатурах и терминалах
-        on_key_backspace(ui, input_buf, input_buf_length);
+//        on_key_backspace(args.input_window, input_buf, &input_buf_length);
         break;
       default:
-        if (iswprint(ch) && *input_buf_length < (max_msg_size - 1)) {
-          waddch(ui.msg_input, ch);
+        if (iswprint(ch) && input_buf_length < (max_msg_size - 1)) {
+          waddch(args.input_window, ch);
           // Дополняем буфер сообщения для отправки
           *(input_buf + input_buf_length) = ch;
           ++input_buf_length;
@@ -49,7 +50,8 @@ void *input(void *arg) {
   }  // while (EOF != (ch = getchar()))
 
   if (NULL != input_buf) free(input_buf);
-  client_exit(args.msg);
+
+  send_exit_msg(args.msg, args.input_updated, args.input_read);
 
   return (void *)0;
 }
