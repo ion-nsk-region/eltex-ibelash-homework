@@ -71,19 +71,12 @@ int init_client(struct chat_msg **msg, sem_t **input_updated,
     goto close_count_reads;
   }
 
-  // err = join_chat(msg);
-  //    nickname = nickname_prompt();
-  //    join_msg = {...JOIN, nickname,...}
-  //    send_msg(msg, input_updated, input_read, join_msg);
-  //  err = nickname_prompt();
-
   if (0 == err) err = initialize_terminal();
   if (0 == err) err = create_windows(ui);
   if (0 == err) {
     handle_resize(*ui);
     print_help(*ui);
     wmove(ui->msg_input, 1, 0);  // устанавливаем курсор в начало поля
-    // refresh_windows(ui);
   }
 
   return err;
