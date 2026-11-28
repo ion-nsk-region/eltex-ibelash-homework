@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-int send_msg(struct chat_msg *shm_addr, struct chat_msg *msg,
+int send_msg(struct chat_msg *shm_addr, const struct chat_msg *msg,
              sem_t *sem4_input_updated, sem_t *sem4_input_read) {
   int err = 0;
 
@@ -15,7 +15,7 @@ int send_msg(struct chat_msg *shm_addr, struct chat_msg *msg,
   if (0 == err) {
     shm_addr->sender = msg->sender;
     shm_addr->cmd = msg->cmd;
-  // TODO округлять размер до кратного 8, чтобы не снижало производительность
+    // TODO округлять размер до кратного 8, чтобы не снижало производительность
     shm_addr->msg_size = msg->msg_size;
     size_t content_size = msg->msg_size - offsetof(struct chat_msg, content);
     strncpy(shm_addr->content, msg->content, content_size);

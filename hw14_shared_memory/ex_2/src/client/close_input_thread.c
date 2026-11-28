@@ -1,4 +1,5 @@
 #include <stdint.h>
+
 #include "client.h"
 
 int close_input_thread(pthread_t input_tid) {
@@ -27,7 +28,10 @@ int close_input_thread(pthread_t input_tid) {
   } else if (PTHREAD_CANCELED == input_return || (void *)0 == input_return) {
     fprintf(stderr, "Инфо: поток обработки ввода завершился.\n");
   } else {
-    fprintf(stderr, "Предупреждение: поток обработки ввода завершился с неожиданным результатом: %ld.\n", (intptr_t)input_return);
+    fprintf(stderr,
+            "Предупреждение: поток обработки ввода завершился с неожиданным "
+            "результатом: %ld.\n",
+            (intptr_t)input_return);
   }
 
   return err;

@@ -1,40 +1,31 @@
 #include "shm_chat.h"
 
-char *pid_to_nick(struct user *users, int n_users, pid_t pid, int *free_nick) {
-  char *nickname = NULL;
-  *free_nick = 0;
+int pid_to_nick(struct user *users, int n_users, pid_t pid, char *nickname) {
+  int err = 0;
+  if (NULL == users || NULL == nickname) {
+    err = -1;
+    return err;
+  }
 
   if (1 == pid) {  // server
-    nickname = malloc(7);
-    if (NULL != nickname) {
-      *free_nick = 1;
-      snprintf(nickname, 7, "server");
-    }
-  } else if (NULL == users || 0 >= n_users) {
+    snprintf(nickname, 7, "server");
+  } else if (0 >= n_users) {
     int nickname_length = snprintf(NULL, 0, "[%d]error", pid);
-    nickname = malloc(nickname_length + 1);
-    if (NULL != nickname) {
-      *free_nick = 1;
-      snprintf(nickname, nickname_length + 1, "[%d]error", pid);
-    }
+    snprintf(nickname, nickname_length + 1, "[%d]error", pid);
     fprintf(stderr,
             "Ошибка: Не найден ник пользователя %d.\n"
             "        Список участников чата пуст.\n",
             pid);
   } else {  // ищем по списку
     for (struct user *user = users; user - users < n_users; ++user) {
-      if (pid == user->pid) nickname = user->nickname;
+      if (pid == user->pid)
+        snprintf(nickname, strlen(user->nickname), "%s", user->nickname);
     }
   }
 
-  if (NULL ==
-      nickname) {  // отключился, битые данные, не удалось выделить память
+  if ('\0' == nickname[0]) {  // отключился, битые данные
     int nickname_length = snprintf(NULL, 0, "[%d]Not found", pid);
-    nickname = malloc(nickname_length + 1);
-    if (NULL != nickname) {
-      *free_nick = 1;
-      snprintf(nickname, nickname_length + 1, "[%d]Not found", pid);
-    }
+    snprintf(nickname, nickname_length + 1, "[%d]Not found", pid);
 
     fprintf(stderr,
             "Не найден ник пользователя %d.\n"
@@ -42,5 +33,5 @@ char *pid_to_nick(struct user *users, int n_users, pid_t pid, int *free_nick) {
             pid);
   }
 
-  return nickname;
+  return err;
 }

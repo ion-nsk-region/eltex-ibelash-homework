@@ -11,7 +11,9 @@ int init_client(struct chat_msg **msg, sem_t **input_updated,
   // input
   *msg = (struct chat_msg *)attach_shm_segment(SHM_INPUT, shm_size, O_RDWR);
   if (NULL == *msg) {
-    printf("Предупреждение: не могу подключиться к разделяемой памяти. Проверьте что сервер запущен.\n");      
+    printf(
+        "Предупреждение: не могу подключиться к разделяемой памяти. Проверьте "
+        "что сервер запущен.\n");
     goto err_exit;
   } else if ((void *)-1 == *msg) {
     goto err_exit;
@@ -28,7 +30,8 @@ int init_client(struct chat_msg **msg, sem_t **input_updated,
   }
 
   // history
-  *history = (struct chat_history *)attach_shm_segment(SHM_HISTORY, shm_size, O_RDONLY);
+  *history = (struct chat_history *)attach_shm_segment(SHM_HISTORY, shm_size,
+                                                       O_RDONLY);
   if ((void *)-1 == *history) {
     goto detach_shm_users;
   } else if ((void *)-2 == *history) {
@@ -71,7 +74,7 @@ int init_client(struct chat_msg **msg, sem_t **input_updated,
     goto close_count_reads;
   }
 
-  if (0 == err) err = join_chat(*msg, *input_updated, *input_read);
+  err = join_chat(*msg, *input_updated, *input_read);
   if (0 == err) err = initialize_terminal();
   if (0 == err) err = create_windows(ui);
   if (0 == err) {

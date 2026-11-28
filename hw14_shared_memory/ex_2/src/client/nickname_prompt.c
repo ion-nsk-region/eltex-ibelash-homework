@@ -44,7 +44,7 @@ int nickname_prompt(char *nickname, size_t *nickname_length) {
     }
 
     ++n_attempts;
-  } // while
+  }  // while
 
   return err;
 }

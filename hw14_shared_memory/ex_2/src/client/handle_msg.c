@@ -2,8 +2,9 @@
 
 int handle_msg(struct chat_msg *msg, struct ui ui, struct user *users,
                int *n_users) {
-  int err = 0, free_nick = 0;
-  char *nickname = pid_to_nick(users, *n_users, msg->sender, &free_nick);
+  int err = 0;
+  char nickname[MAX_NICKNAME_LENGTH] = {};
+  err = pid_to_nick(users, *n_users, msg->sender, nickname);
 
   switch (msg->cmd) {
     case MSG:
@@ -27,8 +28,6 @@ int handle_msg(struct chat_msg *msg, struct ui ui, struct user *users,
               "содержимое: %s.\n",
               msg->sender, nickname, msg->cmd, msg->content);
   }
-
-  if (free_nick) free(nickname);
 
   return err;
 }

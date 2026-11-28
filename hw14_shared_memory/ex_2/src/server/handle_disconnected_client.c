@@ -8,7 +8,8 @@ void handle_disconnected_client(pid_t client, struct user *users,
   }
 
   if (user->pid != client) {
-    fprintf(stderr, "Предупреждение: пользователь с pid %d не найден.\n", client);
+    fprintf(stderr, "Предупреждение: пользователь с pid %d не найден.\n",
+            client);
   } else {
     if (1 < *n_users) {  // заменяем искомого на последнего пользователя
       struct user *last_user = users + *n_users - 1;

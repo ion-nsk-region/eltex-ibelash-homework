@@ -22,7 +22,7 @@ int init_chat(void **shm_addr, sem_t **sem4_input_updated,
   } else if ((void *)-2 == *users) {
     goto destroy_shm_users;
   }
-  
+
   // history
   *history = attach_shm_segment(SHM_HISTORY, shm_size, shm_flags);
   if ((void *)-1 == *history) {
@@ -31,9 +31,9 @@ int init_chat(void **shm_addr, sem_t **sem4_input_updated,
     goto destroy_shm_history;
   }
 
-    (*history)->first_msg = 0;
-    (*history)->last_msg = 0;
-    (*history)->edge_msg = 0;
+  (*history)->first_msg = 0;
+  (*history)->last_msg = 0;
+  (*history)->edge_msg = 0;
 
   // Семафоры
   mode_t perms = 0600;
@@ -50,7 +50,8 @@ int init_chat(void **shm_addr, sem_t **sem4_input_updated,
     perror("sem_open");
     goto destroy_sem4_input_updated;
   }
-  sem_post(*sem4_input_read); // взводим семафор чтобы прочитать самое первое сообщение
+  sem_post(*sem4_input_read);  // взводим семафор чтобы прочитать самое первое
+                               // сообщение
 
   errno = 0;
   *sem4_data_updated = sem_open(SEM4_DATA_UPDATED, O_CREAT, perms, 0);
@@ -75,7 +76,7 @@ int init_chat(void **shm_addr, sem_t **sem4_input_updated,
 
   return 0;
 
-// очистка ресурсов в случае ошибки
+  // очистка ресурсов в случае ошибки
 
 destroy_sem4_count_reads:
   destroy_semaphore(*sem4_count_reads, SEM4_COUNT_READS);

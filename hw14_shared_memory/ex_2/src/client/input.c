@@ -1,4 +1,5 @@
 #include <wctype.h>
+
 #include "client.h"
 
 void *input(void *arg) {
@@ -13,11 +14,11 @@ void *input(void *arg) {
 
   char *input_buf = malloc(max_msg_size);
   if (NULL == input_buf) {
-      perror("malloc");
+    perror("malloc");
   }
   size_t input_buf_length = 0;
 
-  while ( ! (EOF == ch || '\x1B' == ch)) {
+  while (!(EOF == ch || '\x1B' == ch)) {
     // while (EOF != (ch = wgetch(args.input_window))) {  // TODO перейти
     // на wgetch, чтобы забирать управляющие клавиши, включая KEY_RESIZE.
     // Однако, с wgetch была какая-то проблема, которую я нигде не описал.
@@ -26,9 +27,10 @@ void *input(void *arg) {
       case KEY_ENTER:
       case '\r':
       case '\n':
-        on_key_enter(args.msg, args.input_updated, args.input_read, args.input_window, input_buf, &input_buf_length);
+        on_key_enter(args.msg, args.input_updated, args.input_read,
+                     args.input_window, input_buf, &input_buf_length);
         break;
-      case KEY_RESIZE: // не работает без wgetch
+      case KEY_RESIZE:  // не работает без wgetch
         // handle_resize(ui);
         break;
       case '\x7F':  // DEL более известный как Backspace на современных

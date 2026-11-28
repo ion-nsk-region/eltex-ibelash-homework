@@ -1,9 +1,10 @@
 #include "client.h"
 
 void client_cleanup(struct chat_msg **msg, sem_t **input_updated,
-                   sem_t **input_read, struct user **users,
-                   struct chat_history **history, sem_t **data_updated,
-                   sem_t **count_reads, sem_t **next_turn, struct ui *ui) {
+                    sem_t **input_read, struct user **users,
+                    struct chat_history **history, sem_t **data_updated,
+                    sem_t **count_reads, sem_t **next_turn,
+                    const struct ui *ui) {
   if (NULL != *next_turn) close_semaphore(*next_turn);
   if (NULL != *count_reads) close_semaphore(*count_reads);
   if (NULL != *data_updated) close_semaphore(*data_updated);

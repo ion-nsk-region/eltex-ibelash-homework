@@ -1,6 +1,7 @@
 #include "client.h"
 
-void on_key_backspace(WINDOW *input, char *input_buf, size_t *input_buf_length) {
+void on_key_backspace(WINDOW *input, char *input_buf,
+                      size_t *input_buf_length) {
   if (0 < *input_buf_length) {
     *(input_buf + *input_buf_length - 1) = '\0';
     --(*input_buf_length);

@@ -15,7 +15,7 @@ struct input_args {
 void client_cleanup(struct chat_msg **msg, sem_t **input_updated,
                    sem_t **input_read, struct user **users,
                    struct chat_history **history, sem_t **data_updated,
-                   sem_t **count_reads, sem_t **next_turn, struct ui *ui);
+                   sem_t **count_reads, sem_t **next_turn, const struct ui *ui);
 int close_input_thread(pthread_t input_tid);
 void console_handle_msg(struct chat_msg *msg);
 void handle_input(struct ui ui, int server_mq_id, int ch, char *input_buf, size_t *input_buf_length);

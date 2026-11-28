@@ -1,7 +1,7 @@
 #include <common.h>
 
-void notify_about_update(int n_users, sem_t *data_updated, sem_t *count_reads,
-                         sem_t *next_turn) {
+int notify_about_update(int n_users, sem_t *data_updated, sem_t *count_reads,
+                        sem_t *next_turn) {
   int err = 0, next_turn_val;
   sem_getvalue(next_turn, &next_turn_val);
   if (0 != next_turn_val) {
@@ -12,11 +12,12 @@ void notify_about_update(int n_users, sem_t *data_updated, sem_t *count_reads,
   for (int i = 0; i < n_users; i++) {
     sem_post(data_updated);
   }
+
   // Клиенты подтверждают, что прочитали
   for (int i = 0; i < n_users; i++) {
     err = wait_for(count_reads);
     if (0 != err) {
-      return;
+      return err;
     }
   }
 
@@ -24,4 +25,6 @@ void notify_about_update(int n_users, sem_t *data_updated, sem_t *count_reads,
   for (int i = 0; i < n_users; i++) {
     sem_post(next_turn);
   }
+
+  return err;
 }

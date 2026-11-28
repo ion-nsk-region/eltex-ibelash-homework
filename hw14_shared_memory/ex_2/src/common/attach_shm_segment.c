@@ -12,7 +12,8 @@ void *attach_shm_segment(const char *shm_name, size_t shm_size, int shm_flags) {
   errno = 0;
   int shm_fd = shm_open(shm_name, shm_flags, perms);
   if (-1 == shm_fd) {
-    if (ENOENT == errno) { // сервер не создал разделяемую память или не запущен
+    if (ENOENT ==
+        errno) {  // сервер не создал разделяемую память или не запущен
       shm_addr = NULL;
     } else {
       perror("shm_open");

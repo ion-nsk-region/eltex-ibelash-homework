@@ -8,8 +8,8 @@ void *server_queue_handler(void *input_shm_addr) {
   pid_t server_pid = getpid();
   sem_t *data_updated, *count_reads, *next_turn, *input_updated, *input_read;
 
-  err = init_chat(input_shm_addr, &input_updated, &input_read, &users,
-                  &history, &data_updated, &count_reads, &next_turn);
+  err = init_chat(input_shm_addr, &input_updated, &input_read, &users, &history,
+                  &data_updated, &count_reads, &next_turn);
 
   if (0 != err) {
     is_running = 0;
@@ -51,8 +51,8 @@ void *server_queue_handler(void *input_shm_addr) {
   };  // while (is_running)
 
   // очищаем выделенные ресурсы
-  err = server_cleanup(msg, input_updated, input_read, users,
-                       history, data_updated, count_reads, next_turn);
+  err = server_cleanup(msg, input_updated, input_read, users, history,
+                       data_updated, count_reads, next_turn);
 
   return (void *)(intptr_t)err;
 }
