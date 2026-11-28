@@ -6,15 +6,15 @@ void history_update(struct chat_msg *msg, struct chat_history *history) {
   size_t prev_msg = history->last_msg;
   size_t new_msg = 0;
 
-  size_t messages_start = offsetof(struct chat_history, messages);
+//  size_t messages_start = offsetof(struct chat_history, messages);
   size_t messages_end =
       (size_t)sysconf(_SC_PAGESIZE) - offsetof(struct chat_history, messages);
-
+/*
   fprintf(
       stderr,
       "DEBUG: messages_start = %lu, messages_end = %lu, prev_msg = %lu\n",
       messages_start, messages_end, prev_msg);
-
+*/
   // проверка впихуемости
   if (prev_msg > (messages_end - msg->msg_size)) {
     history->edge_msg = prev_msg;
@@ -24,10 +24,11 @@ void history_update(struct chat_msg *msg, struct chat_history *history) {
   }
   history->last_msg = new_msg;
   size_t new_msg_end = new_msg + msg->msg_size;
-  fprintf(
+  /* fprintf(
       stderr,
       "DEBUG: new_msg = %lu, new_msg_end = %lu, first_msg = %lu\n",
       new_msg, new_msg_end, history->first_msg);
+      */
   unsigned char limit = 0;
 
   //              |new message|

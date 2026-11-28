@@ -4,18 +4,20 @@ int main(void) {
   int err = 0;  // , is_running = 1;
   struct user *users = NULL;
   struct chat_history *history = NULL;
-  struct chat_msg *msg = NULL;
+  struct chat_msg *input_msg = NULL;
   sem_t *data_updated = NULL, *count_reads = NULL, *next_turn = NULL,
         *input_updated = NULL, *input_read = NULL;
   struct ui ui = {NULL, NULL, NULL};
   pthread_t input_tid = pthread_self();
 
-  err = init_client(&msg, &input_updated, &input_read, &users, &history,
+  err = init_client(&input_msg, &input_updated, &input_read, &users, &history,
                     &data_updated, &count_reads, &next_turn, &ui);
   if (0 != err) goto exit;
 
-  err = spawn_input_thread(msg, input_updated, input_read, ui.msg_input,
+  err = spawn_input_thread(input_msg, input_updated, input_read, ui.msg_input,
                            &input_tid);
+  if (0 != err) goto client_cleanup;
+
   /*
   if (0 == err) err = run(users, history, data_updated, count_reads, next_turn,
   &ui);
@@ -63,7 +65,7 @@ int main(void) {
 
         if (is_running && NULL != msg && NO_COMMAND != msg->cmd) {
           pthread_mutex_lock(&msg_processing_lock);
-          handle_msg(msg, ui, users, &n_users);
+          handle_msg(input_msg, ui, users, &n_users);
           if (NULL != msg->content) free(msg->content);
           free(msg);
           msg = NULL;
@@ -89,7 +91,7 @@ int main(void) {
   */
 
   refresh_windows(ui);
-  sleep(3);
+  sleep(30);
 
   // ======================
 
@@ -97,7 +99,8 @@ int main(void) {
 
   err = close_input_thread(input_tid);
 
-  client_cleanup(&msg, &input_updated, &input_read, &users, &history,
+client_cleanup:
+  client_cleanup(&input_msg, &input_updated, &input_read, &users, &history,
                  &data_updated, &count_reads, &next_turn, &ui);
 
 exit:

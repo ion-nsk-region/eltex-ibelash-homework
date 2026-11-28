@@ -24,6 +24,7 @@ int init_client(struct chat_msg **msg, sem_t **input_updated,
                 sem_t **input_read, struct user **users,
                 struct chat_history **history, sem_t **data_updated,
                 sem_t **count_reads, sem_t **next_turn, struct ui *ui);
+int join_chat(struct chat_msg *input, sem_t *input_updated, sem_t *input_read);
 void *input(void *arg);
 int nickname_prompt(char *nickname, size_t *nickname_length);
 void on_key_backspace(WINDOW *input, char *input_buf, size_t *input_buf_length);

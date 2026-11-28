@@ -11,6 +11,8 @@ int handle_new_client(struct chat_msg *client_msg, struct user *users,
                      &client_nickname_length);
   // TODO добавить защиту, чтобы клиенты не могли использовать никнейм "server".
 
+  fprintf(stderr, "DEBUG: новый клиент %s\n", client_nickname);
+
   // Добавить пользователя в список участников чата
   if (0 == err) {
     err = user_add(client_msg->sender, client_nickname, client_nickname_length,

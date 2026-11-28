@@ -71,6 +71,7 @@ int init_client(struct chat_msg **msg, sem_t **input_updated,
     goto close_count_reads;
   }
 
+  if (0 == err) err = join_chat(*msg, *input_updated, *input_read);
   if (0 == err) err = initialize_terminal();
   if (0 == err) err = create_windows(ui);
   if (0 == err) {
